@@ -422,7 +422,7 @@ service-ca                                 4.5.22    True        False         F
 storage                                    4.5.22    True        False         False      53m
 
 ```
-#### Debugging the OCP installation dance
+#### Debugging the OCP installation
 
 As noted above you power on all the VMs at once and magically OpenShift gets installed.  This section will explain enough of the magic so that you can figure out what happened when things go wrong. See Reference section below for deeper debug instructions
 
@@ -464,7 +464,8 @@ Next Bootstap installs an OCP control plane on itself, as well as an http server
 **NOTE:** On a MAC, make sure that the permissions on your /etc/host file is correct.  
 If it looks like this:   
 `$ ls -l /etc/hosts
--rw-------  1 root  wheel  622  1 Feb 08:57 /etc/hosts`
+-rw-------  1 root  wheel  622  1 Feb 08:57 /etc/hosts`   
+
 Change to this:  
 `$ sudo chmod ugo+r /etc/hosts
 $ ls -l /etc/hosts
