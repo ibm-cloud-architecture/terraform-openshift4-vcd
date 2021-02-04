@@ -21,3 +21,4 @@ makefile
 **/installer/*
 **/go-vcloud-director.log
 tmp.txt
+crash.log

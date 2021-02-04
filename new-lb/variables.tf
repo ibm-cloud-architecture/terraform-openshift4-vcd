@@ -54,6 +54,9 @@ variable "control_plane_ips" {
 variable "dns_ip_addresses" {
   type = map(string)
 }
+variable "rev_dns_ip_addresses" {
+  type = map(string)
+}
 variable "dhcp_ip_addresses" {
   type = map(string)
 }

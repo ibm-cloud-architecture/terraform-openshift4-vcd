@@ -69,6 +69,7 @@ set -ex
 test -e ${local.installerdir} || mkdir -p ${local.installerdir}
 if [[ $(uname -s) == "Darwin" ]]; then PLATFORM="mac"; else PLATFORM="linux"; fi
 curl -o ${local.installerdir}/openshift-installer.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-${var.openshift_version}/openshift-install-$PLATFORM.tar.gz
+echo curl -o ${local.installerdir}/openshift-installer.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.5.31/openshift-install-$PLATFORM.tar.gz
 tar -xf ${local.installerdir}/openshift-installer.tar.gz -C ${local.installerdir}
 EOF
   }
@@ -148,8 +149,8 @@ data "local_file" "bootstrap_ignition" {
 
 
 
-data "template_file" "append_bootstrap" {
-  template = templatefile("${path.module}/templates/append_bootstrap.ign", {
+data "template_file" "append-bootstrap" {
+  template = templatefile("${path.module}/templates/append-bootstrap.ign", {
     bootstrap_ignition_url = local.bootstrap_ignition_url
   })
     depends_on = [
@@ -157,9 +158,9 @@ data "template_file" "append_bootstrap" {
   ]
 }
 
-resource "local_file" "append_bootstrap" {
-  content  = data.template_file.append_bootstrap.rendered
-  filename = "${local.installerdir}/append_bootstrap.ign"
+resource "local_file" "append-bootstrap" {
+  content  = data.template_file.append-bootstrap.rendered
+  filename = "${local.installerdir}/append-bootstrap.ign"
   depends_on = [
     null_resource.generate_manifests,
   ]

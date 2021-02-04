@@ -14,6 +14,6 @@ output "worker_ignition" {
   value = data.local_file.worker_ignition.content
 }
 
-output "append_bootstrap" {
-  value = data.template_file.append_bootstrap.rendered
+output "append-bootstrap" {
+  value = data.template_file.append-bootstrap.rendered
 }
