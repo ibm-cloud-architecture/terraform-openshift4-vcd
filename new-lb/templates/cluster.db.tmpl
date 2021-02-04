@@ -11,7 +11,7 @@ $ORIGIN ${cluster_domain}.
 
 dns     IN  A   ${lb_ip_address}
 %{ for hostname, addr in dns_ip_addresses ~}
-${split(".", hostname)[0]}     IN A ${addr}
+${hostname}     IN A ${addr}
 %{ endfor ~}
 
 
@@ -24,6 +24,6 @@ $ORIGIN ${element(split(".", element(split("/",machine_cidr),0)),2)}.${element(s
                                 3600       ; minimum (1 hour)
                                 )
         IN       NS     ${lb_ip_address}
-%{ for hostname, addr in dns_ip_addresses ~}
+%{ for hostname, addr in rev_dns_ip_addresses ~}
 ${element(split(".",addr),3)}        IN      PTR ${hostname}.
 %{ endfor ~}

@@ -9,7 +9,8 @@ locals {
   cluster_domain      = "${var.cluster_id}.${var.base_domain}"
   bootstrap_fqdns     = ["bootstrap-00.${local.cluster_domain}"]
   lb_fqdns            = ["lb-00.${local.cluster_domain}"]
-  api_lb_fqdns        = formatlist("%s.%s", ["api", "api-int", "*.apps"], local.cluster_domain)
+  api_lb_fqdns        = formatlist("%s.%s", ["api-int", "api", "*.apps"], local.cluster_domain)
+  rev_api_lb_fqdns       = formatlist("%s.%s", ["api-int", "api"], local.cluster_domain)
   control_plane_fqdns = [for idx in range(var.control_plane_count) : "control-plane-0${idx}.${local.cluster_domain}"]
   compute_fqdns       = [for idx in range(var.compute_count) : "compute-0${idx}.${local.cluster_domain}"]
   storage_fqdns       = [for idx in range(var.storage_count) : "storage-0${idx}.${local.cluster_domain}"]
@@ -102,6 +103,22 @@ module "lb" {
     )
  ) 
 
+  rev_dns_ip_addresses = zipmap(
+    concat(
+      local.bootstrap_fqdns,
+      local.rev_api_lb_fqdns,
+      local.control_plane_fqdns,
+      local.compute_fqdns,
+      local.storage_fqdns
+    ),
+    concat(
+      list(var.bootstrap_ip_address),
+      [for idx in range(length(local.rev_api_lb_fqdns)) : var.lb_ip_address],
+      var.control_plane_ip_addresses,
+      var.compute_ip_addresses,
+      var.storage_ip_addresses
+    )
+ ) 
   dhcp_ip_addresses = zipmap(
     concat(
       local.bootstrap_fqdns,
@@ -159,7 +176,7 @@ module "bootstrap" {
   mac_prefix = var.mac_prefix
   count = var.create_vms_only ? 0 : 1
 
-  ignition = module.ignition.append_bootstrap
+  ignition = module.ignition.append-bootstrap
   hostnames_ip_addresses = zipmap(
     local.bootstrap_fqdns,
     [var.bootstrap_ip_address]

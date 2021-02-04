@@ -42,6 +42,7 @@ data "ignition_file" "coredns_clusterdb" {
     content = templatefile("${path.module}/templates/cluster.db.tmpl", {
       cluster_domain   = var.cluster_domain
       dns_ip_addresses = var.dns_ip_addresses
+      rev_dns_ip_addresses = var.rev_dns_ip_addresses
       lb_ip_address    = var.lb_ip_address
       machine_cidr   = var.machine_cidr
 
