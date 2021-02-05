@@ -261,12 +261,14 @@ ibm.com.		21599	IN	A	129.42.38.10
 ```
 
 #### Install preReqs of the Terraform  and SimpleHTTP server:
-  - `yum install unzip`
-  - `yum install python3`
-  - `yum install -y yum-utils`
-  - `yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo`
-  - `yum install terraform`
-
+```
+  yum install unzip
+  yum install tar
+  yum install python3
+  yum install -y yum-utils
+  yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+  yum install terraform
+```
 #### Update firewall
 Allow HTTP(port 80) and DNS(port 53) traffic into bastion.  Issue the following commands.  You should get `success` message from each:
 ```
@@ -299,6 +301,31 @@ tar -xzvf openshift-client-linux.tar.gz
 mv oc /usr/local/bin/.
 mv kubectl /usr/local/bin/.
 ```
+#### Host files updates on Bastion and Client
+- On the **Bastion**, edit /etc/hosts and add the following entries where 5.6.7.8 is the **Private IP** address of the LB (ex: 172.16.0.19):
+```
+ 5.6.7.8 api.ocp44-myprefix.my.com
+ 5.6.7.8 api-int.ocp44-myprefix.my.com
+```
+
+- One the **Client** that you will access the OCP Console, (your Mac, PC, etc.) add name resolution to direct console to the **Public IP** of the LoadBalancer in /etc/hosts on the client that will login to the Console UI.
+  As an example:
+```
+  1.2.3.4 api.ocp44-myprefix.my.com
+  1.2.3.4 api-int.ocp44-myprefix.my.com
+  1.2.3.4 console-openshift-console.apps.ocp44-myprefix.my.com
+  1.2.3.4 oauth-openshift.apps.ocp44-myprefix.my.com
+```
+
+**NOTE:** On a MAC, make sure that the permissions on your /etc/host file is correct.  
+If it looks like this:   
+`$ ls -l /etc/hosts
+-rw-------  1 root  wheel  622  1 Feb 08:57 /etc/hosts`   
+
+Change to this:  
+`$ sudo chmod ugo+r /etc/hosts
+$ ls -l /etc/hosts
+-rw-r--r--  1 root  wheel  622  1 Feb 08:57 /etc/hosts`
 #### Install Terraform scripts
 ```bash
 git clone https://github.com/slipsibm/terraform-openshift4-vmware
@@ -308,7 +335,7 @@ cp terraform.tfvars.example terraform.tfvars
 
 Update your `terraform.tfvars` with your environment values.  See `terraform.tfvars.example`
 
-```bash
+```
 terraform init
 terraform plan
 terraform apply
@@ -359,13 +386,14 @@ terraform apply
 
 #### Retrieve pull secret from Red Hat sites
 Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) and place in a file on the Bastion Server. Default location is `~/.pull-secret`
+
 #### Let OpenShift finish the installation:
 Once you power on the machines it should take about 20 mins for your cluster to become active. To debug see **Debugging the OCP installation dance** below.
 
-- power on all the VMs in the VAPP.  Alternatively:
-- change terraform template to power on the VMs: run `sed -i "s/false/true/" main.tf`
-- To power on the VMs run `terraform apply --auto-approve`
-- cd to authentication directory: `cd <clusternameDir>/auth`
+- power on all the VMs in the VAPP.
+
+- cd to authentication directory:  
+   `cd <clusternameDir>/auth`
     This directory contains both the cluster config and the kubeadmin password for UI login
 - export KUBECONFIG= clusternameDir/auth/kubeconfig
 
@@ -444,32 +472,7 @@ Next Bootstap installs an OCP control plane on itself, as well as an http server
  console   console-openshift-console.apps.ocp44-myprefix.my.com          console    https   reencrypt/Redirect   None
 ```
 
-- Create Firewall Rule and DNAT using a Public IP in the Edge Gateway in VCD console. TODO instructions
 
-- On the **Bastion**, edit /etc/hosts and add the following entries where 5.6.7.8 is the **Private IP** address of the LB (ex: 172.16.0.19):
-```
- 5.6.7.8 api.ocp44-myprefix.my.com
- 5.6.7.8 api-int.ocp44-myprefix.my.com
-```
-
-- One the **Client** that you will access the OCP Console, (your Mac, PC, etc.) add name resolution to direct console to the **Public IP** of the LoadBalancer in /etc/hosts on the client that will login to the Console UI.
-  As an example:
-```
-  1.2.3.4 api.ocp44-myprefix.my.com
-  1.2.3.4 api-int.ocp44-myprefix.my.com
-  1.2.3.4 console-openshift-console.apps.ocp44-myprefix.my.com
-  1.2.3.4 oauth-openshift.apps.ocp44-myprefix.my.com
-```
-
-**NOTE:** On a MAC, make sure that the permissions on your /etc/host file is correct.  
-If it looks like this:   
-`$ ls -l /etc/hosts
--rw-------  1 root  wheel  622  1 Feb 08:57 /etc/hosts`   
-
-Change to this:  
-`$ sudo chmod ugo+r /etc/hosts
-$ ls -l /etc/hosts
--rw-r--r--  1 root  wheel  622  1 Feb 08:57 /etc/hosts`
 
 - From a browser, connect to the "console host" from the `oc get routes` command with https. You will need to accept numerous security warnings as the deployment is using self-signed certificates.
 - id is `kubeadmin` and password is in `<clusternameDir>/auth/kubeadmin-password`
