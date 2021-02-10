@@ -42,7 +42,6 @@ For example if you are using dnsmasq as your DNS server:
    `172.16.0.19 api-int.test-2w.cdastu.com`    
    `172.16.0.19 api.test-2w.cdastu.com`  
 
-2. [CoreOS OVA](http://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/) must be uploaded to a VCD Catalog as a template.
 
 ## Installation Process
 ## Ordering
@@ -464,13 +463,13 @@ Next Bootstap installs an OCP control plane on itself, as well as an http server
 
 
 ## Configuration to enable OCP console login
-- Get the console url by running  
-   `oc get routes console -n openshift-console`
-`oc get routes console -n openshift-console`
-```
+- Get the console url by running    
+    `oc get routes console -n openshift-console`
+
+    ```
  NAME      HOST/PORT                                                  PATH   SERVICES   PORT    TERMINATION          WILDCARD
  console   console-openshift-console.apps.ocp44-myprefix.my.com          console    https   reencrypt/Redirect   None
-```
+ ```
 
 
 
@@ -483,7 +482,7 @@ Next Bootstap installs an OCP control plane on itself, as well as an http server
 ### Add an NFS Server to provide Persistent storage.
 -  [Here is an article on how to set this up](https://medium.com/faun/openshift-dynamic-nfs-persistent-volume-using-nfs-client-provisioner-fcbb8c9344e). Make the NFS Storage Class the default Storage Class   
 
-`oc patch storageclass managed-nfs-storage -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'`
+  `oc patch storageclass managed-nfs-storage -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'`
 
 
 ### Create Openshift Container Storage Cluster for persistent storage.
