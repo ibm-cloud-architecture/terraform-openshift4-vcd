@@ -466,10 +466,10 @@ Next Bootstap installs an OCP control plane on itself, as well as an http server
 - Get the console url by running    
     `oc get routes console -n openshift-console`
 
-    ```
+ ```
  NAME      HOST/PORT                                                  PATH   SERVICES   PORT    TERMINATION          WILDCARD
  console   console-openshift-console.apps.ocp44-myprefix.my.com          console    https   reencrypt/Redirect   None
- ```
+```
 
 
 
