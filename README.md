@@ -472,7 +472,6 @@ Next Bootstap installs an OCP control plane on itself, as well as an http server
 ```
 
 
-
 - From a browser, connect to the "console host" from the `oc get routes` command with https. You will need to accept numerous security warnings as the deployment is using self-signed certificates.
 - id is `kubeadmin` and password is in `<clusternameDir>/auth/kubeadmin-password`
 
