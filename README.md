@@ -14,6 +14,7 @@ The benefits of this code vs. the VCD Toolkit are:
   - Install doesn't require multiple steps of running scripts, then terraform then more scripts. Just set variables, run terraform, then start VM's.
 
 
+
 Deploy OpenShift 4.6 and later using static IP addresses for CoreOS nodes. The `ignition` module will inject code into the cluster that will automatically approve all node CSRs.  This runs only once at cluster creation.  You can delete the `ibm-post-deployment` namespace once your cluster is up and running.
 
 **NOTE**: This requires OpenShift 4.6 or later to deploy, if you're looking for 4.5 or earlier, take a look at the `pre-4.6` [branch](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware/tree/pre-4.6)
@@ -465,11 +466,10 @@ Next Bootstap installs an OCP control plane on itself, as well as an http server
 - Get the console url by running    
     `oc get routes console -n openshift-console`
 
- ```
+```
  NAME      HOST/PORT                                                  PATH   SERVICES   PORT    TERMINATION          WILDCARD
  console   console-openshift-console.apps.ocp44-myprefix.my.com          console    https   reencrypt/Redirect   None
- ```
-
+```
 
 
 - From a browser, connect to the "console host" from the `oc get routes` command with https. You will need to accept numerous security warnings as the deployment is using self-signed certificates.
