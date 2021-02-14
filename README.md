@@ -1,23 +1,23 @@
-# OpenShift 4.6 UPI Deployment with Static IPs
-
-**Unfortunately, the new capability of OpenShift 4.6 to pass Static IP's thru the ignition string `(guestinfo.afterburn.initrd.network-kargs="ip=<ip>::<gateway>:<netmask>:<hostname>:<iface>:none nameserver=srv1 [nameserver=srv2 [nameserver=srv3 [...]]]")` don't currently work in the VCD environment because the ignition strings depend on VMWare vm_advanced_config parameters, which aren't available in VCD. A bugzilla has been opened ([Bugzilla ID 1913791](https://bugzilla.redhat.com/show_bug.cgi?id=1913791)) but its really a VCD issue. To get around this issue, the best approach is to come up with a scheme for DHCP reservations for the OpenShift servers based on MAC address. There is now a DHCP Server that runs on the LoadBalancer VM. This means you can't use DHCP in the Edge Gateway for the subnet you are using. If you start DHCP services in the Edge Gateway, make sure you don't include this subnet.**
+# OpenShift UPI Deployment with Static IPs on VMWare Cloud Director
 
 **Change History:**
+- 2/14/2021 - Move explaination for our choice to use DHCP for static IP provisioning.  See https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd/issues/3
+
 - 2/01/2021 - Added "Experimental Flag" "create_vms_only". If you set this flag to true, OCP won't be installed, the vm's will be created and the OCP installer will be loaded to the installer/cluster_id directory. There is currently a bug so when you run `terraform apply` the first time, it fails with some error messages after creation of a few VM's but just run `terraform apply` again and it should complete successfully
 
 - 1/25/2021 - The Loadbalancer VM will be automatically started at install time to ensure that DHCP and DNS are ready when the other machines are started.  
 
-
+- 1/25/2021 - Create project.  This project is a combination of the terraform scripting from [ibm-cloud-architecture/terraform-openshift4-vmware](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware) and the setup instructions from [VCD Toolkit](https://github.com/vmware-ibm-jil/vcd_toolkit_for_openshift). 
 The benefits of this code vs. the VCD Toolkit are:
-  - vcd toolkit doesn't update LB haproxy.cfg file properly if you change the number of nodes. You have to manually update.
-  - This code checks for outstanding CSR's and automatically approves them so no more manual step.
-  - Install doesn't require multiple steps of running scripts, then terraform then more scripts. Just set variables, run terraform, then start VM's.
+  - Supports OCP 4.6
+  - Supports variable number of workers.  VCD toolkit hardcoded the worker count and  related LoadBalancer configuration.
+  - Automatic approval of outstanding CSR's.  No more manual step.
+  - Less manual steps overall.  Does not require multiple steps of running scripts, then terraform then more scripts. Just set variables, run terraform, then start VM's.
 
+## Overview
+Deploy OpenShift 4.6 and later on VMWare Cloud Director using static IP addresses for CoreOS nodes.  The `ignition` module will inject code into the cluster that will automatically approve all node CSRs.  This runs only once at cluster creation.  You can delete the `ibm-post-deployment` namespace once your cluster is up and running.
 
-
-Deploy OpenShift 4.6 and later using static IP addresses for CoreOS nodes. The `ignition` module will inject code into the cluster that will automatically approve all node CSRs.  This runs only once at cluster creation.  You can delete the `ibm-post-deployment` namespace once your cluster is up and running.
-
-**NOTE**: This requires OpenShift 4.6 or later to deploy, if you're looking for 4.5 or earlier, take a look at the `pre-4.6` [branch](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware/tree/pre-4.6)
+**NOTE**: This requires OpenShift 4.6 or later, if you're looking for 4.5 or earlier, see the [VCD Toolkit](https://github.com/vmware-ibm-jil/vcd_toolkit_for_openshift) or the `terraform-openshift4-vcd pre-4.6` [branch](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware/tree/pre-4.6)
 
 **NOTE**: Requires terraform 0.13 or later.
 
@@ -26,22 +26,6 @@ Deploy OpenShift 4.6 and later using static IP addresses for CoreOS nodes. The `
 OpenShift 4.6 User-Provided Infrastructure
 
 ![topology](./media/vcd_arch.png)
-
-## Prereqs
-
-1. [DNS](https://docs.openshift.com/container-platform/4.6/installing/installing_vsphere/installing-vsphere.html#installation-dns-user-infra_installing-vsphere) needs to be configured ahead of time
-    - If you're using the helper vm for internal DNS, the only external DNS entries required are:
-      - api.`cluster_id`.`base_domain`
-      - *.apps.`cluster_id`.`base_domain`
-    - Point both of those DNS A or CNAME records to either your LoadBalancers or the public IP address of the CoreOS LoadBalancer VM
-
-For example if you are using dnsmasq as your DNS server:
-    In dnsmasq.conf add:  
-    `  address=/.apps.ocp2-2w.cdastu.com/172.16.0.19`  
-    and in /etc/hosts:  
-   `172.16.0.19 api-int.test-2w.cdastu.com`    
-   `172.16.0.19 api.test-2w.cdastu.com`  
-
 
 ## Installation Process
 ## Ordering
@@ -68,7 +52,7 @@ Fortunately IBM provides a set of images that are tailored to work for OpenShift
 To browse the available images:
 * From your vCloud Director console, click on **Libraries** in the header menu.
 * select *vApp Templates*
-* There are 1 images in the list that we will be using:
+* There is 1 images in the list that we will use:
   * rhcos OpenShift 4.6.8 - OpenShift CoreOS template
 * If you want to add your own Catalogs and more, see the [documentation about catalogs](#about-catalogs)
 
