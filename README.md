@@ -1,13 +1,13 @@
 # OpenShift UPI Deployment with Static IPs on VMWare Cloud Director
 
 **Change History:**
-- 2/14/2021 - Move explaination for our choice to use DHCP for static IP provisioning.  See https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd/issues/3
+- 2/14/2021 - Move explanation for our choice to use DHCP for static IP provisioning.  See https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd/issues/3
 
 - 2/01/2021 - Added "Experimental Flag" "create_vms_only". If you set this flag to true, OCP won't be installed, the vm's will be created and the OCP installer will be loaded to the installer/cluster_id directory. There is currently a bug so when you run `terraform apply` the first time, it fails with some error messages after creation of a few VM's but just run `terraform apply` again and it should complete successfully
 
 - 1/25/2021 - The Loadbalancer VM will be automatically started at install time to ensure that DHCP and DNS are ready when the other machines are started.  
 
-- 1/25/2021 - Create project.  This project is a combination of the terraform scripting from [ibm-cloud-architecture/terraform-openshift4-vmware](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware) and the setup instructions from [VCD Toolkit](https://github.com/vmware-ibm-jil/vcd_toolkit_for_openshift). 
+- 1/25/2021 - Create project.  This project is a combination of the terraform scripting from [ibm-cloud-architecture/terraform-openshift4-vmware](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware) and the setup instructions from [VCD Toolkit](https://github.com/vmware-ibm-jil/vcd_toolkit_for_openshift).
 The benefits of this code vs. the VCD Toolkit are:
   - Supports OCP 4.6
   - Supports variable number of workers.  VCD toolkit hardcoded the worker count and  related LoadBalancer configuration.
@@ -17,7 +17,7 @@ The benefits of this code vs. the VCD Toolkit are:
 ## Overview
 Deploy OpenShift 4.6 and later on VMWare Cloud Director using static IP addresses for CoreOS nodes.  The `ignition` module will inject code into the cluster that will automatically approve all node CSRs.  This runs only once at cluster creation.  You can delete the `ibm-post-deployment` namespace once your cluster is up and running.
 
-**NOTE**: This requires OpenShift 4.6 or later, if you're looking for 4.5 or earlier, see the [VCD Toolkit](https://github.com/vmware-ibm-jil/vcd_toolkit_for_openshift) or the `terraform-openshift4-vcd pre-4.6` [branch](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware/tree/pre-4.6)
+**NOTE**: This requires OpenShift 4.6 or later, if you're looking for 4.5 or earlier, see the [VCD Toolkit](https://github.com/vmware-ibm-jil/vcd_toolkit_for_openshift) or the `terraform-openshift4-vmware pre-4.6` [branch](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware/tree/pre-4.6)
 
 **NOTE**: Requires terraform 0.13 or later.
 
