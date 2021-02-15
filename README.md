@@ -173,7 +173,7 @@ Configure DNAT so that you have https access to the console from public internet
 
 
 ## Create and configure Bastion VM
-The Bastion VM hosts the vcd_toolkit_for_openshift and is the VM where we launch installations from.  The VM also hosts **DNS service**, and an **HTTP server** through which the Ignition configuration files are provided to Bootstrap during installation.
+The Bastion VM is where we launch OpenShift installations from.  The VM also hosts **DNS service**, and an **HTTP server** through which the Ignition configuration files are provided to Bootstrap during installation.
 
 Go to Virtual Machines > **New VM**
 Name: **bastion**
