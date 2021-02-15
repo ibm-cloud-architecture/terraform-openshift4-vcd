@@ -98,8 +98,11 @@ loadbalancer_lb_ip_address = "172.16.0.19"
 loadbalancer_lb_machine_cidr = "172.16.0.1/24"
 
 
-// including Bastion server for local DNS
-vm_dns_addresses = ["172.16.0.10","9.9.9.9"]
+//  Bastion ip address
+bastion_ip_address = "172.16.0.10"
+
+// external DNS
+vm_dns_addresses = ["9.9.9.9"]
 
 openshift_pull_secret = "~/.pull-secret"
 create_loadbalancer_vm = true

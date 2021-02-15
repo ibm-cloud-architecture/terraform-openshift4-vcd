@@ -1,0 +1,6 @@
+mkdir ${installer_workspace}/examine
+cp -R ${installer_workspace}/manifests ${installer_workspace}/examine/examine-manifests
+cp -R ${installer_workspace}/openshift ${installer_workspace}/examine/examine-openshift
+${installer_workspace}/openshift-install --dir=${installer_workspace} create ignition-configs --log-level=debug
+${installer_workspace}/jq '.infraID="${cluster_id}"' ${installer_workspace}/metadata.json > _metadata.json
+mv _metadata.json ${installer_workspace}/metadata.json

@@ -45,24 +45,6 @@ variable "ssh_public_key" {
   type = string
 }
 
-
-
-#variable "vsphere_datastore" {
-#  type = string
-#}
-
-#variable "vsphere_password" {
-#  type = string
-#}
-
-#variable "vsphere_server" {
-#  type = string
-#}
-
-#variable "vsphere_username" {
-#  type = string
-#}
-
 variable "openshift_version" {
   type    = string
   default = "4.6"
@@ -70,4 +52,32 @@ variable "openshift_version" {
 
 variable "total_node_count" {
   type = number
+}
+
+variable "airgapped"  {
+  type        = map(string)
+  description = "test  variable for airgapped instead of separate vars"
+  default     =  {
+         enabled   = false
+         mirror_ip   = ""
+         mirror_fqdn = ""
+         mirror_port = ""
+         mirror_repository = ""
+         additionalTrustBundle = ""
+         }
+}
+
+variable "openshift_installer_url" {
+  type    = string
+  default = "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp"
+}
+
+variable "proxy_config" {
+  type = map(string)
+  default = {
+    enabled               = false
+    httpProxy             = ""
+    httpsProxy            = ""
+    noProxy               = ""
+  }
 }

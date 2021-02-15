@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+cp ${installer_workspace}/install-config.yaml ${installer_workspace}/tinstall-config.bkup
+${installer_workspace}/openshift-install --dir=${installer_workspace} create manifests --log-level=debug
+cp ${path_module}/templates/99_01-post-deployment.yaml ${installer_workspace}/manifests
+cp ${path_module}/templates/99_02-post-deployment.yaml ${installer_workspace}/manifests
+cp ${path_module}/templates/99_03-post-deployment.yaml ${installer_workspace}/manifests
+cp ${path_module}/templates/99_04-post-deployment.yaml ${installer_workspace}/manifests
+#rm ${installer_workspace}/openshift/99_openshift-cluster-api_worker-machineset-*
+#rm ${installer_workspace}/openshift/99_openshift-cluster-api_master-machines-*

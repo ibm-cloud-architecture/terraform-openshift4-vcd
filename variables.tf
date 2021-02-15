@@ -261,3 +261,26 @@ variable "create_vms_only" {
   default     = false
 }
 
+variable "airgapped"  {
+  type        = map(string)
+  description = "test  variable for airgapped instead of separate vars"
+  default     =  {
+         enabled   = false
+         mirror_ip   = ""
+         mirror_fqdn = ""
+         mirror_port = ""
+         mirror_repository = ""
+         additionalTrustBundle = ""         
+         }
+}
+
+variable "proxy_config" {
+  type = map(string)
+  default = {
+    enabled               = false
+    httpProxy             = ""
+    httpsProxy            = ""
+    noProxy               = ""
+  }
+}
+

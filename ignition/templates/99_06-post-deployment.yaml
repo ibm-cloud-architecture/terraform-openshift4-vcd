@@ -12,7 +12,7 @@ spec:
     image: quay.io/openshift/origin-cli:latest
     command: ["/bin/sh", "-c"]
     args: 
-      - "mkdir /tmp/csrs-rw && cp /tmp/csrs/*.sh /tmp/csrs-rw && cd /tmp/csrs-rw && ./approve-csrs.sh --wait-count 60 --nodes ${node_count}"
+      - "mkdir /tmp/csrs-rw && cp /tmp/csrs/*.sh /tmp/csrs-rw && cd /tmp/csrs-rw && ./approve-csrs.sh --wait-count 200 --nodes ${node_count}"
     volumeMounts:
       - name: approve-csrs
         mountPath: /tmp/csrs

@@ -16,7 +16,8 @@ data "ignition_file" "coredns_corefile" {
   content {
     content = templatefile("${path.module}/templates/Corefile.tmpl", {
       cluster_domain   = var.cluster_domain
-      vm_dns_addresses = join(" ", var.vm_dns_addresses)
+      dns_addresses = join(" ", var.dns_addresses)
+      machine_cidr   = var.machine_cidr      
     })
   }
 }
@@ -26,8 +27,11 @@ data "ignition_file" "dhcpd_conf" {
   mode = 420
   content {
     content = templatefile("${path.module}/templates/dhcpd.tmpl", {
-      cluster_domain   = var.cluster_domain
-      dns_ip_addresses = join(" ", var.vm_dns_addresses)
+    dhcp_ip_addresses = var.dhcp_ip_addresses
+    mac_prefix = var.mac_prefix
+    machine_cidr   = var.machine_cidr
+    cluster_domain = var.cluster_domain
+    lb_ip_address    = var.lb_ip_address
     })
   }
 }
@@ -38,7 +42,10 @@ data "ignition_file" "coredns_clusterdb" {
     content = templatefile("${path.module}/templates/cluster.db.tmpl", {
       cluster_domain   = var.cluster_domain
       dns_ip_addresses = var.dns_ip_addresses
+      rev_dns_ip_addresses = var.rev_dns_ip_addresses
       lb_ip_address    = var.lb_ip_address
+      machine_cidr   = var.machine_cidr
+
     })
   }
 }
@@ -58,7 +65,7 @@ data "ignition_file" "static_ip" {
 
   content {
     content = templatefile("${path.module}/templates/ifcfg.tmpl", {
-      dns_addresses  = var.vm_dns_addresses
+      dns_addresses  = var.dns_addresses
       machine_cidr   = var.machine_cidr
       ip_address     = var.lb_ip_address
       cluster_domain = var.cluster_domain
@@ -78,7 +85,7 @@ data "ignition_file" "static_ip_loadbalancer" {
 
   content {
     content = templatefile("${path.module}/templates/ifcfg.tmpl", {
-      dns_addresses  = var.vm_dns_addresses
+      dns_addresses  = var.dns_addresses
       machine_cidr   = var.loadbalancer_cidr
       ip_address     = var.loadbalancer_ip
       cluster_domain = var.cluster_domain

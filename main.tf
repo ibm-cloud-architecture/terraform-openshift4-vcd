@@ -4,7 +4,9 @@
 # }
 
 locals {
-  app_name           = "${var.cluster_id}-${var.base_domain}"
+  mirror_repo_ip      = [var.airgapped["mirror_ip"]]
+  mirror_repo_fqdn    = [var.airgapped["mirror_fqdn"]]
+  app_name            = "${var.cluster_id}-${var.base_domain}"
   vcd_net_name        = var.vm_network
   cluster_domain      = "${var.cluster_id}.${var.base_domain}"
   bootstrap_fqdns     = ["bootstrap-00.${local.cluster_domain}"]
@@ -68,7 +70,7 @@ resource "local_file" "write_public_key" {
 }
 module "lb" {
   count = var.create_loadbalancer_vm ? 1 : 0
-  source        = "./new-lb"
+  source        = "./lb"
   lb_ip_address = var.lb_ip_address
 
   api_backend_addresses = flatten([
@@ -84,10 +86,11 @@ module "lb" {
   bootstrap_ip      = var.bootstrap_ip_address
   control_plane_ips = var.control_plane_ip_addresses
 //  vm_dns_addresses  = var.vm_dns_addresses
-  dns_addresses = var.create_loadbalancer_vm ? concat([var.lb_ip_address],var.vm_dns_addresses) : var.vm_dns_addresses
+  dns_addresses = var.create_loadbalancer_vm ? concat([var.lb_ip_address],local.mirror_repo_ip,var.vm_dns_addresses) : var.vm_dns_addresses
 
   dns_ip_addresses = zipmap(
     concat(
+      local.mirror_repo_fqdn,
       local.bootstrap_fqdns,
       local.api_lb_fqdns,
       local.control_plane_fqdns,
@@ -95,6 +98,7 @@ module "lb" {
       local.storage_fqdns
     ),
     concat(
+      local.mirror_repo_ip,
       list(var.bootstrap_ip_address),
       [for idx in range(length(local.api_lb_fqdns)) : var.lb_ip_address],
       var.control_plane_ip_addresses,
@@ -105,6 +109,7 @@ module "lb" {
 
   rev_dns_ip_addresses = zipmap(
     concat(
+      local.mirror_repo_fqdn,
       local.bootstrap_fqdns,
       local.rev_api_lb_fqdns,
       local.control_plane_fqdns,
@@ -112,6 +117,7 @@ module "lb" {
       local.storage_fqdns
     ),
     concat(
+      local.mirror_repo_ip,
       list(var.bootstrap_ip_address),
       [for idx in range(length(local.rev_api_lb_fqdns)) : var.lb_ip_address],
       var.control_plane_ip_addresses,
@@ -155,7 +161,6 @@ module "lb" {
 }
 module "ignition" {
   source              = "./ignition"
-//  count = var.create_vms_only ? 0 : 1
   ssh_public_key      = chomp(tls_private_key.installkey.public_key_openssh)
   base_domain         = var.base_domain
   cluster_id          = var.cluster_id
@@ -166,13 +171,14 @@ module "ignition" {
   pull_secret         = var.openshift_pull_secret
   openshift_version   = var.openshift_version
   total_node_count    = var.compute_count + var.storage_count
+  airgapped           = var.airgapped   
   depends_on = [
      local_file.write_public_key
   ]
  }
-
+ 
 module "bootstrap" {
-  source = "./new-vm"
+  source = "./vm"
   mac_prefix = var.mac_prefix
   count = var.create_vms_only ? 0 : 1
 
@@ -200,7 +206,7 @@ module "bootstrap" {
 //  ]
 }
 module "bootstrap_vms_only" {
-  source = "./new-vm"
+  source = "./vm"
   mac_prefix = var.mac_prefix
   count = var.create_vms_only ? 1 : 0
   ignition = local.no_ignition 
@@ -229,7 +235,7 @@ module "bootstrap_vms_only" {
 
 
 module "control_plane_vm" {
-  source = "./new-vm"
+  source = "./vm"
   mac_prefix = var.mac_prefix
   hostnames_ip_addresses = zipmap(
     local.control_plane_fqdns,
@@ -260,7 +266,7 @@ module "control_plane_vm" {
 //   ]  
 }
 module "control_plane_vm_vms_only" {
-  source = "./new-vm"
+  source = "./vm"
   mac_prefix = var.mac_prefix
   hostnames_ip_addresses = zipmap(
     local.control_plane_fqdns,
@@ -291,7 +297,7 @@ module "control_plane_vm_vms_only" {
 }
 
 module "compute_vm" {
-  source = "./new-vm"
+  source = "./vm"
   mac_prefix = var.mac_prefix
   hostnames_ip_addresses = zipmap(
     local.compute_fqdns,
@@ -320,7 +326,7 @@ module "compute_vm" {
 //   ]
 }
 module "compute_vm_vms_only" {
-  source = "./new-vm"
+  source = "./vm"
   mac_prefix = var.mac_prefix
   hostnames_ip_addresses = zipmap(
     local.compute_fqdns,
@@ -406,4 +412,10 @@ module "storage_vm_vms_only" {
   depends_on = [
       module.control_plane_vm
    ]
+}
+  data "local_file" "kubeadmin_password" {
+  filename = "${path.cwd}/installer/${var.cluster_id}/auth/kubeadmin-password"
+  depends_on = [
+    module.ignition
+  ]
 }

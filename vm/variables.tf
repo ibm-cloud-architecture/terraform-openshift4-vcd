@@ -1,8 +1,13 @@
-variable "hostnames_mac_addresses" {
+variable "hostnames_ip_addresses" {
   type = map(string)
 }
 
 variable "ignition" {
+  type    = string
+  default = ""
+}
+
+variable "mac_prefix" {
   type    = string
   default = ""
 }
@@ -67,6 +72,10 @@ variable "nested_hv_enabled" {
 
 variable "network_id" {
   type = string
+}
+variable "create_vms_only" {
+  type = bool
+  default = false
 }
 // variable "staticip_file_vm" {
 //  type = string
