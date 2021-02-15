@@ -264,6 +264,11 @@ firewall-cmd --reload
 ```
 [More about firewalld](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/security_guide/sec-using_firewalls#sec-Getting_started_with_firewalld)
 
+#### Use SSH Key rather than password authentication (optional)
+For login to Bastion, you can choose to use SSH Keys and disable password login:
+  - edit /etc/ssh/sshd_config and set password authentication to no
+  - add your id_rsa.pub ssh key to .ssh/authorised_keys on bastion
+
 #### Move SSH to higher port (optional)
 If you want to move your ssh port to a higher port to slow down hackers that are constantly looking to hack your server at port 22 then do the following:
 1. Edit /etc/ssh/sshd_config and uncomment the line that currently reads #Port 22 and change to your desired port and save file. `systemctl stop sshd` `systemctl start sshd`
