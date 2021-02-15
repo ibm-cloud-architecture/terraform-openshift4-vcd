@@ -178,7 +178,7 @@ The Bastion VM is where we launch OpenShift installations from.  The VM also hos
 Go to Virtual Machines > **New VM**
 Name: **bastion**
   - **From Template**
-  - Select **vm-redhat8** (todo - have to test bastion setup instructions with redhat8, we know it works but have not double checked the instructions.  If you have a problem please open an issue)
+  - Select **vm-redhat8**
 
 After the VM is created, connect it to your network:
  - from Virtual Machines, select bastion VM
@@ -187,7 +187,9 @@ After the VM is created, connect it to your network:
     - Network = **ocpnet**
     - IP Mode = **Static - Manual**
     - IP Address **172.16.0.10**
-    - Click **Save**  
+    - Click **Save**
+
+Set the Bastion password:  On the VCD console, select the Bastion VM and on the `Guest OS Configurations` tab, Set the password.  
 
 #### Enable Redhat entitlement
   * You need to enable RedHat entitlement so that you can use yum.
