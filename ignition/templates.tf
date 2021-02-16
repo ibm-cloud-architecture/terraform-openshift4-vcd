@@ -150,43 +150,6 @@ resource "local_file" "cluster-dns-02-config" {
   ]
 }
 
-
-
-//data "template_file" "configure-image-registry-job" {
-//  template = <<EOF
-//apiVersion: batch/v1
-//kind: Job
-//metadata:
-//  name: ibm-configure-image-registry
-//  namespace: openshift-image-registry
-//spec:
-//  parallelism: 1
-//  completions: 1
-//  template:
-//    metadata:
-//      name: configure-image-registry
-//      labels:
-//        app: configure-image-registry
-//    serviceAccountName: infra
-//    spec:
-//      containers:
-//      - name:  client
-//        image: quay.io/openshift/origin-cli:latest
-//        command: ["/bin/sh","-c"]
-//        args: ["while ! /usr/bin/oc get configs.imageregistry.operator.openshift.io cluster >/dev/null 2>&1; do sleep 1;done;/usr/bin/oc patch configs.imageregistry.operator.openshift.io cluster --type merge --patch '{\"spec\": {\"nodeSelector\": {\"node-role.kubernetes.io/infra\": \"\"}}}'"]
-//      restartPolicy: Never
-//EOF
-//}
-
-//resource "local_file" "configure-image-registry-job" {
-//  content  = data.template_file.configure-image-registry-job.rendered
-//  filename = "${local.installer_workspace}/openshift/99_configure-image-registry-job.yml"
-//  depends_on = [
-//    null_resource.download_binaries,
-//    null_resource.generate_manifests,
-//  ]
-//}
-
 data "template_file" "cluster_scheduler" {
   template = <<EOF
 apiVersion: config.openshift.io/v1

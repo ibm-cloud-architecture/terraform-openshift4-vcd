@@ -17,8 +17,6 @@ locals {
   compute_fqdns       = [for idx in range(var.compute_count) : "compute-0${idx}.${local.cluster_domain}"]
   storage_fqdns       = [for idx in range(var.storage_count) : "storage-0${idx}.${local.cluster_domain}"]
   no_ignition         = ""
-//  repo_fqdn = var.airgapped["enabled"] ? local.mirror_repo_fqdn : local.bootstrap_fqdns
-//  repo_ip = var.airgapped["enabled"] ? local.mirror_repo_ip : list(var.bootstrap_ip_address)
   repo_fqdn = var.airgapped["enabled"] ? local.mirror_repo_fqdn : []
   repo_ip = var.airgapped["enabled"] ? local.mirror_repo_ip : []
   }
@@ -36,11 +34,7 @@ provider "vcd" {
 resource "vcd_vapp_org_network" "vappOrgNet" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
-
   vapp_name         = local.app_name
-#  is_fenced = true
-
- # Comment below line to create an isolated vApp network
   org_network_name  = var.vm_network
   depends_on = [vcd_vapp.app_name]
 }
@@ -49,7 +43,6 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
 resource "vcd_vapp" "app_name" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
-
   name = local.app_name
 
 }

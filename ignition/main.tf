@@ -1,18 +1,4 @@
 
-
-//data "template_file" "post_deployment_05" {
-//  template = templatefile("${path.module}/templates/99_05-post-deployment.yaml", {
-//    csr_common_secret  = base64encode(file("${path.module}/templates/common.sh"))
-//    csr_approve_secret = base64encode(file("${path.module}/templates/approve-csrs.sh"))
-//  })
-//}
-
-//data "template_file" "post_deployment_06" {
-//  template = templatefile("${path.module}/templates/99_06-post-deployment.yaml", {
-//    node_count = var.total_node_count
-//  })
-//}
-
 locals {
   installerdir = "${path.cwd}/installer/${var.cluster_id}"
   openshift_installer_url = "${var.openshift_installer_url}/latest-${var.openshift_version}"
@@ -20,8 +6,8 @@ locals {
   mirror_fqdn = var.airgapped["mirror_fqdn"]
   mirror_port = var.airgapped["mirror_port"]
   mirror_repository = var.airgapped["mirror_repository"]
+  module_path = path.module
 }
-
 
 resource "null_resource" "download_binaries" {
     triggers = {
@@ -42,11 +28,12 @@ resource "null_resource" "download_binaries" {
     })
   }
 
-  provisioner "local-exec" {
-    when    = destroy
-    command = "rm -rf local.installerdir"
-  }
-
+//  provisioner "local-exec" {
+//    when    = destroy
+//      command = templatefile("${local.module_path}/scripts/destroy.sh.tmpl", { 
+//      installer_workspace = local.installerdir
+//    })
+//  }
 }
 
 resource "null_resource" "generate_manifests" {
@@ -84,40 +71,6 @@ resource "null_resource" "generate_ignition" {
     })
   }
 }
-
-
-//resource "null_resource" "generate_manifests" {
-//  provisioner "local-exec" {
-//    command = <<EOF
-//set -ex
-//${local.installerdir}/openshift-install --dir=${local.installerdir}/ create manifests --log-level debug
-//touch ${local.installerdir}/openshift/99_openshift-cluster-api_master-machines1
-//rm ${local.installerdir}/openshift/99_openshift-cluster-api_master-machines*
-//touch ${local.installerdir}/openshift/99_openshift-cluster-api_worker-machineset1
-//rm ${local.installerdir}/openshift/99_openshift-cluster-api_worker-machineset*
-//cp ${path.module}/templates/99_01-post-deployment.yaml ${local.installerdir}/manifests
-//cp ${path.module}/templates/99_02-post-deployment.yaml ${local.installerdir}/manifests
-//cp ${path.module}/templates/99_03-post-deployment.yaml ${local.installerdir}/manifests
-//cp ${path.module}/templates/99_04-post-deployment.yaml ${local.installerdir}/manifests
-//EOF
-//  }
-//  depends_on = [
-//    local_file.install_config_yaml
-//  ]
-//}
-
-
-//resource "local_file" "post_deployment_05" {
-//  content  = data.template_file.post_deployment_05.rendered
-//  filename = "${local.installerdir}/manifests/99_05-post-deployment.yaml"
-//  depends_on = [
-//    null_resource.generate_manifests,
-//  ]
-//}
-
-
-
-
 
   data "local_file" "bootstrap_ignition" {
   filename = "${local.installerdir}/bootstrap.ign"
