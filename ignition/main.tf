@@ -44,7 +44,7 @@ resource "null_resource" "download_binaries" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "rm -rf ./installer-files"
+    command = "rm -rf local.installerdir"
   }
 
 }

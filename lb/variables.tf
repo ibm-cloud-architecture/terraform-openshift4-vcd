@@ -128,3 +128,13 @@ variable "extra_disk_size" {
   default = 0
 }
 
+variable "repo_ip" {
+  type    = list(string)
+  default = []
+}
+
+variable "repo_fqdn" {
+  type    = list(string)
+  default = []
+}
+

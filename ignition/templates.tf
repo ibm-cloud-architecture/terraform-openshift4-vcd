@@ -90,11 +90,10 @@ spec:
   containers:
   - name: csr-approve
     imagePullPolicy: Always
-    %{if var.airgapped["enabled"] == false}    
-    image: quay.io/openshift/origin-cli:latest
-    %{endif}
     %{if var.airgapped["enabled"]}    
     image: ${var.airgapped["mirror_fqdn"]}:${var.airgapped["mirror_port"]}/openshift/origin-cli:latest
+    %{else}    
+    image: quay.io/openshift/origin-cli:latest
     %{endif}
     command: ["/bin/sh", "-c"]
     args: 

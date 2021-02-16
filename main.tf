@@ -17,6 +17,10 @@ locals {
   compute_fqdns       = [for idx in range(var.compute_count) : "compute-0${idx}.${local.cluster_domain}"]
   storage_fqdns       = [for idx in range(var.storage_count) : "storage-0${idx}.${local.cluster_domain}"]
   no_ignition         = ""
+//  repo_fqdn = var.airgapped["enabled"] ? local.mirror_repo_fqdn : local.bootstrap_fqdns
+//  repo_ip = var.airgapped["enabled"] ? local.mirror_repo_ip : list(var.bootstrap_ip_address)
+  repo_fqdn = var.airgapped["enabled"] ? local.mirror_repo_fqdn : []
+  repo_ip = var.airgapped["enabled"] ? local.mirror_repo_ip : []
   }
 
 provider "vcd" {
@@ -68,6 +72,7 @@ resource "local_file" "write_public_key" {
   filename        = "${path.cwd}/installer/${var.cluster_id}/openshift_rsa.pub"
   file_permission = 0600
 }
+
 module "lb" {
   count = var.create_loadbalancer_vm ? 1 : 0
   source        = "./lb"
@@ -85,12 +90,13 @@ module "lb" {
 
   bootstrap_ip      = var.bootstrap_ip_address
   control_plane_ips = var.control_plane_ip_addresses
-//  vm_dns_addresses  = var.vm_dns_addresses
+
   dns_addresses = var.create_loadbalancer_vm ? concat([var.lb_ip_address],local.mirror_repo_ip,var.vm_dns_addresses) : var.vm_dns_addresses
+
 
   dns_ip_addresses = zipmap(
     concat(
-      local.mirror_repo_fqdn,
+      local.repo_fqdn,
       local.bootstrap_fqdns,
       local.api_lb_fqdns,
       local.control_plane_fqdns,
@@ -98,7 +104,7 @@ module "lb" {
       local.storage_fqdns
     ),
     concat(
-      local.mirror_repo_ip,
+      local.repo_ip,
       list(var.bootstrap_ip_address),
       [for idx in range(length(local.api_lb_fqdns)) : var.lb_ip_address],
       var.control_plane_ip_addresses,
@@ -109,7 +115,7 @@ module "lb" {
 
   rev_dns_ip_addresses = zipmap(
     concat(
-      local.mirror_repo_fqdn,
+      local.repo_fqdn,
       local.bootstrap_fqdns,
       local.rev_api_lb_fqdns,
       local.control_plane_fqdns,
@@ -117,7 +123,7 @@ module "lb" {
       local.storage_fqdns
     ),
     concat(
-      local.mirror_repo_ip,
+      local.repo_ip,
       list(var.bootstrap_ip_address),
       [for idx in range(length(local.rev_api_lb_fqdns)) : var.lb_ip_address],
       var.control_plane_ip_addresses,

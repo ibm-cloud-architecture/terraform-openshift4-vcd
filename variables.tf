@@ -261,6 +261,16 @@ variable "create_vms_only" {
   default     = false
 }
 
+//variable "repo_ip" {
+//  type    = list(string)
+//  default = []
+//}
+
+//variable "repo_fqdn" {
+//  type    = list(string)
+//  default = []
+//}
+
 variable "airgapped"  {
   type        = map(string)
   description = "test  variable for airgapped instead of separate vars"
