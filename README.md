@@ -174,12 +174,12 @@ Configure DNAT so that you have https access to the console from public internet
 
 
 ## Create and configure Bastion VM
-The Bastion VM hosts the vcd_toolkit_for_openshift and is the VM where we launch installations from.  The VM also hosts **DNS service**, and an **HTTP server** through which the Ignition configuration files are provided to Bootstrap during installation.
+The Bastion VM is where we launch OpenShift installations from.  The VM also hosts **DNS service**, and an **HTTP server** through which the Ignition configuration files are provided to Bootstrap during installation.
 
 Go to Virtual Machines > **New VM**
 Name: **bastion**
   - **From Template**
-  - Select **vm-redhat8** (todo - have to test bastion setup instructions with redhat8, we know it works but have not double checked the instructions.  If you have a problem please open an issue)
+  - Select **vm-redhat8**
 
 After the VM is created, connect it to your network:
  - from Virtual Machines, select bastion VM
@@ -188,7 +188,9 @@ After the VM is created, connect it to your network:
     - Network = **ocpnet**
     - IP Mode = **Static - Manual**
     - IP Address **172.16.0.10**
-    - Click **Save**  
+    - Click **Save**
+
+Set the Bastion password:  On the VCD console, select the Bastion VM and on the `Guest OS Configurations` tab, Set the password.  
 
 #### Enable Redhat entitlement
   * You need to enable RedHat entitlement so that you can use yum.
@@ -262,6 +264,11 @@ firewall-cmd --add-port=53/udp --zone=public --permanent
 firewall-cmd --reload
 ```
 [More about firewalld](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/security_guide/sec-using_firewalls#sec-Getting_started_with_firewalld)
+
+#### Use SSH Key rather than password authentication (optional)
+For login to Bastion, you can choose to use SSH Keys and disable password login:
+  - edit /etc/ssh/sshd_config and set password authentication to no
+  - add your id_rsa.pub ssh key to .ssh/authorised_keys on bastion
 
 #### Move SSH to higher port (optional)
 If you want to move your ssh port to a higher port to slow down hackers that are constantly looking to hack your server at port 22 then do the following:
