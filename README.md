@@ -2,6 +2,7 @@
 # OpenShift UPI Deployment with Static IPs on VMWare Cloud Director
 
 **Change History:**
+- 2/18/2021 - When you create a cluster, the firewall rules and DNAT rule for that cluster are automatically created. Airgapped install is now supported. You need to build your own mirror. If you have previously created a Edge Firewall Rule for ALLOW Internet access for all resources on your vcd network, you probably should delete that rule. It will interfere with the new automated Firewall. The automation will add Firewall rules for all the VM's that require it when you create a cluster.
 - 2/14/2021 - Move explanation for our choice to use DHCP for static IP provisioning.  See https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd/issues/3
 
 - 2/01/2021 - Added "Experimental Flag" "create_vms_only". If you set this flag to true, OCP won't be installed, the vm's will be created and the OCP installer will be loaded to the installer/cluster_id directory. There is currently a bug so when you run `terraform apply` the first time, it fails with some error messages after creation of a few VM's but just run `terraform apply` again and it should complete successfully
@@ -96,23 +97,6 @@ See also https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared
 
 **Note:** make modifications by editing the various columns on the screen as instructed below.
 
-#### Outbound from the OCP private network to public Internet
-1. Firewall Rule
-    - go to the Firewall tab and select '+' to add
-      - Name: **ocpnet**
-      - Source: Select the '+'
-        - select 'Org Vdc Networks' from the objects type list
-        - select 'ocpnet' from list and then click '->' and 'Keep'
-      - Destination: skip. (this will become "any" in the Firewall Rules screen)
-     - Select: 'Save changes'
-
-2. NAT
-    - go to the NAT tab and select '+SNAT RULE' in the NAT44 Rules
-      - Applied On: **<your>-tenant-external**
-      - Original Source IP/Range: **172.16.0.1/24**
-      - Translated Source IP/Range: pick an address not already used address from the sub-allocated network IPs
-      - Description: **ocpnet outbound**
-
 #### Outbound from OCP private network to IBM Cloud private network
 [Official instruction to connect to the IBM Cloud Services Private Network](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-enable-access).  Our shorthand setup steps:
 1. Firewall Rule
@@ -133,6 +117,26 @@ See also https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared
       - Translated Source IP/Range: enter the `Primary IP` for the service network interface copied from the ESG settings (Or select it from the dropdown list)
       - Description: **access to the IBM Cloud private**
 
+#### Outbound from the Bastion to the public Internet
+1. Firewall Rule
+    - go to the Firewall tab and select '+' to add
+      - Name: **Bastion Outbound**
+      - Source: Select the 'IP'
+        - enter the IP Address of your Bastion (usually 172.16.0.10)
+        - Destination: skip. (this will become "any" in the Firewall Rules screen)
+     - Select: 'Save changes'
+
+2. NAT
+    - go to the NAT tab and select '+SNAT RULE' in the NAT44 Rules
+      - Applied On: **<your>-tenant-external**
+      - Original Source IP/Range: **172.16.0.1/24**
+      - Translated Source IP/Range: pick an address not already used address from the sub-allocated network IPs
+      - Description: **ocpnet outbound**
+
+![Public IP](./media/public_ip.png)
+
+
+
 #### Inbound config to the bastion on OCP private network
 We need to configure DNAT so that we have ssh access the bastion VM from public internet:
   - We will use  172.16.0.10 address for bastion VM
@@ -140,7 +144,7 @@ We need to configure DNAT so that we have ssh access the bastion VM from public 
     - go to the Firewall tab and select '+' to add
       - Name: **bastion**
       - Destination: tap the 'IP' button
-        - choose an available IP address from your list of  `public/sub-allocated IPs` and enter it
+        - choose the same IP address that you used for Bastion Outbound above
       - Service: Protocol: `TCP` Source port: `any` Destination port: `22`
      - Select: 'Save changes'
 
@@ -152,21 +156,8 @@ We need to configure DNAT so that we have ssh access the bastion VM from public 
       - Description: **access to bastion host**
 
 #### Inbound config to OCP Console
-Configure DNAT so that you have https access to the console from public internet:
-1. Firewall Rule
-    - go to the Firewall tab and select '+' to add
-      - Name: **ocpconsole**
-      - Destination: Select the 'IP'
-        - choose an available IP address from your list of  `public/sub-allocated IPs` and enter it
-      - Service: Protocol: `any`
-     - Select: 'Save changes'
+Now automatically provisioned. A new variable called cluster_public_ip in the vcd_edge_gateway object can be set to an available Public IP.  
 
-2. NAT
-    - go to the NAT tab and select '+DNAT RULE' in the NAT44 Rules
-      - Applied On: **your-tenant-external**
-      - Original Source IP/Range: choose an available IP address from your list of  `public/sub-allocated IPs` and enter it
-      - Translated Source IP/Range: **172.16.0.19** (This is the IP address we will use for the Load Balancer)
-      - Description: **access to ocp console**
 
 #### Do not Setup DHCP within the Edge Gateway
 **You cannot use DHCP within the ESG or it will interfere with the DHCP Server deployed on the LoadBalancer. This is a change if you were previously using the vcd_toolkit**
@@ -374,6 +365,9 @@ terraform apply
 | openshift_host_prefix        | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23               |
 | create_loadbalancer_vm | Create the LoadBalancer VM and use it as a DNS server for your cluster.  If set to `false` you must provide a valid pre-configured LoadBalancer for your `api` and `*.apps` endpoints and DNS Zone for your `cluster_id`.`base_domain`. | bool | false |
 |create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
+|edge_gateway   | The name of the Edge Gateway  | String  |   |
+|gateway  |  The ip address of the gateway router. Usually `172.16.0.1` |  String |   |
+|  external_gateway_interface |  Name of the Gateway Interface for external access (typically something like `xxx10-xxx-tenant-external`)  | String  |   |
 
 #### Retrieve pull secret from Red Hat sites
 Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) and place in a file on the Bastion Server. Default location is `~/.pull-secret`
