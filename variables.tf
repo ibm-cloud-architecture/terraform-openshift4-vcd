@@ -43,11 +43,6 @@ variable "mac_prefix" {
   type        = string
   description = "Prefix for creating MAC addresses for control, compute and storage nodes (first five parts. MAC address is created by taking this prefix appending it with the final part of the ip address"
 }
-variable "vm_network" {
-  type        = string
-  description = "This is the name of the publicly accessible network for cluster ingress and access."
-  default     = "VM Network"
-}
 
 variable "loadbalancer_network" {
   type        = string
@@ -261,14 +256,10 @@ variable "create_vms_only" {
   default     = false
 }
 
-//variable "repo_ip" {
-//  type    = list(string)
-//  default = []
-//}
 
-//variable "repo_fqdn" {
-//  type    = list(string)
-//  default = []
+//variable "openshift_console_url" {
+//  type    = string
+//  default = ""
 //}
 
 variable "airgapped"  {
@@ -284,6 +275,7 @@ variable "airgapped"  {
          }
 }
 
+
 variable "proxy_config" {
   type = map(string)
   default = {
@@ -294,3 +286,14 @@ variable "proxy_config" {
   }
 }
 
+variable "vcd_edge_gateway" {
+  type = map(string)
+  default = {
+    edge_gateway = ""
+    gateway      = ""
+    network_name          = ""
+    static_start_address  = ""
+    static_end_address    = ""
+    cluster_public_ip     = ""
+  }
+}

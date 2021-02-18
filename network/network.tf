@@ -4,39 +4,28 @@
 # }
 
 locals {
-    source_networks = [var.vcd_edge_gateway["name"]]
+    source_networks = [var.vcd_edge_gateway["network_name"]]
+    rule_id = ""
   }
 
-provider "vcd" {
-  user                 = var.vcd_user
-  password             = var.vcd_password
-  org                  = var.vcd_org
-  url                  = var.vcd_url
-  max_retry_timeout    = 30
-  allow_unverified_ssl = true
-  logging              = true
-}
+//provider "vcd" {
+//  user                 = var.vcd_user
+//  password             = var.vcd_password
+//  org                  = var.vcd_org
+//  url                  = var.vcd_url
+//  max_retry_timeout    = 30
+//  allow_unverified_ssl = true
+//  logging              = true
+//}
 
-resource "vcd_network_routed" "network_routed" {
-  org          = var.vcd_org
-  vdc          = var.vcd_vdc
-  edge_gateway = var.vcd_edge_gateway["edge_gateway"]
-  name         = var.vcd_edge_gateway["name"]
-  gateway      = var.vcd_edge_gateway["gateway"]
-  interface_type  = "internal"
-  static_ip_pool { 
-       start_address = var.vcd_edge_gateway["static_start_address"]
-       end_address   = var.vcd_edge_gateway["static_end_address"]
-    }
-}
 
-resource "vcd_nsxv_firewall_rule" "deny_rule" {
+resource "vcd_nsxv_firewall_rule" "deny_all" {
+  count = var.airgapped["enabled"] ? 1 : 0 
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = var.vcd_edge_gateway["edge_gateway"]
   action       = "deny"
-  name         = "${var.cluster_id}_deny_rule"  
-  
+  name         = "${var.cluster_id}_deny_all_rule"  
   source {
     org_networks = local.source_networks
   }
@@ -48,19 +37,22 @@ resource "vcd_nsxv_firewall_rule" "deny_rule" {
   service {
     protocol = "any"
   }
-  depends_on = [vcd_network_routed.network_routed]
 }
 
-resource "vcd_nsxv_firewall_rule" "cluster_allow" {
+
+resource "vcd_nsxv_firewall_rule" "lb_allow" {
+// if airgapped, you need the lb to have access so it can get dhcpd, coredns and haproxy images
+  count = var.airgapped["enabled"] ? 1 : 0 
+
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = var.vcd_edge_gateway["edge_gateway"]
-  above_rule_id = vcd_nsxv_firewall_rule.deny_rule.id
+  above_rule_id   = vcd_nsxv_firewall_rule.deny_all[count.index].id 
   action       = "accept"
-  name         = "${var.cluster_id}_cluster_allow_rule"  
+  name         = "${var.cluster_id}_lb_allow_rule"  
   
   source {
-    ip_addresses = concat(var.bootstrap_ip_address,var.control_plane_ip_addresses,var.compute_ip_addresses)
+    ip_addresses = [var.network_lb_ip_address]
   }
 
   destination {
@@ -70,21 +62,73 @@ resource "vcd_nsxv_firewall_rule" "cluster_allow" {
   service {
     protocol = "any"
   }
-  depends_on = [vcd_network_routed.network_routed]
+  depends_on = [
+     vcd_nsxv_firewall_rule.deny_all
+  ]
+}
+
+resource "vcd_nsxv_firewall_rule" "cluster_allow" {
+// if airgapped, you need the lb to have access so it can get dhcpd, coredns and haproxy images
+  count = var.airgapped["enabled"] ? 0 : 1 
+
+  org          = var.vcd_org
+  vdc          = var.vcd_vdc
+  edge_gateway = var.vcd_edge_gateway["edge_gateway"]
+ // above_rule_id   = vcd_nsxv_firewall_rule.deny_all[count.index].id 
+  action       = "accept"
+  name         = "${var.cluster_id}_cluster_allow_rule"  
+  
+  source {
+    ip_addresses = flatten([var.network_lb_ip_address,var.cluster_ip_addresses])
+  }
+
+  destination {
+    ip_addresses = ["any"]
+  }
+
+  service {
+    protocol = "any"
+  }
+  depends_on = [
+     vcd_nsxv_firewall_rule.deny_all
+  ]
+}
+
+resource "vcd_nsxv_firewall_rule" "ocp_console_allow" {
+// in case you have airgapped clusters and deny all rule in place we generate an exclusion 
+
+  org          = var.vcd_org
+  vdc          = var.vcd_vdc
+  edge_gateway = var.vcd_edge_gateway["edge_gateway"]
+ // above_rule_id =   vcd_nsxv_firewall_rule.deny_all[count.index].id
+
+  action       = "accept"
+  name         = "${var.cluster_id}_ocp_console_allow_rule"  
+  
+  source {
+    ip_addresses = ["any"]
+  }
+
+  destination {
+    ip_addresses = [var.vcd_edge_gateway["cluster_public_ip"]]
+  }
+
+  service {
+    protocol = "any"
+  }
+ 
 }
 
 resource "vcd_nsxv_dnat" "dnat" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = var.vcd_edge_gateway["edge_gateway"]
-  network_name = "dal10-w02-tenant-external" 
+  network_name =  var.vcd_edge_gateway["external_public_network_name"] 
   network_type = "ext"
   
-  original_address   = var.cluster_public_ip
-  translated_address = var.lb_ip_address
+  original_address   = var.vcd_edge_gateway["cluster_public_ip"]
+  translated_address = var.network_lb_ip_address
   protocol = "any"
-  description = "${var.cluster_id} DNAT Rule"
-  
-  depends_on = [vcd_network_routed.network_routed]
+  description = "${var.cluster_id} OCP Console DNAT Rule"
 }
 

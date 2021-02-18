@@ -7,7 +7,7 @@ locals {
   mirror_repo_ip      = [var.airgapped["mirror_ip"]]
   mirror_repo_fqdn    = [var.airgapped["mirror_fqdn"]]
   app_name            = "${var.cluster_id}-${var.base_domain}"
-  vcd_net_name        = var.vm_network
+  vcd_net_name        = var.vcd_edge_gateway["network_name"]
   cluster_domain      = "${var.cluster_id}.${var.base_domain}"
   bootstrap_fqdns     = ["bootstrap-00.${local.cluster_domain}"]
   lb_fqdns            = ["lb-00.${local.cluster_domain}"]
@@ -19,6 +19,8 @@ locals {
   no_ignition         = ""
   repo_fqdn = var.airgapped["enabled"] ? local.mirror_repo_fqdn : []
   repo_ip = var.airgapped["enabled"] ? local.mirror_repo_ip : []
+  openshift_console_url = "https://console-openshift-console.apps.${var.cluster_id}.${var.base_domain}"
+
   }
 
 provider "vcd" {
@@ -35,7 +37,7 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   vapp_name         = local.app_name
-  org_network_name  = var.vm_network
+  org_network_name  = var.vcd_edge_gateway["network_name"]
   depends_on = [vcd_vapp.app_name]
 }
 
@@ -66,6 +68,26 @@ resource "local_file" "write_public_key" {
   file_permission = 0600
 }
 
+module "network" {
+  source        = "./network"
+  cluster_ip_addresses = flatten ([
+      var.bootstrap_ip_address,
+      var.control_plane_ip_addresses,
+      var.compute_ip_addresses,
+      var.storage_ip_addresses
+      ])
+  airgapped     = var.airgapped   
+  network_lb_ip_address = var.lb_ip_address
+  vcd_password  = var.vcd_password
+  vcd_org       = var.vcd_org
+  vcd_vdc       = var.vcd_vdc
+  cluster_id    = var.cluster_id
+  vcd_edge_gateway = var.vcd_edge_gateway
+   
+  depends_on = [
+     local_file.write_public_key
+  ]
+}
 module "lb" {
   count = var.create_loadbalancer_vm ? 1 : 0
   source        = "./lb"
@@ -147,7 +169,7 @@ module "lb" {
 
   hostnames_ip_addresses  = zipmap(local.lb_fqdns, [var.lb_ip_address])
   machine_cidr            = var.machine_cidr
-  network_id              = var.vm_network
+  network_id              = var.vcd_edge_gateway["network_name"]
   loadbalancer_network_id = var.loadbalancer_network 
 
    vcd_catalog             = var.vcd_catalog
@@ -157,6 +179,10 @@ module "lb" {
    vcd_vdc                 = var.vcd_vdc
    vcd_org                 = var.vcd_org 
    app_name                = local.app_name
+   
+   depends_on = [
+      module.network
+  ]
 }
 module "ignition" {
   source              = "./ignition"
@@ -172,7 +198,8 @@ module "ignition" {
   total_node_count    = var.compute_count + var.storage_count
   airgapped           = var.airgapped   
   depends_on = [
-     local_file.write_public_key
+     local_file.write_public_key,
+     module.network
   ]
  }
  
@@ -190,7 +217,7 @@ module "bootstrap" {
   create_vms_only = var.create_vms_only
   cluster_domain = local.cluster_domain
   machine_cidr   = var.machine_cidr
-  network_id              = var.vm_network
+  network_id              = var.vcd_edge_gateway["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -200,9 +227,9 @@ module "bootstrap" {
   memory        = 8192
   disk_size    = var.bootstrap_disk
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
-//  depends_on = [
-//   module.lb
-//  ]
+  depends_on = [
+   module.network
+  ]
 }
 module "bootstrap_vms_only" {
   source = "./vm"
@@ -217,7 +244,7 @@ module "bootstrap_vms_only" {
   create_vms_only = var.create_vms_only
   cluster_domain = local.cluster_domain
   machine_cidr   = var.machine_cidr
-  network_id              = var.vm_network
+  network_id              = var.vcd_edge_gateway["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -244,7 +271,7 @@ module "control_plane_vm" {
   create_vms_only = var.create_vms_only
   count = var.create_vms_only ? 0 : 1
   ignition = module.ignition.master_ignition
-  network_id            = var.vm_network
+  network_id              = var.vcd_edge_gateway["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -274,7 +301,7 @@ module "control_plane_vm_vms_only" {
   count = var.create_vms_only ? 1 : 0
   create_vms_only = var.create_vms_only
   ignition = local.no_ignition 
-  network_id            = var.vm_network
+  network_id              = var.vcd_edge_gateway["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -308,7 +335,7 @@ module "compute_vm" {
 
   cluster_domain = local.cluster_domain
   machine_cidr   = var.machine_cidr
-  network_id            = var.vm_network
+  network_id              = var.vcd_edge_gateway["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -337,7 +364,7 @@ module "compute_vm_vms_only" {
 
   cluster_domain = local.cluster_domain
   machine_cidr   = var.machine_cidr
-  network_id            = var.vm_network
+  network_id              = var.vcd_edge_gateway["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -364,7 +391,7 @@ module "storage_vm" {
   create_vms_only = var.create_vms_only
   count = var.create_vms_only ? 0 : 1
   ignition =  module.ignition.worker_ignition
-  network_id            = var.vm_network
+  network_id              = var.vcd_edge_gateway["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -393,7 +420,7 @@ module "storage_vm_vms_only" {
   create_vms_only = var.create_vms_only
   count = var.create_vms_only ? 1 : 0
   ignition = local.no_ignition
-  network_id            = var.vm_network
+  network_id              = var.vcd_edge_gateway["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
