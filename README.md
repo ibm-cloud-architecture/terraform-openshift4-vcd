@@ -342,8 +342,12 @@ git clone https://github.com/slipsibm/terraform-openshift4-vcd
 cd terraform-openshift4-vcd
 cp terraform.tfvars.example terraform.tfvars
 ```
+#### Retrieve pull secret from Red Hat sites
+Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) and place in a file on the Bastion Server. Default location is `~/.pull-secret`   
 
 Update your `terraform.tfvars` with your environment values.  See `terraform.tfvars.example`
+
+After your `terraform.tfvars` has been updated, execute the following terraform commands:
 
 ```
 terraform init
@@ -406,20 +410,38 @@ terraform apply
 |  mirror_repository |  name of repo in mirror containing OCP install images (currently should be set to `ocp4/openshift4` see RH Doc for details) |  string |  - |
 |additional_trust_bundle   |  name of file containing cert for mirror | string  |  - |
 
-#### Retrieve pull secret from Red Hat sites
-Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) and place in a file on the Bastion Server. Default location is `~/.pull-secret`
+
 
 #### Let OpenShift finish the installation:
+Once terraform has completed sucessfully, you will see several pieces of information display. As sample is below:
+```
+Apply complete! Resources: 31 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+export_kubeconfig = "export KUBECONFIG=/root/terraform-openshift4-vcd/installer/testinf/auth/kubeconfig"
+kubeadmin_user_info = [
+  "kubeadmin",
+  "6y9pL-RPoTq-SKADP-M6K5S",
+]
+openshift_console_url = "https://console-openshift-console.apps.testinf.cdastu.com"
+public_ip = "150.238.224.81"
+
+```
 Once you power on the machines it should take about 20 mins for your cluster to become active. To debug see **Debugging the OCP installation dance** below.
 
 - power on all the VMs in the VAPP.
 
-- cd to authentication directory:  
+- The cluster userid and password are output from the `terraform apply` command.
+- You can copy the export command generated to define KUBECONFIG. Alternately, you can get the info using the following methods:
+
+  - You can also retrieve the password as follows:  
+  cd to authentication directory:  
    `cd <clusternameDir>/auth`
     This directory contains both the cluster config and the kubeadmin password for UI login
-- export KUBECONFIG= clusternameDir/auth/kubeconfig
+ - export KUBECONFIG= clusternameDir/auth/kubeconfig   
 
-  Example:   
+    Example:   
    `export KUBECONFIG=/root/terraform-openshift-vmware/installer/stuocpvmshared1/auth/kubeconfig`
 - If you want to watch the install, you can  
   `ssh -i installer/stuocpvmshared1/openshift_rsa core@<bootstrap ip>`  into the bootstrap console and watch the logs. Bootstrap will print the jounalctl command when you login: `journalctl -b -f -u release-image.service -u bootkube.service`. You will see lots of messages (including error messages) and in 15-20 minutes, you should see a message about the bootstrap service completing. Once this happens, exit the bootstrap node.
@@ -480,16 +502,18 @@ When the machines boot for the first time they each have special logic which run
 
 Assuming Bootstrap VM boots correctly, the first thing it does is pull additional ignition data from the bastion HTTP server.  If you don't see a 200 get successful in the bastion HTTP server log within a few minutes of Bootstrap being powered on, that is a problem
 
-Next Bootstap installs an OCP control plane on itself, as well as an http server that it uses to help the master nodes get their own cluster setup.  You can ssh into boostrap (ssh core@172.16.0.20) and watch the logs.  Bootstrap will print the jounalctl command when you login: `journalctl -b -f -u release-image.service -u bootkube.service` . Look carefully at the logs. Typical problems at this stage are:
+Next Bootstrap installs an OCP control plane on itself, as well as an http server that it uses to help the master nodes get their own cluster setup.  You can ssh into boostrap (ssh core@172.16.0.20) and watch the logs.  Bootstrap will print the jounalctl command when you login: `journalctl -b -f -u release-image.service -u bootkube.service` . Look carefully at the logs. Typical problems at this stage are:
   * bad/missing pull secret
-  * no internet access - double check your edge configuration, run tyical ip network debug
+  * no internet access - double check your edge configuration, run typical ip network debug
 
 
 ## Configuration to enable OCP console login
-- Get the console url by running    
-    `oc get routes console -n openshift-console`
+- The console login information are now output as part of the terraform apply. Alternately, you can retrieve the information as follows:    
+
 
 ```
+oc get routes console -n openshift-console
+
  NAME      HOST/PORT                                                  PATH   SERVICES   PORT    TERMINATION          WILDCARD
  console   console-openshift-console.apps.ocp44-myprefix.my.com          console    https   reencrypt/Redirect   None
 ```
@@ -527,7 +551,7 @@ You will need to follow the instructions carefully in order to setup imagesource
 An example of the airgapped object:
 ```
 airgapped = {
-      enabled = true 
+      enabled = true
       mirror_ip = "172.16.0.10"
       mirror_fqdn = "bastion.airgapfull.cdastu.com"
       mirror_port = "5000"
