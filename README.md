@@ -429,7 +429,7 @@ openshift_console_url = "https://console-openshift-console.apps.testinf.cdastu.c
 public_ip = "150.238.224.81"
 
 ```
-Once you power on the machines it should take about 20 mins for your cluster to become active. To debug see **Debugging the OCP installation dance** below.
+Once you power on the machines it should take about 20 mins for your cluster to become active. To debug see **Debugging the OCP installation** below.
 
 - power on all the VMs in the VAPP.
 
@@ -507,6 +507,13 @@ Next Bootstrap installs an OCP control plane on itself, as well as an http serve
   * bad/missing pull secret
   * no internet access - double check your edge configuration, run typical ip network debug
 
+The installer should have created Edge Firewall Rules for the OCP Cluster that look something like this:
+
+![FW Example](./media/fwexample.png)
+
+The DNAT rule for the OCP Console should look something like this:
+
+![DNAT Example](./media/dnatexample.png)
 
 ## Configuration to enable OCP console login
 - The console login information are now output as part of the terraform apply. Alternately, you can retrieve the information as follows:    
