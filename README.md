@@ -2,7 +2,13 @@
 # OpenShift UPI Deployment with Static IPs on VMWare Cloud Director
 
 **Change History:**
-- 2/18/2021 - When you create a cluster, the firewall rules and DNAT rule for that cluster are automatically created. Airgapped install is now supported. You need to build your own mirror. If you have previously created a Edge Firewall Rule for ALLOW Internet access for all resources on your vcd network, you probably should delete that rule. It will interfere with the new automated Firewall. The automation will add Firewall rules for all the VM's that require it when you create a cluster.
+- 2/18/2021:
+
+   - Airgapped install is now supported. You need to build your own mirror.
+   - When you create a cluster, the firewall rules and DNAT rule for that cluster will be automatically created. You should probably delete any DNAT or FW rules that relate to any clusters you have previously built. If you have previously created a Edge Firewall Rule for ALLOW Internet access for all resources on your vcd network, you probably should delete that rule. It will interfere with the new automated Firewall. The automation will add Firewall rules for all the VM's that require it when you create a cluster. You will need to add a new set of variables in your `terraform.tfvars` file. The instructions have been updated to relect this and only create rules for the Bastion server. If you create additional servers in your vcd, outside of the automation, you should add internet access to these servers by following the setup instructions for the Bastion.
+   - At the end of the Terraform apply, several (hopefully) useful variables are printed out to help you out. Open an issue if you would like more/less/different info listed.   
+
+
 - 2/14/2021 - Move explanation for our choice to use DHCP for static IP provisioning.  See https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd/issues/3
 
 - 2/01/2021 - Added "Experimental Flag" "create_vms_only". If you set this flag to true, OCP won't be installed, the vm's will be created and the OCP installer will be loaded to the installer/cluster_id directory. There is currently a bug so when you run `terraform apply` the first time, it fails with some error messages after creation of a few VM's but just run `terraform apply` again and it should complete successfully
@@ -79,17 +85,22 @@ Create a network where we will install VMs and OCP.
   - DNS: Use Edge DNS -  toggled off.  Set primary DNS to 172.16.0.10 which is where we will put the Bastion VM.  This is the DNS that will be used by default for VMs created with static or pool based IP addresses.
 
 
-### Configure edge networking
+### Configure edge networking Parameters for your cluster
 Configure the Edge Service Gateway (ESG) to provide inbound and outbound connectivity.  For a network overview diagram, followed by general Edge setup instruction, see: https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-create-network
 
 Each vCloud Datacenter comes with 5 IBM Cloud public IP addresses which we can use for SNAT and DNAT translations in and out of the datacenter instance.  VMWare vCloud calls these `sub-allocated` addresses.
 The sub-allocated address are available in IBM Cloud on the vCloud instance Resources page.
 Gather the following information that you will need when configuring the ESG:
-* Make a `list of the IPs and Sub-allocated IP Addresses` for the ESG.       
+* Make a `list of the IPs and Sub-allocated IP Addresses` for the ESG.   
+![Public IP](./media/public_ip.png)    
+
+Take an unused IP and set  
 * Go to main menu > Networking > Edges,  and Select your ESG
   - Go to `Networks and subnets` and copy down the `Participating Subnets` of the `tenant-external` and `servicexx` external networks. (we will need this info later)
     - the tenant-external network allows external internet routing
-    - the service network allows routing to IBM Cloud private network /services
+    - the service network allows routing to IBM Cloud private network /services   
+
+ ![Networks](./media/networks.png)
 
 For the following steps go to main menu > Networks > Edges > Select your ESG and select **SERVICES**
 
