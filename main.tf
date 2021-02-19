@@ -20,6 +20,7 @@ locals {
   repo_fqdn = var.airgapped["enabled"] ? local.mirror_repo_fqdn : []
   repo_ip = var.airgapped["enabled"] ? local.mirror_repo_ip : []
   openshift_console_url = "https://console-openshift-console.apps.${var.cluster_id}.${var.base_domain}"
+  export_kubeconfig     = "export KUBECONFIG=${path.cwd}/installer/${var.cluster_id}/auth/kubeconfig"
 
   }
 

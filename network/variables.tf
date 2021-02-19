@@ -41,18 +41,17 @@ variable "cluster_ip_addresses" {
   type        = list(string)
 }
 
-
 variable "vcd_edge_gateway" {
-  type = map(string)
-  default = {
-    edge_gateway = ""
-    gateway      = ""
-    network_name         = ""
-    static_start_address  = ""
-    static_end_address    = ""
-    cluster_public_ip     = ""
-  }
+  type = object ({
+    edge_gateway = string
+    external_gateway_interface = string
+    network_name          = string
+//    static_start_address  = string
+//    static_end_address    = string
+    cluster_public_ip     = string  
+  })
 }
+
 
 variable "airgapped"  {
   type        = map(string)

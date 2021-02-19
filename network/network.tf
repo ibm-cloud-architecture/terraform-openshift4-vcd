@@ -123,7 +123,7 @@ resource "vcd_nsxv_dnat" "dnat" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = var.vcd_edge_gateway["edge_gateway"]
-  network_name =  var.vcd_edge_gateway["external_public_network_name"] 
+  network_name =  var.vcd_edge_gateway["external_gateway_interface"] 
   network_type = "ext"
   
   original_address   = var.vcd_edge_gateway["cluster_public_ip"]

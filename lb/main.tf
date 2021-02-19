@@ -42,7 +42,7 @@ data "template_file" "lb_ignition" {
       cluster_domain = var.cluster_domain
       ens_device     = "ens192"
       prefix         = element(split("/", var.machine_cidr), 1)
-      gateway        = "172.16.0.1"      
+      gateway        = cidrhost(var.machine_cidr, 1)      
     }))
      dual_homed = local.dual_homed
      staticip_file_loadbalancer = base64encode(templatefile("${path.module}/templates/ifcfg.tmpl", {
@@ -52,8 +52,8 @@ data "template_file" "lb_ignition" {
        cluster_domain = var.cluster_domain
        ens_device     = "ens224"
        prefix         = local.dual_homed ? element(split("/", var.machine_cidr), 1) : ""
-       gateway        = "172.16.0.1"
-      gateway        = local.dual_homed ? cidrhost(var.loadbalancer_cidr, 1) : ""
+       gateway        = cidrhost(var.machine_cidr, 1)
+      gateway         = local.dual_homed ? cidrhost(var.loadbalancer_cidr, 1) : ""
      }))
     hostname_file        = base64encode("lb-0")
     haproxy_systemd_unit = file("${path.module}/templates/haproxy.service")

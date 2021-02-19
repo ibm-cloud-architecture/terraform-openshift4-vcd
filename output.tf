@@ -13,3 +13,7 @@ output "public_ip" {
 output "openshift_console_url" {
   value = local.openshift_console_url 
 }
+
+output "export_kubeconfig" {
+  value = local.export_kubeconfig 
+}
