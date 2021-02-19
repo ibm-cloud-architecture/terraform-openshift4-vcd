@@ -105,9 +105,9 @@ openshift_pull_secret = "~/.pull-secret"
 create_loadbalancer_vm = true
 
 vcd_edge_gateway = {
-    edge_gateway = "edge-dal10-0e8bfc36"
-    external_gateway_interface = "dal10-w02-tenant-external"
-    network_name      = "test"
-    cluster_public_ip       = "150.238.224.81"
+    edge_gateway = "edge-xx10-xxxxxx"
+    external_gateway_interface = "xx10-xx02-tenant-external"
+    network_name      = "ocpnet"
+    cluster_public_ip       = "<public IP Address"
 
   }
