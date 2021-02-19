@@ -92,7 +92,8 @@ Each vCloud Datacenter comes with 5 IBM Cloud public IP addresses which we can u
 The sub-allocated address are available in IBM Cloud on the vCloud instance Resources page.
 Gather the following information that you will need when configuring the ESG:
 * Make a `list of the IPs and Sub-allocated IP Addresses` for the ESG.   
-![Public IP](./media/public_ip.png)    
+![Public IP](media/public_ip.jpg)
+
 
 - Take an unused IP and set `cluster_public_ip
 `
@@ -161,7 +162,7 @@ Our shorthand setup steps:
       - Translated Source IP/Range: pick an address not already used address from the sub-allocated network IPs
       - Description: **ocpnet outbound**
 
-![Public IP](./media/public_ip.png)
+![Public IP](./media/public_ip.jpg)
 
 
 
