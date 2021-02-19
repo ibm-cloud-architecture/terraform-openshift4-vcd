@@ -94,7 +94,8 @@ Gather the following information that you will need when configuring the ESG:
 * Make a `list of the IPs and Sub-allocated IP Addresses` for the ESG.   
 ![Public IP](./media/public_ip.png)    
 
-Take an unused IP and set  
+- Take an unused IP and set `cluster_public_ip
+`
 * Go to main menu > Networking > Edges,  and Select your ESG
   - Go to `Networks and subnets` and copy down the `Participating Subnets` of the `tenant-external` and `servicexx` external networks. (we will need this info later)
     - the tenant-external network allows external internet routing
@@ -102,14 +103,30 @@ Take an unused IP and set
 
  ![Networks](./media/networks.png)
 
+- Set `external_gateway_interface` to the tenant-external name displayed.   
+- Set `network_name` to the name of the network that you created above (ex. `ocpnet`)     
+
+- Your terraform.tfvars entries should look something like this:    
+```
+vcd_edge_gateway = {
+    edge_gateway = "edge-dal10-0e8bfc36"
+    external_gateway_interface = "dal10-w02-tenant-external"
+    network_name      = "ocpnet"
+    cluster_public_ip       = "150.238.224.81"
+  }
+```
+
+
+
+#### Outbound from OCP private network to IBM Cloud private network
+[Official instruction to connect to the IBM Cloud Services Private Network](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-enable-access).  
+
 For the following steps go to main menu > Networks > Edges > Select your ESG and select **SERVICES**
 
 See also https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-enable-traffic
 
 **Note:** make modifications by editing the various columns on the screen as instructed below.
-
-#### Outbound from OCP private network to IBM Cloud private network
-[Official instruction to connect to the IBM Cloud Services Private Network](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-enable-access).  Our shorthand setup steps:
+Our shorthand setup steps:
 1. Firewall Rule
     - go to the Firewall tab and select '+' to add
       - Name: **ocpnet cloud-private**
@@ -148,7 +165,7 @@ See also https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared
 
 
 
-#### Inbound config to the bastion on OCP private network
+#### Inbound config to the Bastion on from internet
 We need to configure DNAT so that we have ssh access the bastion VM from public internet:
   - We will use  172.16.0.10 address for bastion VM
 1. Firewall Rule
@@ -321,8 +338,8 @@ $ ls -l /etc/hosts
 -rw-r--r--  1 root  wheel  622  1 Feb 08:57 /etc/hosts`
 #### Install Terraform scripts
 ```bash
-git clone https://github.com/slipsibm/terraform-openshift4-vmware
-cd terraform-openshift4-vmware
+git clone https://github.com/slipsibm/terraform-openshift4-vcd
+cd terraform-openshift4-vcd
 cp terraform.tfvars.example terraform.tfvars
 ```
 
@@ -347,7 +364,7 @@ terraform apply
 | rhcos_template | Name of CoreOS OVA template from prereq #2 | string | - |
 | lb_template | VCD Network for OpenShift nodes                   | string | - |
 | vcd_catalog   | Name of VCD Catalog containing your templates  | string  |  Public Catalog |
-| vm_network | VCD Network for OpenShift nodes                   | string | - ||   |   |   |   |
+| vm_network | **deprecated- replaced by network_name in vcd_edge_gateway definition**     |- | - ||   |   |   |   |
 | loadbalancer_network       | VCD Network for Loadbalancer/DNS VM                      | string | -                              |
 | vm_dns_addresses           | List of DNS servers to use for your OpenShift Nodes          | list   | 8.8.8.8, 8.8.4.4               |
 | base_domain                | Base domain for your OpenShift Cluster                       | string | -                              |
@@ -376,9 +393,18 @@ terraform apply
 | openshift_host_prefix        | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23               |
 | create_loadbalancer_vm | Create the LoadBalancer VM and use it as a DNS server for your cluster.  If set to `false` you must provide a valid pre-configured LoadBalancer for your `api` and `*.apps` endpoints and DNS Zone for your `cluster_id`.`base_domain`. | bool | false |
 |create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
-|edge_gateway   | The name of the Edge Gateway  | String  |   |
-|gateway  |  The ip address of the gateway router. Usually `172.16.0.1` |  String |   |
-|  external_gateway_interface |  Name of the Gateway Interface for external access (typically something like `xxx10-xxx-tenant-external`)  | String  |   |
+|**vcd_edge_gateway object** |   |   |   |
+|edge_gateway   | The name of the Edge Gateway from Edges/Edge Gateway deploying_openshift_container_storage_using_bare_metal_infrastructure   | String  |   |
+|external_gateway_interface |  Name of the Gateway Interface for external access (typically something like `xxx10-xxx-tenant-external`)  | String  |   |
+|network_name   | Network name that you created within your VCD. (ex. ocpnet)  |  string |  - |
+| cluster_public_ip |Public IP address to be used for your OCP Cluster Console   |  string |   |
+|**airgapped object** |   |   |   |
+|  enabled | set to true for airgapped, false for regular install  |  bool |  false |
+|mirror_ip   |  ip address of the server hosting mirro | string  | -  |
+| mirror_fqdn  | fqdn of the mirror host. Must match the name in the mirrors registry's cert  |  string | -  |
+|  mirror_port | port of the mirror  |string   | -  |
+|  mirror_repository |  name of repo in mirror containing OCP install images (currently should be set to `ocp4/openshift4` see RH Doc for details) |  string |  - |
+|additional_trust_bundle   |  name of file containing cert for mirror | string  |  - |
 
 #### Retrieve pull secret from Red Hat sites
 Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) and place in a file on the Bastion Server. Default location is `~/.pull-secret`
@@ -490,7 +516,30 @@ Next Bootstap installs an OCP control plane on itself, as well as an http server
  - [Enable the OCP Image registry using your NFS Storage](https://docs.openshift.com/container-platform/4.5/registry/configuring_registry_storage/configuring-registry-storage-baremetal.html)
  - [Exposing the Registry](https://docs.openshift.com/container-platform/4.5/registry/securing-exposing-registry.html)
 
+### Airgapped Installation
+You will need a registry to store your images. A simple registry can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).  
+You will need to create your own mirror or use an existing mirror to do an airgapped install. Instructions to create a mirror for OpenShift 4.6 can be found [here](https://docs.openshift.com/container-platform/4.6/installing/install_config/installing-restricted-networks-preparations.html#installing-restricted-networks-preparations).
+
+You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
+
+You will need to follow the instructions carefully in order to setup imagesources for any operators that you want to install.
+
+An example of the airgapped object:
+```
+airgapped = {
+      enabled = true 
+      mirror_ip = "172.16.0.10"
+      mirror_fqdn = "bastion.airgapfull.cdastu.com"
+      mirror_port = "5000"
+      mirror_repository = "ocp4/openshift4"
+      additionalTrustBundle = "~/airgap.crt"      
+      }
+```
 ### Deleting Cluster (and reinstalling)
-`terraform destroy` will delete you cluster and remove all resources on VCD.  
-After 24 hours (or any changes to the terraform.tfvars file) you will need to remove the installer/cluster_id directory  
+If you want to delete your cluster, you should use `terraform destroy` as this will delete you cluster and remove all resources on VCD, including FW rules. If you manually delete your cluster via the VCD Console, remember to delete the FW rules and DNAT rules associated with your cluster or the reinstall may fail. The FW and DNAT rules should be tagged with your cluster name in the name and/or description fields.
+
+You should keep your installer/cluster_id directory because the ssh keys that you need to access any of the vm's in your cluster are in this directory.
+
+If you delete your cluster and want to reinstall, you will need to remove the installer/cluster_id directory or the install will likely fail when you start the VM's. You will see messages referencing x.509 certificate errors in the logs of the bootstrap and other servers if you forget to delete the directory.
+
 `rm -rf installer/<your cluster id>`
