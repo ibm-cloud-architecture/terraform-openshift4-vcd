@@ -403,7 +403,7 @@ terraform apply
 |external_gateway_interface |  Name of the Gateway Interface for external access (typically something like `xxx10-xxx-tenant-external`)  | String  |   |
 |network_name   | Network name that you created within your VCD. (ex. ocpnet)  |  string |  - |
 | cluster_public_ip |Public IP address to be used for your OCP Cluster Console   |  string |   |
-|**airgapped object** |   |   |   |
+|**airgapped object** | (only necessary for airgapped install)  |   |   |
 |  enabled | set to true for airgapped, false for regular install  |  bool |  false |
 |mirror_ip   |  ip address of the server hosting mirro | string  | -  |
 | mirror_fqdn  | fqdn of the mirror host. Must match the name in the mirrors registry's cert  |  string | -  |
