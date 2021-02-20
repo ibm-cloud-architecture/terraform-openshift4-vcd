@@ -19,27 +19,6 @@ locals {
 //}
 
 
-resource "vcd_nsxv_firewall_rule" "deny_all" {
-  count = var.airgapped["enabled"] ? 1 : 0 
-  org          = var.vcd_org
-  vdc          = var.vcd_vdc
-  edge_gateway = var.vcd_edge_gateway["edge_gateway"]
-  action       = "deny"
-  name         = "${var.cluster_id}_deny_all_rule"  
-  source {
-    org_networks = local.source_networks
-  }
-
-  destination {
-    ip_addresses = ["any"]
-  }
-
-  service {
-    protocol = "any"
-  }
-}
-
-
 resource "vcd_nsxv_firewall_rule" "lb_allow" {
 // if airgapped, you need the lb to have access so it can get dhcpd, coredns and haproxy images
   count = var.airgapped["enabled"] ? 1 : 0 
@@ -47,7 +26,6 @@ resource "vcd_nsxv_firewall_rule" "lb_allow" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = var.vcd_edge_gateway["edge_gateway"]
-  above_rule_id   = vcd_nsxv_firewall_rule.deny_all[count.index].id 
   action       = "accept"
   name         = "${var.cluster_id}_lb_allow_rule"  
   
@@ -62,9 +40,6 @@ resource "vcd_nsxv_firewall_rule" "lb_allow" {
   service {
     protocol = "any"
   }
-  depends_on = [
-     vcd_nsxv_firewall_rule.deny_all
-  ]
 }
 
 resource "vcd_nsxv_firewall_rule" "cluster_allow" {
@@ -74,7 +49,6 @@ resource "vcd_nsxv_firewall_rule" "cluster_allow" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = var.vcd_edge_gateway["edge_gateway"]
- // above_rule_id   = vcd_nsxv_firewall_rule.deny_all[count.index].id 
   action       = "accept"
   name         = "${var.cluster_id}_cluster_allow_rule"  
   
@@ -89,9 +63,7 @@ resource "vcd_nsxv_firewall_rule" "cluster_allow" {
   service {
     protocol = "any"
   }
-  depends_on = [
-     vcd_nsxv_firewall_rule.deny_all
-  ]
+
 }
 
 resource "vcd_nsxv_firewall_rule" "ocp_console_allow" {
@@ -100,7 +72,6 @@ resource "vcd_nsxv_firewall_rule" "ocp_console_allow" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = var.vcd_edge_gateway["edge_gateway"]
- // above_rule_id =   vcd_nsxv_firewall_rule.deny_all[count.index].id
 
   action       = "accept"
   name         = "${var.cluster_id}_ocp_console_allow_rule"  

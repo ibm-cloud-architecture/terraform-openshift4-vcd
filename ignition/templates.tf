@@ -47,6 +47,7 @@ installer_workspace = "${path.cwd}/installer/${var.cluster_id}"
 node_count = var.total_node_count
 csr_common_secret  = base64encode(file("${path.module}/templates/common.sh"))
 csr_approve_secret = base64encode(file("${path.module}/templates/approve-csrs.sh"))
+chrony_secret      = base64encode(file("${path.module}/templates/chrony.yaml"))
 
 }
 resource "local_file" "install_config_yaml" {
@@ -171,6 +172,87 @@ EOF
     null_resource.generate_manifests,
   ]
 }
+
+data "template_file" "chrony_master_config" {
+  count    = var.airgapped["enabled"] ? 1 : 0
+  template = <<EOF
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: master
+  name: masters-chrony-configuration
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 3.1.0
+    networkd: {}
+    passwd: {}
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,${local.chrony_secret}
+        mode: 420
+        overwrite: true
+        path: /etc/chrony.conf
+  osImageURL: ""
+EOF
+}
+
+resource "local_file" "chrony_master_config" {
+  count    = var.airgapped["enabled"] ? 1 : 0
+  content  = element(data.template_file.chrony_master_config.*.rendered, count.index)
+  filename = "${local.installer_workspace}/openshift/99_masters_chrony_config.yaml"
+  depends_on = [
+    null_resource.download_binaries,
+    null_resource.generate_manifests,
+  ]
+}
+
+data "template_file" "chrony_worker_config" {
+  count    = var.airgapped["enabled"] ? 1 : 0
+  template = <<EOF
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: workers-chrony-configuration
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 3.1.0
+    networkd: {}
+    passwd: {}
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,${local.chrony_secret}
+        mode: 420
+        overwrite: true
+        path: /etc/chrony.conf
+  osImageURL: ""
+EOF
+}
+
+resource "local_file" "chrony_worker_config" {
+  count    = var.airgapped["enabled"] ? 1 : 0
+  content  = element(data.template_file.chrony_worker_config.*.rendered, count.index)
+  filename = "${local.installer_workspace}/openshift/99_worker_chrony_config.yaml"
+  depends_on = [
+    null_resource.download_binaries,
+    null_resource.generate_manifests,
+  ]
+}
+
 
 data "template_file" "airgapped_registry_upgrades" {
   count    = var.airgapped["enabled"] ? 1 : 0
