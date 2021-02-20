@@ -552,6 +552,10 @@ oc get routes console -n openshift-console
 You will need a registry to store your images. A simple registry can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).  
 You will need to create your own mirror or use an existing mirror to do an airgapped install. Instructions to create a mirror for OpenShift 4.6 can be found [here](https://docs.openshift.com/container-platform/4.6/installing/install_config/installing-restricted-networks-preparations.html#installing-restricted-networks-preparations).
 
+In order for the accept CSR code to work, you will have to  
+`podman pull quay.io/openshift/origin-cli:latest` and push to your repository   
+`podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest`
+
 You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
 
 You will need to follow the instructions carefully in order to setup imagesources for any operators that you want to install.
