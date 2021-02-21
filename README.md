@@ -556,6 +556,10 @@ In order for the accept CSR code to work, you will have to
 `podman pull quay.io/openshift/origin-cli:latest` and push to your repository   
 `podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest`
 
+You should edit your pull secret and remove the section that refers to `cloud.openshift.com`. This removes Telemetry and Health Reporting. If you don't do this before installation, you will get an error in the insights operator. After installation, go [here](https://docs.openshift.com/container-platform/4.6/support/remote_health_monitoring/opting-out-of-remote-health-reporting.html) for instructions to disable Telemetry Reporting.
+
+You may receive an Alert stating `Cluster version operator has not retrieved updates in xh xxm 17s. Failure reason RemoteFailed . For more information refer to https://console-openshift-console.apps.<cluster_id>.<base_domain>.com/settings/cluster/` this is normal and can be ignored.
+
 You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
 
 You will need to follow the instructions carefully in order to setup imagesources for any operators that you want to install.
