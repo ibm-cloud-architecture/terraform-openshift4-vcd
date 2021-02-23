@@ -59,6 +59,7 @@ variable "airgapped"  {
   description = "test  variable for airgapped instead of separate vars"
   default     =  {
          enabled   = false
+         ocp_rel_ver = ""
          mirror_ip   = ""
          mirror_fqdn = ""
          mirror_port = ""

@@ -39,11 +39,6 @@ vcd_catalog = "Public Catalog"
 loadbalancer_network = "ocpnet"
 
 
-//Prefix for creating MAC addresses for control, compute and storage nodes (first five parts)
-// MAC address is created by taking this prefix appending it with the final part of the ip address
-// the MAC addresses are generated for the DHCP Reservations based on the IP address.
-// do not use IP addresses higher than 99 in the last position
-mac_prefix="00:50:56:01:20"
 
 // The machine_cidr where IP addresses will be assigned for cluster nodes.
 // Additionally, IPAM will assign IPs based on the network ID.

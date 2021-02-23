@@ -23,7 +23,7 @@ resource "null_resource" "download_binaries" {
       airgapped_port       = var.airgapped["mirror_port"]
       airgapped_repository = var.airgapped["mirror_repository"]
       pull_secret          = var.pull_secret	
-      openshift_version    = var.openshift_version
+      ocp_ver_rel          = var.airgapped["ocp_ver_rel"]
       path_root            = path.cwd
     })
   }

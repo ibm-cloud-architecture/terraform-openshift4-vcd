@@ -42,6 +42,8 @@ variable "rhcos_template" {
 variable "mac_prefix" {
   type        = string
   description = "Prefix for creating MAC addresses for control, compute and storage nodes (first five parts. MAC address is created by taking this prefix appending it with the final part of the ip address"
+  default     = "00:50:56:01:30"
+
 }
 
 variable "loadbalancer_network" {
@@ -267,6 +269,7 @@ variable "airgapped"  {
   description = "test  variable for airgapped instead of separate vars"
   default     =  {
          enabled   = false
+         ocp_ver_rel = ""
          mirror_ip   = ""
          mirror_fqdn = ""
          mirror_port = ""
