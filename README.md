@@ -405,6 +405,7 @@ terraform apply
 | cluster_public_ip |Public IP address to be used for your OCP Cluster Console   |  string |   |
 |**airgapped object** | (only necessary for airgapped install)  |   |   |
 |  enabled | set to true for airgapped, false for regular install  |  bool |  false |
+|ocp_ver_rel   | Full version and release loaded into your mirror (ex. 4.6.15)  | string  | -  |
 |mirror_ip   |  ip address of the server hosting mirro | string  | -  |
 | mirror_fqdn  | fqdn of the mirror host. Must match the name in the mirrors registry's cert  |  string | -  |
 |  mirror_port | port of the mirror  |string   | -  |
@@ -568,6 +569,7 @@ An example of the airgapped object:
 ```
 airgapped = {
       enabled = true
+      ocp_ver_rel = "4.6.15"
       mirror_ip = "172.16.0.10"
       mirror_fqdn = "bastion.airgapfull.cdastu.com"
       mirror_port = "5000"
