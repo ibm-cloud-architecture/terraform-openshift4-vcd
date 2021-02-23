@@ -22,3 +22,4 @@ makefile
 **/go-vcloud-director.log
 tmp.txt
 crash.log
+.docker*
