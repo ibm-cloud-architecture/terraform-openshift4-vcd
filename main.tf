@@ -197,6 +197,8 @@ module "ignition" {
   pull_secret         = var.openshift_pull_secret
   openshift_version   = var.openshift_version
   total_node_count    = var.compute_count + var.storage_count
+  storage_fqdns       = local.storage_fqdns
+  storage_count       = var.storage_count
   airgapped           = var.airgapped   
   depends_on = [
      local_file.write_public_key,

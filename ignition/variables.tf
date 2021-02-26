@@ -54,6 +54,15 @@ variable "total_node_count" {
   type = number
 }
 
+variable "storage_fqdns" {
+  type = list(string)   
+}
+
+variable "storage_count" {
+  type = number
+  default = 0
+}
+
 variable "airgapped"  {
   type        = map(string)
   description = "test  variable for airgapped instead of separate vars"
