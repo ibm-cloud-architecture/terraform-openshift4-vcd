@@ -291,7 +291,6 @@ variable "proxy_config" {
 
 variable "vcd_edge_gateway" {
   type = object ({
-    edge_gateway = string
     external_gateway_interface = string
     network_name          = string
 //    static_start_address  = string

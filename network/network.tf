@@ -18,6 +18,19 @@ locals {
 //  logging              = true
 //}
 
+data "vcd_resource_list" "edge_gateway_name" {
+  org          = var.vcd_org
+  vdc          = var.vcd_vdc
+  name          = "edge_gateway_name"
+  resource_type = "vcd_edgegateway" # Finds all networks, regardless of their type
+  list_mode     = "name"
+}
+
+# Shows the list of all networks with the corresponding import command
+output "gateway_list" {
+  value = data.vcd_resource_list.edge_gateway_name.list
+}
+
 
 resource "vcd_nsxv_firewall_rule" "lb_allow" {
 // if airgapped, you need the lb to have access so it can get dhcpd, coredns and haproxy images
@@ -25,7 +38,7 @@ resource "vcd_nsxv_firewall_rule" "lb_allow" {
 
   org          = var.vcd_org
   vdc          = var.vcd_vdc
-  edge_gateway = var.vcd_edge_gateway["edge_gateway"]
+  edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
   action       = "accept"
   name         = "${var.cluster_id}_lb_allow_rule"  
   
@@ -48,7 +61,7 @@ resource "vcd_nsxv_firewall_rule" "cluster_allow" {
 
   org          = var.vcd_org
   vdc          = var.vcd_vdc
-  edge_gateway = var.vcd_edge_gateway["edge_gateway"]
+  edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
   action       = "accept"
   name         = "${var.cluster_id}_cluster_allow_rule"  
   
@@ -71,7 +84,7 @@ resource "vcd_nsxv_firewall_rule" "ocp_console_allow" {
 
   org          = var.vcd_org
   vdc          = var.vcd_vdc
-  edge_gateway = var.vcd_edge_gateway["edge_gateway"]
+  edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
 
   action       = "accept"
   name         = "${var.cluster_id}_ocp_console_allow_rule"  
@@ -93,7 +106,7 @@ resource "vcd_nsxv_firewall_rule" "ocp_console_allow" {
 resource "vcd_nsxv_dnat" "dnat" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
-  edge_gateway = var.vcd_edge_gateway["edge_gateway"]
+  edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
   network_name =  var.vcd_edge_gateway["external_gateway_interface"] 
   network_type = "ext"
   
