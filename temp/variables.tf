@@ -51,6 +51,7 @@ variable "cluster_id" {
 //}
 
 
+
 variable "airgapped"  {
   type        = map(string)
   description = "test  variable for airgapped instead of separate vars"
