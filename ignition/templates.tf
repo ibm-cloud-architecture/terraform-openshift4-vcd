@@ -45,9 +45,26 @@ EOF
 locals {
 installer_workspace = "${path.cwd}/installer/${var.cluster_id}"
 node_count = var.total_node_count
-csr_common_secret  = base64encode(file("${path.module}/templates/common.sh"))
-csr_approve_secret = base64encode(file("${path.module}/templates/approve-csrs.sh"))
-chrony_secret      = base64encode(file("${path.module}/templates/chrony.yaml"))
+csr_common_secret    = base64encode(file("${path.module}/templates/common.sh"))
+csr_approve_secret   = base64encode(file("${path.module}/templates/approve-csrs.sh"))
+user_cmds_secret     = base64encode(file("${path.module}/templates/post-install-user-cmds.sh"))
+chrony_secret        = base64encode(file("${path.module}/templates/chrony.yaml"))
+label_storage_nodes_secret  = base64encode(<<EOF
+# find out if OCP is up
+ready_storage_nodes_count=0
+while [ $ready_storage_nodes_count -lt ${var.storage_count} ]; do
+   ready_storage_nodes_count=$(oc get nodes | awk '{print $1, $2}' | grep storage- | grep Ready | wc -l)
+   echo "Ready storage nodes count: " $ready_storage_nodes_count
+   sleep 10
+done   
+oc patch OperatorHub cluster --type json  -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
+%{ for hostname in var.storage_fqdns ~}
+oc label node  ${hostname} node-role.kubernetes.io/infra=""
+oc label node  ${hostname}  cluster.ocs.openshift.io/openshift-storage=""
+oc adm taint node ${hostname} node.ocs.openshift.io/storage="true":NoSchedule
+%{ endfor ~}
+EOF
+)
 
 }
 resource "local_file" "install_config_yaml" {
@@ -119,6 +136,73 @@ EOF
 resource "local_file" "post_deployment_06" {
   content  = data.template_file.post_deployment_06.rendered
   filename = "${local.installerdir}/manifests/99_06-post-deployment.yaml"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+
+
+data "template_file" "post_deployment_07_secret" {
+  template = <<EOF
+apiVersion: v1
+kind: Secret
+data:
+  post-deployment-user-cmds.sh: ${local.user_cmds_secret}
+metadata:
+  name: user-cmds-scripts
+  namespace: ibm-post-deployment
+type: Opaque
+EOF
+}
+
+resource "local_file" "post_deployment_07" {
+  content  = data.template_file.post_deployment_07_secret.rendered
+  filename = "${local.installerdir}/manifests/99_07-post-deployment.yaml"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+
+
+data "template_file" "post_deployment_08" {
+  template = <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: user-cmds
+  namespace: ibm-post-deployment
+spec:
+  containers:
+  - name: user-cmds
+    imagePullPolicy: Always
+    %{if var.airgapped["enabled"]}    
+    image: ${var.airgapped["mirror_fqdn"]}:${var.airgapped["mirror_port"]}/openshift/origin-cli:latest
+    %{else}    
+    image: quay.io/openshift/origin-cli:latest
+    %{endif}
+    command: ["/bin/sh", "-c"]
+    args: 
+      - "mkdir /tmp/user-cmds-rw && cp /tmp/user-cmds/*.sh /tmp/user-cmds-rw && cd /tmp/user-cmds-rw && ./post-install-user-cmds.sh "
+    volumeMounts:
+      - name: user-cmds
+        mountPath: /tmp/user-cmds
+  restartPolicy: Never
+  serviceAccount: ibm-deployment-sa
+  volumes:
+    - name: user-cmds
+      secret:
+        defaultMode: 0755
+        secretName: user-cmds-scripts
+  tolerations:
+    - operator: Exists
+  nodeSelector:
+    node-role.kubernetes.io/master: ''
+EOF
+}
+
+resource "local_file" "post_deployment_08" {
+  content  = data.template_file.post_deployment_08.rendered
+  filename = "${local.installerdir}/manifests/99_08-post-deployment.yaml"
   depends_on = [
     null_resource.generate_manifests,
   ]
@@ -278,6 +362,61 @@ resource "local_file" "airgapped_registry_upgrades" {
   filename = "${local.installer_workspace}/openshift/99_airgapped_registry_upgrades.yaml"
   depends_on = [
     null_resource.download_binaries,
+    null_resource.generate_manifests,
+  ]
+}
+
+data "template_file" "label_storage_nodes" {
+count = var.storage_count > 3 ? 1 : 0  
+  template = <<EOF
+apiVersion: v1
+kind: Secret
+data:
+  label_storage_nodes.sh: ${local.label_storage_nodes_secret}
+metadata:
+  name: label-storage-nodes
+  namespace: ibm-post-deployment
+type: Opaque
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: label-storage-nodes
+  namespace: ibm-post-deployment
+spec:
+  containers:
+  - name: label-storage-nodes
+    imagePullPolicy: Always
+    %{if var.airgapped["enabled"]}    
+    image: ${var.airgapped["mirror_fqdn"]}:${var.airgapped["mirror_port"]}/openshift/origin-cli:latest
+    %{else}    
+    image: quay.io/openshift/origin-cli:latest
+    %{endif}
+    command: ["/bin/sh", "-c"]
+    args: 
+      - "mkdir /tmp/label-nodes-rw && cp /tmp/label-nodes/*.sh /tmp/label-nodes-rw && cd /tmp/label-nodes-rw && ./label_storage_nodes.sh "
+    volumeMounts:
+      - name: label-nodes
+        mountPath: /tmp/label-nodes
+  restartPolicy: Never
+  serviceAccount: ibm-deployment-sa
+  volumes:
+    - name: label-nodes
+      secret:
+        defaultMode: 0755
+        secretName: label-storage-nodes
+  tolerations:
+    - operator: Exists
+  nodeSelector:
+    node-role.kubernetes.io/master: ''
+EOF
+}
+
+resource "local_file" "label_storage_nodes" {
+  count = var.storage_count > 3 ? 1 : 0  
+  content  = data.template_file.label_storage_nodes[count.index].rendered
+  filename = "${local.installerdir}/manifests/99_label_storage_nodes.yaml"
+  depends_on = [
     null_resource.generate_manifests,
   ]
 }
