@@ -212,10 +212,10 @@ resource "vcd_vapp_vm" "bastion" {
   power_on = true
   # upload the ssh key on the VM. it will avoid password authentification for later interaction with the vm
   provisioner "local-exec" {
-    command = <<EOF 
-  ssh-keygen -t ed25519 -N ''  -f ~/.ssh/id_bastion 
-  sshpass -p ${var.bastion_password} ssh-copy-id -i ~/.ssh/bastion_id root@${var.bastion_ip} -f
-  EOF
+      command = templatefile("${path.module}/scripts/fix_ssh.sh.tmpl", {
+         bastion_password     = var.bastion_password
+         bastion_ip           = var.bastion_ip 
+    })
   }
   # extract from terraform.tfvars file the values to create ansible inventory and varaible files.
   provisioner "local-exec"  {
