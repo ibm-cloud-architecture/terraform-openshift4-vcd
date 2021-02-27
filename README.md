@@ -110,7 +110,6 @@ Gather the following information that you will need when configuring the ESG:
 - Your terraform.tfvars entries should look something like this:    
 ```
 vcd_edge_gateway = {
-    edge_gateway = "edge-dal10-0e8bfc36"
     external_gateway_interface = "dal10-w02-tenant-external"
     network_name      = "ocpnet"
     cluster_public_ip       = "150.238.224.81"
@@ -399,7 +398,6 @@ terraform apply
 | create_loadbalancer_vm | Create the LoadBalancer VM and use it as a DNS server for your cluster.  If set to `false` you must provide a valid pre-configured LoadBalancer for your `api` and `*.apps` endpoints and DNS Zone for your `cluster_id`.`base_domain`. | bool | false |
 |create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
 |**vcd_edge_gateway object** |   |   |   |
-|edge_gateway   | The name of the Edge Gateway from Edges/Edge Gateway deploying_openshift_container_storage_using_bare_metal_infrastructure   | String  |   |
 |external_gateway_interface |  Name of the Gateway Interface for external access (typically something like `xxx10-xxx-tenant-external`)  | String  |   |
 |network_name   | Network name that you created within your VCD. (ex. ocpnet)  |  string |  - |
 | cluster_public_ip |Public IP address to be used for your OCP Cluster Console   |  string |   |
