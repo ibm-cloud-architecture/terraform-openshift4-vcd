@@ -110,7 +110,7 @@ resource "vcd_nsxv_dnat" "dnat" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
-  network_name =  var.routed_net 
+  network_name =  "dal10-w02-tenant-external" 
   network_type = "org"
   
   original_address   = var.bastion_ip
