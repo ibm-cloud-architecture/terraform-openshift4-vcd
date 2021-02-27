@@ -90,7 +90,7 @@ resource "vcd_nsxv_firewall_rule" "bastion_inbound_allow" {
   name         = "bastion_inbound_allow_rule"  
   
   source {
-    ip_addresses = ["Any"]
+    ip_addresses = ["any"]
   }
 
   destination {
