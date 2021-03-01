@@ -1,4 +1,4 @@
+sleep 60 
+echo "waiting 1 min for vm to boot"
 ssh-keygen -t ed25519 -N ''  -f ~/.ssh/id_bastion <<< n
-echo "key created successfully"
-ls -la ~/.ssh
 sshpass -p ${bastion_password} ssh-copy-id -i ~/.ssh/id_bastion root@${bastion_ip} -f

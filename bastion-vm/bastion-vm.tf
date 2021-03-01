@@ -180,6 +180,8 @@ resource "vcd_vapp_vm" "bastion" {
   name          = "testbastion"
   depends_on = [
     vcd_vapp_org_network.vappOrgNet,
+    vcd_nsxv_dnat.dnat,
+    vcd_nsxv_firewall_rule.bastion_inbound_allow,  
   ]
   catalog_name  = var.template_catalog
   template_name = var.bastion_template
@@ -219,10 +221,10 @@ resource "vcd_vapp_vm" "bastion" {
   }
   # extract from terraform.tfvars file the values to create ansible inventory and varaible files.
   provisioner "local-exec"  {
-    command = "./bastion-vm/scripts/extract_vars.sh terraform.tfvars" 
+    command = "${path.module}/scripts/extract_vars.sh terraform.tfvars" 
   }
   #launch ansible script. 
   provisioner "local-exec" {
-      command = " ansible-playbook -i ./bastion-vm/ansible/inventory ./bastion-vm/ansible/main.yaml" 
+      command = " ansible-playbook -i ${path.module}/ansible/inventory ${path.module}ansible/main.yaml" 
   }
 }
