@@ -86,6 +86,7 @@ module "network" {
   base_domain   = var.base_domain
   vcd_edge_gateway = var.vcd_edge_gateway
   vcd_url       = var.vcd_url 
+  public_bastion_ip = var.public_bastion_ip
    
   depends_on = [
      local_file.write_public_key

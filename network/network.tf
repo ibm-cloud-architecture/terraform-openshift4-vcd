@@ -122,7 +122,8 @@ resource "vcd_nsxv_dnat" "dnat" {
  data "template_file" "ansible_add_entries_bastion" {
   template = <<EOF
 ---
-- hosts: all
+- hosts: localhost
+  connection: local
   gather_facts: False
   vars:
      myvars: "{{ lookup('file', './ansible_vars.json') }}"
@@ -147,10 +148,23 @@ resource "local_file" "ansible_add_entries_bastion" {
   filename = "${local.ansible_directory}/add_entries.yaml"
 }
 
+
+ data "template_file" "ansible_net_inventory" {
+  template = <<EOF
+${var.public_bastion_ip}
+ ansible_connection=ssh ansible_user=root ansible_python_interpreter="/usr/libexec/platform-python" 
+EOF
+}
+ 
+resource "local_file" "ansible_net_inventory" {
+  content  = data.template_file.ansible_net_inventory.rendered
+  filename = "${local.ansible_directory}/inventory"
+} 
  data "template_file" "ansible_remove_entries_bastion" {
   template = <<EOF
 ---
-- hosts: all
+- hosts: localhost
+  connection: local
   gather_facts: False
   vars:
      myvars: "{{ lookup('file', './ansible_vars.json') }}"

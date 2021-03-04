@@ -44,6 +44,9 @@ variable "cluster_ip_addresses" {
 variable "base_domain" {
   type        = string
 }
+variable "public_bastion_ip" {
+  type        = string
+}
 
 variable "vcd_edge_gateway" {
   type = object ({
