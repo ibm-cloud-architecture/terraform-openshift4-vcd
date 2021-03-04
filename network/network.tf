@@ -6,6 +6,8 @@
 locals {
     source_networks = [var.vcd_edge_gateway["network_name"]]
     ansible_directory = "/tmp"
+    external_network_name     =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-tenant-external" : "fra04-w02-tenant-external"
+
     rule_id = ""
   }
 
@@ -108,7 +110,7 @@ resource "vcd_nsxv_dnat" "dnat" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
-  network_name =  var.vcd_edge_gateway["external_gateway_interface"] 
+  network_name =  local.external_network_name 
   network_type = "ext"
   
   original_address   = var.vcd_edge_gateway["cluster_public_ip"]
@@ -180,15 +182,13 @@ resource "null_resource" "update_bastion_files" {
       when = create
       command = " ansible-playbook -i ${local.ansible_directory}/inventory ${local.ansible_directory}/add_entries.yaml"
   }
-    provisioner "local-exec" {
-      when = destroy
-      command = " ansible-playbook -i ${local.ansible_directory}/inventory ${local.ansible_directory}/remove_entries.yaml"
-  } 
-  
+//    provisioner "local-exec" {
+//      when = destroy
+//      command = " ansible-playbook -i ${local.ansible_directory}/inventory ${local.ansible_directory}/remove_entries.yaml"
+//  } 
   depends_on = [
       local_file.ansible_add_entries_bastion,
       local_file.ansible_remove_entries_bastion,
-
   ]
 }
 

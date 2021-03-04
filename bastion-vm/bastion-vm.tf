@@ -27,14 +27,14 @@ data "vcd_resource_list" "edge_gateway_name" {
 resource "vcd_network_routed" "net" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
-  name         = var.routed_net
+  name         = var.vcd_edge_gateway["network_name"]
   interface_type = "internal"
   edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
-  gateway      = var.vcd_network_routed["gateway"]
+  gateway      = cidrhost(var.machine_cidr, 1)
 
   static_ip_pool {
-    start_address = var.vcd_network_routed["static_ip_start"]
-    end_address   = var.vcd_network_routed["static_ip_end"]
+    start_address = var.vcd_edge_gateway["static_start_address"]
+    end_address   = var.vcd_edge_gateway["static_end_address"]
   }
   
 }
@@ -72,7 +72,7 @@ resource "vcd_nsxv_firewall_rule" "bastion_private_outbound_allow" {
   name         = "bastion_outbound_private_allow_rule"  
   
   source {
-    org_networks = [var.routed_net]
+    org_networks = [var.vcd_edge_gateway["network_name"]]
   }
 
   destination {
@@ -175,7 +175,7 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
    vdc          = var.vcd_vdc
    vapp_name         = vcd_vapp.bastion.name
 
-   org_network_name  = var.routed_net
+   org_network_name  = var.vcd_edge_gateway["network_name"]
    depends_on = [vcd_network_routed.net]
 }
 # Create the bastion VM
@@ -207,7 +207,7 @@ resource "vcd_vapp_vm" "bastion" {
   # Assign IP address on the routed network 
   network {
     type               = "org"
-    name               = var.routed_net
+    name               = var.vcd_edge_gateway["network_name"]
     ip_allocation_mode = "MANUAL"
     ip                 = var.internal_bastion_ip
     is_primary         = true

@@ -2,7 +2,7 @@
 locals {
   installerdir = "${path.cwd}/installer/${var.cluster_id}"
   openshift_installer_url = "${var.openshift_installer_url}/latest-${var.openshift_version}"
-  bootstrap_ignition_url = "http://172.16.0.10${local.installerdir}/bootstrap.ign"
+  bootstrap_ignition_url = "http://172.16.0.10/installer/${var.cluster_id}/bootstrap.ign"
   mirror_fqdn = var.airgapped["mirror_fqdn"]
   mirror_port = var.airgapped["mirror_port"]
   mirror_repository = var.airgapped["mirror_repository"]
@@ -111,3 +111,11 @@ data "local_file" "worker_ignition" {
   ]
 }
 
+resource "null_resource" "ignition_access_right" {
+  depends_on = [  
+    null_resource.generate_ignition, local_file.append-bootstrap
+  ]
+  provisioner "local-exec" {
+    command = "chmod 644 ${local.installerdir}/bootstrap.ign"
+  }
+}

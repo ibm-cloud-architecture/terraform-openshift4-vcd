@@ -29,10 +29,6 @@ variable "vcd_catalog" {
   default     = "Public Catalog"
 }
 
-variable "routed_net"{
-  type        = string
-  description = "name of the routed network used"
-  }
 
 variable "internal_bastion_ip"{
   type        = string
@@ -92,16 +88,24 @@ variable "machine_cidr"     {
   }
 
 // Network object
-variable "vcd_network_routed" {
+//variable "vcd_network_routed" {
+//  type = object ({
+//    gateway = string
+//    static_ip_start = string
+//    static_ip_end   = string
+//  })
+//  default = {
+//    gateway          = "192.16.0.1"
+//    static_ip_start  = "192.16.0.11"
+//    static_ip_end    = "192.16.0.18"
+//    
+//  }
+//}
+variable "vcd_edge_gateway" {
   type = object ({
-    gateway = string
-    static_ip_start = string
-    static_ip_end   = string
+    network_name          = string
+    static_start_address  = string
+    static_end_address    = string
+    cluster_public_ip     = string  
   })
-  default = {
-    gateway          = "192.16.0.1"
-    static_ip_start  = "192.16.0.11"
-    static_ip_end    = "192.16.0.18"
-    
-  }
 }

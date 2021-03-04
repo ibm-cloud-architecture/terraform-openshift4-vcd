@@ -258,6 +258,30 @@ variable "create_vms_only" {
   default     = false
 }
 
+variable "public_bastion_ip" {
+  type        = string
+  default     = ""
+}
+
+variable "bastion_password" {
+  type        = string
+  default     = ""
+}
+variable "internal_bastion_ip" {
+  type        = string
+  default     = ""
+}
+
+variable "terraform_ocp_repo" {
+  type        = string
+  default     = ""
+}
+variable "rhel_key" {
+  type        = string
+  default     = ""
+}
+
+
 
 //variable "openshift_console_url" {
 //  type    = string
@@ -279,6 +303,7 @@ variable "airgapped"  {
 }
 
 
+
 variable "proxy_config" {
   type = map(string)
   default = {
@@ -291,10 +316,9 @@ variable "proxy_config" {
 
 variable "vcd_edge_gateway" {
   type = object ({
-    external_gateway_interface = string
     network_name          = string
-//    static_start_address  = string
-//    static_end_address    = string
+    static_start_address  = string
+    static_end_address    = string
     cluster_public_ip     = string  
   })
 }
