@@ -86,7 +86,9 @@ variable "terraform_ocp_repo"{
 variable "machine_cidr"     {
   type        = string
   }
-
+variable "openshift_pull_secret"     {
+  type        = string
+  }
 // Network object
 //variable "vcd_network_routed" {
 //  type = object ({

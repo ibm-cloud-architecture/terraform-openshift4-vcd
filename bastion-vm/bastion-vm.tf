@@ -244,6 +244,7 @@ EOF
          openshift_version = var.openshift_version
          terraform_ocp_repo = var.terraform_ocp_repo
          nginx_repo_dir = local.nginx_repo
+         openshift_pull_secret = var.openshift_pull_secret
        }
  }
  
