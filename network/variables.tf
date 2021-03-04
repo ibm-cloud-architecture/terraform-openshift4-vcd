@@ -20,10 +20,10 @@ variable "vcd_org" {
   type        = string
   description = "This is the vcd org string from the console for the environment."
 }
-//variable "vcd_url" {
-//  type        = string
-//  description = "This is the vcd url for the environment."
-//}
+variable "vcd_url" {
+  type        = string
+  description = "This is the vcd url for the environment."
+}
 variable "vcd_catalog" {
   type        = string
   description = "This is the vcd catalog to use for the environment."
@@ -47,10 +47,9 @@ variable "base_domain" {
 
 variable "vcd_edge_gateway" {
   type = object ({
-    external_gateway_interface = string
     network_name          = string
-//    static_start_address  = string
-//    static_end_address    = string
+    static_start_address  = string
+    static_end_address    = string
     cluster_public_ip     = string  
   })
 }
