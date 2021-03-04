@@ -83,6 +83,7 @@ module "network" {
   vcd_org       = var.vcd_org
   vcd_vdc       = var.vcd_vdc
   cluster_id    = var.cluster_id
+  base_domain   = var.base_domain
   vcd_edge_gateway = var.vcd_edge_gateway
    
   depends_on = [

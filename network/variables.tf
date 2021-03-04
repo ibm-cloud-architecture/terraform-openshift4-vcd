@@ -41,6 +41,10 @@ variable "cluster_ip_addresses" {
   type        = list(string)
 }
 
+variable "base_domain" {
+  type        = string
+}
+
 variable "vcd_edge_gateway" {
   type = object ({
     external_gateway_interface = string

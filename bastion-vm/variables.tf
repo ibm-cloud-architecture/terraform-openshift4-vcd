@@ -38,7 +38,7 @@ variable "internal_bastion_ip"{
   type        = string
   description = "ip of bastion on routed network"
 }
-variable "bastion_ip"{
+variable "public_bastion_ip"{
   type        = string
   description = "external ip of the bastion"
 }
@@ -58,6 +58,38 @@ variable "bastion_password"{
   type        = string
   description = "password of the bastion vm"
 }
+
+variable "rhel_key"{
+  type        = string
+  description = "Red Hat Activation Key from Cloud Console"
+}
+
+variable "base_domain"{
+  type        = string
+  description = "base domain of cluster"
+}
+
+variable "cluster_id"{
+  type        = string
+  description = "cluster id/name"
+}
+
+variable "openshift_version"{
+  type        = string
+  description = "openshift version"
+}
+
+variable "lb_ip_address"{
+  type        = string
+}
+
+variable "terraform_ocp_repo"{
+  type        = string
+}
+
+variable "machine_cidr"     {
+  type        = string
+  }
 
 // Network object
 variable "vcd_network_routed" {

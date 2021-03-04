@@ -16,7 +16,7 @@
       shell: "echo '{\"dmi.system.uuid\":\"{{uuid.stdout}}\"}' > /etc/rhsm/facts/uuid_override.facts"
     
     - name: enable RHEL host entitlement
-      shell: "subscription-manager register --org=\"customer\" --activationkey=\"{{myvars.rhel_key}}\" --force"
+      shell: "subscription-manager register --org=\"customer\" --activationkey=\"${rhel_key}\" --force"
 
     # configure DNS server on the vm
     - name: install dnsmasq
@@ -44,13 +44,13 @@
       shell: "echo \"interface=lo\" >> /etc/dnsmasq.conf"
 
     - name: update dnsmasq.conf
-      shell: "echo \"address=/.apps.{{myvars.ocp_cluster}}.{{myvars.domain}}/{{myvars.lb_ip}}\" >> /etc/dnsmasq.conf"
+      shell: "echo \"address=/.apps.${cluster_id}.${base_domain}/${lb_ip_address}\" >> /etc/dnsmasq.conf"
     
     - name: update etc hosts
-      shell: "echo \"{{myvars.lb_ip}} api.{{myvars.ocp_cluster}}.{{myvars.domain}}\" >> /etc/hosts "
+      shell: "echo \"${lb_ip_address} api.${cluster_id}.${base_domain}\" >> /etc/hosts "
       
     - name: update etc hosts
-      shell: "echo \"{{myvars.lb_ip}} api-int.{{myvars.ocp_cluster}}.{{myvars.domain}}\" >> /etc/hosts "
+      shell: "echo \"${lb_ip_address} api-int.${cluster_id}.${base_domain}\" >> /etc/hosts "
 
     - name: enable dns
       ansible.builtin.systemd:
@@ -98,7 +98,7 @@
     # openshift cli
     - name: get oc client archive
       get_url:
-        url: "http://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest-{{myvars.ocp_version}}/openshift-client-linux.tar.gz"
+        url: "http://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest-${openshift_version}/openshift-client-linux.tar.gz"
         dest: "/tmp" 
 
     - name: untar oc cli archive
@@ -123,6 +123,6 @@
     # check out git repo with OCP terraform script
     - name: git checkout
       git:
-        repo: "{{myvars.terraform_ocp_repo}}"
+        repo: "${terraform_ocp_repo}"
         dest: /opt/terraform
     

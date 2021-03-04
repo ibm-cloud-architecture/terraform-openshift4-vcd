@@ -5,6 +5,7 @@
 
 locals {
     source_networks = [var.vcd_edge_gateway["network_name"]]
+    ansible_directory = "/tmp"
     rule_id = ""
   }
 
@@ -116,3 +117,80 @@ resource "vcd_nsxv_dnat" "dnat" {
   description = "${var.cluster_id} OCP Console DNAT Rule"
 }
 
+ data "template_file" "ansible_add_entries_bastion" {
+  template = <<EOF
+---
+- hosts: all
+  gather_facts: False
+  vars:
+     myvars: "{{ lookup('file', './ansible_vars.json') }}"
+  tasks:
+    - name: update hosts
+      blockinfile:
+         path: /etc/hosts
+         block: |
+            ${var.network_lb_ip_address}  api.${var.cluster_id}.${var.base_domain}
+            ${var.network_lb_ip_address}  api-int.${var.cluster_id}.${var.base_domain}
+         state: present
+    - name: update dnsmasq
+      lineinfile:
+         path: /etc/dnsmasq.conf
+         line: address=/.apps.${var.cluster_id}.${var.base_domain}/${var.network_lb_ip_address}
+         state: present
+EOF
+}
+
+resource "local_file" "ansible_add_entries_bastion" {
+  content  = data.template_file.ansible_add_entries_bastion.rendered
+  filename = "${local.ansible_directory}/add_entries.yaml"
+}
+
+ data "template_file" "ansible_remove_entries_bastion" {
+  template = <<EOF
+---
+- hosts: all
+  gather_facts: False
+  vars:
+     myvars: "{{ lookup('file', './ansible_vars.json') }}"
+  tasks:
+    - name: update hosts
+      blockinfile:
+         path: /etc/hosts
+         block: |
+            ${var.network_lb_ip_address}  api.${var.cluster_id}.${var.base_domain}
+            ${var.network_lb_ip_address}  api-int.${var.cluster_id}.${var.base_domain}
+         state: absent
+    - name: update dnsmasq
+      lineinfile:
+         path: /etc/dnsmasq.conf
+         line: address=/.apps.${var.cluster_id}.${var.base_domain}/${var.network_lb_ip_address}
+         state: absent
+EOF
+}
+
+resource "local_file" "ansible_remove_entries_bastion" {
+  content  = data.template_file.ansible_remove_entries_bastion.rendered
+  filename = "${local.ansible_directory}/remove_entries.yaml"
+}
+
+
+resource "null_resource" "update_bastion_files" {
+   #launch ansible script. 
+    provisioner "local-exec" {
+      when = create
+      command = " ansible-playbook -i ${local.ansible_directory}/inventory ${local.ansible_directory}/add_entries.yaml"
+  }
+    provisioner "local-exec" {
+      when = destroy
+      command = " ansible-playbook -i ${local.ansible_directory}/inventory ${local.ansible_directory}/remove_entries.yaml"
+  } 
+  
+  depends_on = [
+      local_file.ansible_add_entries_bastion,
+      local_file.ansible_remove_entries_bastion,
+
+  ]
+}
+
+
+         
