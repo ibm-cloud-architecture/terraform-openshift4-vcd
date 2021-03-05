@@ -23,22 +23,10 @@ variable "vcd_url" {
   type        = string
   description = "This is the vcd url for the environment."
 }
-variable "vcd_catalog" {
-  type        = string
-  description = "This is the vcd catalog to use for the environment."
-  default     = "Public Catalog"
-}
 
-variable "bastion_template"{
+variable "vcd_catalog"{
   type        = string
-  description = "name of the template used to create the bastion vm"
-  default     = "RedHat-8-Template-Official"
-}
-
-variable "template_catalog"{
-  type        = string
-  description = "name of tempalte catalog"
-  default     = "Public Catalog" 
+  description = "name of template catalog"
 }
 
 variable "base_domain"{
@@ -61,6 +49,9 @@ variable "lb_ip_address"{
 }
 
 variable "openshift_pull_secret"     {
+  type        = string
+  }
+variable "cluster_public_ip" {
   type        = string
   }
 
@@ -87,8 +78,8 @@ variable "initialization_info" {
     rhel_key               = string
     machine_cidr           = string
     network_name           = string
-    cluster_public_ip      = string
     static_start_address   = string
-    static_end_address     = string    
+    static_end_address     = string 
+    bastion_template       = string
   })
   }

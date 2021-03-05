@@ -255,8 +255,6 @@ variable "airgapped"  {
          }
 }
 
-
-
 variable "proxy_config" {
   type = map(string)
   default = {
@@ -265,6 +263,10 @@ variable "proxy_config" {
     httpsProxy            = ""
     noProxy               = ""
   }
+}
+
+variable "cluster_public_ip" {
+  type        = string
 }
 
 variable "initialization_info" {
@@ -276,8 +278,8 @@ variable "initialization_info" {
     rhel_key               = string
     machine_cidr           = string
     network_name           = string
-    cluster_public_ip      = string
     static_start_address   = string
-    static_end_address     = string    
+    static_end_address     = string
+    bastion_template       = string
   })
 }

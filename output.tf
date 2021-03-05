@@ -3,7 +3,7 @@ output "kubeadmin_user_info" {
 }  
 
 output "public_ip" {
-  value = var.vcd_edge_gateway["cluster_public_ip"]
+  value = var.cluster_public_ip
 }
 
 output "openshift_console_url" {

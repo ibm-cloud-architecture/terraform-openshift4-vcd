@@ -41,22 +41,13 @@ variable "cluster_ip_addresses" {
   type        = list(string)
 }
 
+variable "cluster_public_ip" {
+  type        = string
+}
+
 variable "base_domain" {
   type        = string
 }
-variable "public_bastion_ip" {
-  type        = string
-}
-
-variable "vcd_edge_gateway" {
-  type = object ({
-    network_name          = string
-    static_start_address  = string
-    static_end_address    = string
-    cluster_public_ip     = string  
-  })
-}
-
 
 variable "airgapped"  {
   type        = map(string)
@@ -71,3 +62,16 @@ variable "airgapped"  {
          }
 }
 
+variable "initialization_info" {
+  type = object ({
+    public_bastion_ip      = string
+    bastion_password       = string
+    internal_bastion_ip    = string
+    terraform_ocp_repo     = string  
+    rhel_key               = string
+    machine_cidr           = string
+    network_name           = string
+    static_start_address   = string
+    static_end_address     = string    
+  })
+}

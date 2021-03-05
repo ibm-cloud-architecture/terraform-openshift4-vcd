@@ -1,53 +1,35 @@
-
-
-
-
 // ID identifying the cluster to create. Use your username so that resources created can be tracked back to you.
 
-cluster_id = "your-cluster-name"
+cluster_id = "cluster id"
 
 // Base domain from which the cluster domain is a subdomain.
-base_domain = "your-basedomain.com"
+base_domain = "xxxx.com"
 
 // Name of the VDC.
-vcd_vdc = "your-vdc"
+vcd_vdc = "your vdc name"
 
 // User on the vSphere server.
 vcd_user = "admin"
 
-// Password of the user on the vSphere server.
-vcd_password = "your vdc password"
+// Password of the user on the vcd console.
+vcd_password = "xxxyyyxxxsss"
 
 // Name of the VCD organization. Found on the VCD console, Data Centers tab
-vcd_org = "long vorg is from vcloud director console"
+vcd_org = "long currently 33 character string retrieved from vdc console"
 
-// url for the vcd. (this is dallas)
-vcd_url = "https://daldir01.vmware-solutions.cloud.ibm.com/api"
+// url for the vcd. (this is frankfurt)
+vcd_url = "https://fradir01.vmware-solutions.cloud.ibm.com/api"
 
 
 // Name of the RHCOS VM template to clone to create VMs for the cluster
-rhcos_template = "rhcos OpenShift 4.6.8"
+rhcos_template = "rhcos OpenShift 4.7.0"
 
 // Name of the LB VM template to clone to create VMs for the cluster
-lb_template = "rhcos OpenShift 4.6.8"
+lb_template = "rhcos OpenShift 4.7.0"
 
 
 // Name of the vcd Catalog
 vcd_catalog = "Public Catalog"
-
-// Name of the VM Network for loadbalancer NIC in loadbalancer.
-loadbalancer_network = "ocpnet"
-
-
-
-// The machine_cidr where IP addresses will be assigned for cluster nodes.
-// Additionally, IPAM will assign IPs based on the network ID.
-machine_cidr = "172.16.0.1/24"
-
-// The number of control plane VMs to create. Default is 3.
-control_plane_count = 3
-control_disk = 250000
-
 
 
 // Set bootstrap_ip, control_plane_ip, and compute_ip if you want to use static
@@ -57,27 +39,32 @@ control_disk = 250000
 bootstrap_disk = 250000
 bootstrap_ip_address = "172.16.0.20"
 
+
+// The number of control plane VMs to create. Default is 3.
+control_plane_count = 3
+control_disk = 250000
 // The IP addresses to assign to the control plane VMs. The length of this list
 // must match the value of control_plane_count.
   control_plane_ip_addresses = ["172.16.0.21", "172.16.0.22", "172.16.0.23"]
 
 
 
+
 // The number of compute VMs to create. Default is 3.
-compute_count = 3
+compute_count = 2
 compute_disk =250000
 
 // The IP addresses to assign to the compute VMs. The length of this list must
 // match the value of compute_count.
-    compute_ip_addresses = ["172.16.0.24","172.16.0.25","172.16.0.26"]
-//    compute_ip_addresses = ["172.16.0.24"]
+     compute_ip_addresses = ["172.16.0.24","172.16.0.25"]
 
 
-// Storage Nodes disk size must be at least 2097152 (2TB) if you want to install OCS
+// Storage Nodes disk size must be at least 2097152 (2TB) if you want to install OCS and set storage count to 3
 
 storage_count = 0
 storage_disk = 2097152
-// storage_ip_addresses = ["172.16.0.35", "172.16.0.36", "172.16.0.37"]
+//storage_ip_addresses = ["172.16.0.26", "172.16.0.27", "172.16.0.28"]
+
 
 
 
@@ -87,22 +74,38 @@ lb_ip_address = "172.16.0.19"
 
 // The IP address to assign to the public loadbalancer interface
 loadbalancer_lb_ip_address = "172.16.0.19"
-loadbalancer_lb_machine_cidr = "172.16.0.1/24"
 
-
-//  Bastion ip address
-bastion_ip_address = "172.16.0.10"
-
-// external DNS includes IBM Clouds DNS on private network
+// including Bastion server for local DNS 161.26.0.10 is the DNS server for IBM Cloud Private Network so you can use things like NTP from IBM Cloud Private Network
 vm_dns_addresses = ["9.9.9.9","161.26.0.10"]
 
-openshift_pull_secret = "~/.pull-secret"
-create_loadbalancer_vm = true
+openshift_pull_secret = "~/pull-secret"
+openshift_version="4.7"
 
-vcd_edge_gateway = {
-    edge_gateway = "edge-xx10-xxxxxx"
-    external_gateway_interface = "xx10-xx02-tenant-external"
+// airgapped block see readme for details on airgapped
+airgapped = {
+      enabled = false
+// ocp_ver_rel has to match version.release that you loaded in mirror
+      ocp_ver_rel = "4.6.15" 
+      mirror_ip = "172.16.0.10"
+      mirror_fqdn = "mirror.airgapped.com"
+      mirror_port = "5000"
+      mirror_repository = "ocp4/openshift4"
+      additionalTrustBundle = "~/airgap.crt"      
+      }
+
+
+//public IP for your cluster pick one of the 5 available
+cluster_public_ip       = "161.xxx.xx.xxx"
+ 
+initialization_info     = {
+    public_bastion_ip = "161.x.y.y"
+    bastion_password = "OCP4All"
+    internal_bastion_ip = "172.16.0.10"
+    terraform_ocp_repo = "https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd"
+    rhel_key = "redhat license key from VCD screen"
+    machine_cidr = "172.16.0.1/24"
     network_name      = "ocpnet"
-    cluster_public_ip       = "<public IP Address"
-
-  }
+    static_start_address    = "172.16.0.150"
+    static_end_address      = "172.16.0.220"
+    bastion_template        = "RedHat-8-Template-Official"
+    }

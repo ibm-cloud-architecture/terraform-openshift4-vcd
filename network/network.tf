@@ -4,7 +4,7 @@
 # }
 
 locals {
-    source_networks = [var.vcd_edge_gateway["network_name"]]
+    source_networks = [var.initialization_info["network_name"]]
     ansible_directory = "/tmp"
     external_network_name     =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-tenant-external" : "fra04-w02-tenant-external"
 
@@ -97,7 +97,7 @@ resource "vcd_nsxv_firewall_rule" "ocp_console_allow" {
   }
 
   destination {
-    ip_addresses = [var.vcd_edge_gateway["cluster_public_ip"]]
+    ip_addresses = [var.cluster_public_ip]
   }
 
   service {
@@ -113,7 +113,7 @@ resource "vcd_nsxv_dnat" "dnat" {
   network_name =  local.external_network_name 
   network_type = "ext"
   
-  original_address   = var.vcd_edge_gateway["cluster_public_ip"]
+  original_address   = var.cluster_public_ip
   translated_address = var.network_lb_ip_address
   protocol = "any"
   description = "${var.cluster_id} OCP Console DNAT Rule"
@@ -125,8 +125,6 @@ resource "vcd_nsxv_dnat" "dnat" {
 - hosts: localhost
   connection: local
   gather_facts: False
-  vars:
-     myvars: "{{ lookup('file', './ansible_vars.json') }}"
   tasks:
     - name: update hosts
       blockinfile:
@@ -151,7 +149,7 @@ resource "local_file" "ansible_add_entries_bastion" {
 
  data "template_file" "ansible_net_inventory" {
   template = <<EOF
-${var.public_bastion_ip} ansible_connection=ssh ansible_user=root ansible_python_interpreter="/usr/libexec/platform-python" 
+${var.initialization_info["internal_bastion_ip"]} ansible_connection=ssh ansible_user=root ansible_python_interpreter="/usr/libexec/platform-python" 
 EOF
 }
  
