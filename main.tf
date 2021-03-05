@@ -86,7 +86,7 @@ module "network" {
   base_domain   = var.base_domain
   initialization_info = var.initialization_info
   vcd_url       = var.vcd_url 
-  public_bastion_ip = var.public_bastion_ip
+  cluster_public_ip = var.cluster_public_ip
    
   depends_on = [
      local_file.write_public_key
