@@ -279,6 +279,7 @@ variable "initialization_info" {
     machine_cidr           = string
     network_name           = string
     static_start_address   = string
-    static_end_address     = string    
+    static_end_address     = string
+    bastion_template       = string
   })
 }
