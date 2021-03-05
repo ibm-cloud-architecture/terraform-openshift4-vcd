@@ -2,7 +2,16 @@
 # OpenShift UPI Deployment with Static IPs on VMWare Cloud Director
 
 **Change History:**
-- 2/18/2021:
+  - 3/5/2021:
+    - **Due to networking changes and updated configurations and software on the Bastion, it is recommended that you not reuse an existing VDC and Bastion. If you really need or want to reuse your existing VDC, you should delete all the existing DNAT, SNAT and any FW rules that you created. There should be a Default rule to Deny all public and private access**
+    - Added full creation of Bastion and all networking including creation of vdc network, fw rules, dnat and snat rules.
+    - Full install and configure all software on Bastion including dnsmasq, ansible, terraform, oc client, nginx web server for ignition
+    - Load terraform repo and terraform.tfvars onto Bastion
+    - Load pull-secret and additionalTrustBundle cert if present on host machine.
+    - Create any fw and dnat rules, Bastion /etc/hosts and dsnmasq.conf automatically when you create a new clusters.
+
+
+  - 2/18/2021:
 
    - Airgapped install is now supported. You need to build your own mirror.
    - When you create a cluster, the firewall rules and DNAT rule for that cluster will be automatically created. You should probably delete any DNAT or FW rules that relate to any clusters you have previously built. If you have previously created a Edge Firewall Rule for ALLOW Internet access for all resources on your vcd network, you probably should delete that rule. It will interfere with the new automated Firewall. The automation will add Firewall rules for all the VM's that require it when you create a cluster. You will need to add a new set of variables in your `terraform.tfvars` file. The instructions have been updated to relect this and only create rules for the Bastion server. If you create additional servers in your vcd, outside of the automation, you should add internet access to these servers by following the setup instructions for the Bastion.
@@ -60,32 +69,51 @@ Fortunately IBM provides a set of images that are tailored to work for OpenShift
 To browse the available images:
 * From your vCloud Director console, click on **Libraries** in the header menu.
 * select *vApp Templates*
-* There is 1 images in the list that we will use:
+* There may be several images in the list that we can use, pick the one that matches the version of OCP that you intend to install:
   * rhcos OpenShift 4.6.8 - OpenShift CoreOS template
+  * rhcos OpenShift 4.7.0 - OpenShift CoreOS template
 * If you want to add your own Catalogs and more, see the [documentation about catalogs](#about-catalogs)
 
 ## Networking
-Much of the following is covered in general in the [Operator Guide/Networking](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-networking). Below is the specific network configuration required.
-
-### Create private networks
-
-Create a network where we will install VMs and OCP.
-* Go to main menu > Networking > Networks and select **NEW** or **ADD**
-  - Select Network Type: `Routed`
-  - General:
-    - Name:  **ocpnet**
-    - Gateway/CIDR: **172.16.0.1/24**
-    - Shared - leave it toggled off
-  - Edge:  
-    - connect to your ESG
-    - Interface Type:  **Internal**  (changed from **Distributed** temporarily due to a bug in VMWare. Not sure if its really necessary to change back? )
-    - Guest Vlan Allowed: **no**
-  - Static IP Pools:
-     - convenient for establishing a range that you manually assign from.   **172.16.0.10 - 172.16.0.18**
-  - DNS: Use Edge DNS -  toggled off.  Set primary DNS to 172.16.0.10 which is where we will put the Bastion VM.  This is the DNS that will be used by default for VMs created with static or pool based IP addresses.
+VCD Networking is covered in general in the [Operator Guide/Networking](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-networking). Below is the specific network configuration required.
 
 
-### Configure edge networking Parameters for your cluster
+The Bastion installation process will now create the Networking entries necessary for the environment. You simply need to pick
+ - a **Network Name** (ex. ocpnet)
+ - a **Gateway/CIDR** (ex. 172.16.0.1/24)
+ - an **external** ip for use by the Bastion
+ - an **internal** ip for use by the bastion
+
+
+The Default FW rules created will Deny all traffic except for the Bastion which will have access both to the Public Internet and the IBM Cloud Private Network. DNAT and SNAT rules will be set up for the Bastion to support the above.
+
+When you create a cluster, the FW will be set up as follows.
+- The loadbalancer will always have Internet access as it needs to pull images from docker.io and quay.io in order to operate properly.
+- If you do not request an airgap install, all workers and masters will be allowed access via the FW
+- A DNAT rule will be set up so that you can access you cluster from your workstation regardless of whether or not you requested airgap.
+
+DHCP is not enabled on the Network as it will interfere with the DHCP server running in the cluster. If you have previously enabled it for use in the vcd toolkit, you should now disable it.
+
+# Installing the Bastion
+You will need a "Host" machine to perform the initial Bastion install and configuration. This process has only been tested on a RHEL8 Linux machine but should work on any machine that supports the required software. You should have the following installed on your Host:
+ - ansible
+ - git
+ - terraform
+ - ssh
+
+On your Host, clone the git repository https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd. After cloning the repo
+```
+git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd
+cd terraform_openshift4-vcd
+cp terraform.tfvars.example terraform.tfvars
+```
+You will need to edit terraform.tfvars as appropriate, setting up all the information necessary to create your cluster. You will need to set the vcd information as well as public ip's, etc. This file will eventually be copied to the newly created Bastion. 
+```
+terraform init
+terraform -chdir=bastion-vm destroy --var-file="../terraform.tfvars" --auto-approve
+
+```
+### Choosing an External IP  for your cluster and Bastion
 Configure the Edge Service Gateway (ESG) to provide inbound and outbound connectivity.  For a network overview diagram, followed by general Edge setup instruction, see: https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-create-network
 
 Each vCloud Datacenter comes with 5 IBM Cloud public IP addresses which we can use for SNAT and DNAT translations in and out of the datacenter instance.  VMWare vCloud calls these `sub-allocated` addresses.
@@ -95,199 +123,32 @@ Gather the following information that you will need when configuring the ESG:
 ![Public IP](media/public_ip.jpg)
 
 
-- Take an unused IP and set `cluster_public_ip
-`
-* Go to main menu > Networking > Edges,  and Select your ESG
-  - Go to `Networks and subnets` and copy down the `Participating Subnets` of the `tenant-external` and `servicexx` external networks. (we will need this info later)
-    - the tenant-external network allows external internet routing
-    - the service network allows routing to IBM Cloud private network /services   
+- Take an unused IP and set `cluster_public_ip` and for `public_bastion_ip`
 
- ![Networks](./media/networks.png)
-
-- Set `external_gateway_interface` to the tenant-external name displayed.   
-- Set `network_name` to the name of the network that you created above (ex. `ocpnet`)     
 
 - Your terraform.tfvars entries should look something like this:    
 ```
-vcd_edge_gateway = {
-    external_gateway_interface = "dal10-w02-tenant-external"
+ cluster_public_ip  = "161.yyy.yy.yyy"
+
+ initialization_info     = {
+    public_bastion_ip = "161.xxx.xx.xxx"
+    bastion_password = "OCP4All"
+    internal_bastion_ip = "172.16.0.10"
+    terraform_ocp_repo = "https://github.com/slipsibm/terraform-openshift4-vcd"
+    rhel_key = "xxxxxxxxxxxxxxxxxxxxxx"
+    machine_cidr = "172.16.0.1/24"
     network_name      = "ocpnet"
-    cluster_public_ip       = "150.238.224.81"
-  }
+    static_start_address    = "172.16.0.150"
+    static_end_address      = "172.16.0.220"
+    }
 ```
-
-
-
-#### Outbound from OCP private network to IBM Cloud private network
-[Official instruction to connect to the IBM Cloud Services Private Network](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-enable-access).  
-
-For the following steps go to main menu > Networks > Edges > Select your ESG and select **SERVICES**
-
-See also https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-enable-traffic
-
-**Note:** make modifications by editing the various columns on the screen as instructed below.
-Our shorthand setup steps:
-1. Firewall Rule
-    - go to the Firewall tab and select '+' to add
-      - Name: **ocpnet cloud-private**
-      - Source: Select the '+'
-        - select 'Org Vdc Networks' from the objects type list
-        - select 'ocpnet' from list and then click '->' and 'Keep'
-      - Destination: Select the '+'
-        - select 'Gateway Interfaces' from the objects type list
-        - select **<your>-service-nn** network from list and then click '->' and 'Keep'. (this will become "vnic-1" in the Firewall Rules screen)
-     - Select: 'Save changes'
-
-2. NAT
-    - go to the NAT tab and select '+SNAT RULE' in the NAT44 Rules
-      - Applied On: **<your>-service-nn**
-      - Original Source IP/Range: **172.16.0.1/24**
-      - Translated Source IP/Range: enter the `Primary IP` for the service network interface copied from the ESG settings (Or select it from the dropdown list)
-      - Description: **access to the IBM Cloud private**
-
-#### Outbound from the Bastion to the public Internet
-1. Firewall Rule
-    - go to the Firewall tab and select '+' to add
-      - Name: **Bastion Outbound**
-      - Source: Select the 'IP'
-        - enter the IP Address of your Bastion (usually 172.16.0.10)
-        - Destination: skip. (this will become "any" in the Firewall Rules screen)
-     - Select: 'Save changes'
-
-2. NAT
-    - go to the NAT tab and select '+SNAT RULE' in the NAT44 Rules
-      - Applied On: **<your>-tenant-external**
-      - Original Source IP/Range: **172.16.0.1/24**
-      - Translated Source IP/Range: pick an address not already used address from the sub-allocated network IPs
-      - Description: **ocpnet outbound**
-
-![Public IP](./media/public_ip.jpg)
-
-
-
-#### Inbound config to the Bastion on from internet
-We need to configure DNAT so that we have ssh access the bastion VM from public internet:
-  - We will use  172.16.0.10 address for bastion VM
-1. Firewall Rule
-    - go to the Firewall tab and select '+' to add
-      - Name: **bastion**
-      - Destination: tap the 'IP' button
-        - choose the same IP address that you used for Bastion Outbound above
-      - Service: Protocol: `TCP` Source port: `any` Destination port: `22`
-     - Select: 'Save changes'
-
-2. NAT
-    - go to the NAT tab and select '+DNAT RULE' in the NAT44 Rules
-      - Applied On: **your-tenant-external**
-      - Original Source IP/Range: enter the same public IP that you used in the firewall rule
-      - Translated Source IP/Range: **172.16.0.10**
-      - Description: **access to bastion host**
-
-#### Inbound config to OCP Console
-Now automatically provisioned. A new variable called cluster_public_ip in the vcd_edge_gateway object can be set to an available Public IP.  
-
-
-#### Do not Setup DHCP within the Edge Gateway
-**You cannot use DHCP within the ESG or it will interfere with the DHCP Server deployed on the LoadBalancer. This is a change if you were previously using the vcd_toolkit**
-
-
-
-## Create and configure Bastion VM
-The Bastion VM is where we launch OpenShift installations from.  The VM also hosts **DNS service**, and an **HTTP server** through which the Ignition configuration files are provided to Bootstrap during installation.
-
-Go to Virtual Machines > **New VM**
-Name: **bastion**
-  - **From Template**
-  - Select **vm-redhat8**
-
-After the VM is created, connect it to your network:
- - from Virtual Machines, select bastion VM
-  - Details > Hardware > **NICs**
-    - select **Connected**
-    - Network = **ocpnet**
-    - IP Mode = **Static - Manual**
-    - IP Address **172.16.0.10**
-    - Click **Save**
-
-Set the Bastion password:  On the VCD console, select the Bastion VM and on the `Guest OS Configurations` tab, Set the password.  
-
-#### Enable Redhat entitlement
-  * You need to enable RedHat entitlement so that you can use yum.
-  * ssh to bastion and execute the [steps in bullet 3 here](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-public-cat-rhel) to register the VM
-  * **NOTE** if later on you are unable to yum install packages, you may need to `attach` to the subscription manager
-```
-    subscription-manager attach --auto
-```
-  * For more info see [Subscription Manager Cheatsheet](https://access.redhat.com/sites/default/files/attachments/rh_sm_command_cheatsheet_1214_jcs_print.pdf)
-
-#### Install and configure DNS based on dnsmasq
-We will use DNSMasq to be our local DNS server.  We need a local DNS server to resolve names for the nodes (VMs) in our OpenShift Cluster.
-We also need the local DNS server to forward requests for names outside the local network to a public name server.
-Also recall that we configured the Edge to be our DHCP server.
-
-#### Install DNS Servvices (dnsmasq)
-First, install dnsmasq:   
-`yum install dnsmasq`
-
-dnsmasq is configured in /etc/dnsmasq.conf.  Add the following entries:
-  ```
-  no-dhcp-interface=ens192
-  server=8.8.8.8
-  server=8.8.4.4
-  listen-address=127.0.0.1
-  interface=ens192
-  interface=lo
-  ```
-
-Enable and restart dnsmasq service:
-
-`systemctl enable dnsmasq.service`   
-`systemctl start dnsmasq.service`
-
-Note:  /etc/resolv.conf needs to be configured so that all DNS requests go through dnsmasq.  The config will look like this.  TODO I think dnsmasq makes it so:
-  ```
-  cat /etc/resolv.conf
-  # Generated by NetworkManager
-  nameserver 172.16.0.10
-  ```
-
-  Verify that bastion is configured correctly as the nameserver, and that public names are resolved. We should get a valid address back, and the SERVER should be bastion (172.16.0.10):
-
-`dig ibm.com`
-```
-...
-;; Got answer:
-...
-;; ANSWER SECTION:
-ibm.com.		21599	IN	A	129.42.38.10
-...
-;; SERVER: 172.16.0.10#53(172.16.0.10)
-...
-```
-
-#### Install preReqs of the Terraform  and SimpleHTTP server:
-```
-  yum install unzip
-  yum install tar
-  yum install python3
-  yum install -y yum-utils
-  yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
-  yum install terraform
-```
-#### Update firewall
-Allow HTTP(port 80) and DNS(port 53) traffic into bastion.  Issue the following commands.  You should get `success` message from each:
-```
-firewall-cmd --add-port=80/tcp --zone=public --permanent
-firewall-cmd --add-port=53/tcp --zone=public --permanent
-firewall-cmd --add-port=53/udp --zone=public --permanent
-firewall-cmd --reload
-```
-[More about firewalld](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/security_guide/sec-using_firewalls#sec-Getting_started_with_firewalld)
 
 #### Use SSH Key rather than password authentication (optional)
+The Bastion install process will create an ssh key and place it in  `~/.ssh/bastion_id`  
+
 For login to Bastion, you can choose to use SSH Keys and disable password login:
   - edit /etc/ssh/sshd_config and set password authentication to no
-  - add your id_rsa.pub ssh key to .ssh/authorised_keys on bastion
+  - add your bastion_id.pub ssh key to .ssh/authorised_keys on bastion
 
 #### Move SSH to higher port (optional)
 If you want to move your ssh port to a higher port to slow down hackers that are constantly looking to hack your server at port 22 then do the following:
@@ -298,25 +159,6 @@ If you want to move your ssh port to a higher port to slow down hackers that are
 `firewall-cmd --reload`
 1. Update your edge FW rule for your Bastion with your new port. (replace port 22 with your new port)
 
-#### Start HTTP Server
-The HTTP Server is used by the bootstrap and other coreOS nodes to retrieve their ignition files.
-* Important: start the server from / directory so that path to ignition files is correct!
-* `cd /; nohup python3 -m http.server 80 &`
-* Note: to see requests to the server `tail -f /nohup.out`
-
-#### Install OpenShift Client on Bastion
-```
-wget mirror.openshift.com/pub/openshift-v4/clients/ocp/latest-4.6/openshift-client-linux.tar.gz
-tar -xzvf openshift-client-linux.tar.gz
-mv oc /usr/local/bin/.
-mv kubectl /usr/local/bin/.
-```
-#### Host files updates on Bastion and Client
-- On the **Bastion**, edit /etc/hosts and add the following entries where 5.6.7.8 is the **Private IP** address of the LB (ex: 172.16.0.19):
-```
- 5.6.7.8 api.ocp44-myprefix.my.com
- 5.6.7.8 api-int.ocp44-myprefix.my.com
-```
 
 - One the **Client** that you will access the OCP Console, (your Mac, PC, etc.) add name resolution to direct console to the **Public IP** of the LoadBalancer in /etc/hosts on the client that will login to the Console UI.
   As an example:
