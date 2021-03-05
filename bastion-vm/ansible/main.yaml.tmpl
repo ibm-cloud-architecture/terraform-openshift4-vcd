@@ -7,6 +7,8 @@
     # register the VM
     - name: Prepare RHEL host entitlement enablement
       shell: "rpm -ivh --replacepkgs http://52.117.132.7/pub/katello-ca-consumer-latest.noarch.rpm"
+      args:
+        warn: no
     
     - name: Generate an uuidgen  
       shell: "uuidgen"
@@ -42,13 +44,18 @@
         state: restarted
         enabled: yes
 
+    # install additional tools
+    - name: epel tools
+      shell: "yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
+      args:
+        warn: no 
+
     # install additioanl tools
     - name: install tools
       yum:
         name:
           - git
           - unzip
-          - https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
           - tar
           - yum-utils
           - ansible
@@ -60,18 +67,19 @@
         src: ${nginx_repo_dir}/nginx.repo
         dest: /etc/yum.repos.d/nginx.repo
         mode: '0644'
-
+   
+    - name: install nginx
+      yum:
+        name: nginx
+        state: latest
+        
     #upload the nginx config
     - name: Nginx - config - Copy file with owner and permissions
       ansible.builtin.copy:
         src: ${nginx_repo_dir}/default.conf
         dest: /etc/nginx/conf.d/default.conf
         mode: '0644'
-   
-    - name: install nginx
-      yum:
-        name: nginx
-        state: latest
+
   
     - name: enable ngix
       ansible.builtin.systemd:

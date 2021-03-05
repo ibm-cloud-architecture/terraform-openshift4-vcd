@@ -227,8 +227,7 @@ resource "vcd_vapp_vm" "bastion" {
 
  data "template_file" "ansible_inventory" {
   template = <<EOF
-${var.public_bastion_ip}
- ansible_connection=ssh ansible_user=root ansible_python_interpreter="/usr/libexec/platform-python" 
+${var.public_bastion_ip} ansible_connection=ssh ansible_user=root ansible_python_interpreter="/usr/libexec/platform-python" 
 EOF
 }
 
