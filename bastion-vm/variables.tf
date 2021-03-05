@@ -29,15 +29,6 @@ variable "vcd_catalog" {
   default     = "Public Catalog"
 }
 
-
-variable "internal_bastion_ip"{
-  type        = string
-  description = "ip of bastion on routed network"
-}
-variable "public_bastion_ip"{
-  type        = string
-  description = "external ip of the bastion"
-}
 variable "bastion_template"{
   type        = string
   description = "name of the template used to create the bastion vm"
@@ -48,16 +39,6 @@ variable "template_catalog"{
   type        = string
   description = "name of tempalte catalog"
   default     = "Public Catalog" 
-}
-
-variable "bastion_password"{
-  type        = string
-  description = "password of the bastion vm"
-}
-
-variable "rhel_key"{
-  type        = string
-  description = "Red Hat Activation Key from Cloud Console"
 }
 
 variable "base_domain"{
@@ -79,35 +60,35 @@ variable "lb_ip_address"{
   type        = string
 }
 
-variable "terraform_ocp_repo"{
-  type        = string
-}
-
-variable "machine_cidr"     {
-  type        = string
-  }
 variable "openshift_pull_secret"     {
   type        = string
   }
-// Network object
-//variable "vcd_network_routed" {
-//  type = object ({
-//    gateway = string
-//    static_ip_start = string
-//    static_ip_end   = string
-//  })
-//  default = {
-//    gateway          = "192.16.0.1"
-//    static_ip_start  = "192.16.0.11"
-//    static_ip_end    = "192.16.0.18"
-//    
-//  }
-//}
-variable "vcd_edge_gateway" {
-  type = object ({
-    network_name          = string
-    static_start_address  = string
-    static_end_address    = string
-    cluster_public_ip     = string  
-  })
+
+variable "airgapped"  {
+  type        = map(string)
+  description = "test  variable for airgapped instead of separate vars"
+  default     =  {
+         enabled   = false
+         ocp_ver_rel = ""
+         mirror_ip   = ""
+         mirror_fqdn = ""
+         mirror_port = ""
+         mirror_repository = ""
+         additionalTrustBundle = ""         
+         }
 }
+
+variable "initialization_info" {
+  type = object ({
+    public_bastion_ip      = string
+    bastion_password       = string
+    internal_bastion_ip    = string
+    terraform_ocp_repo     = string  
+    rhel_key               = string
+    machine_cidr           = string
+    network_name           = string
+    cluster_public_ip      = string
+    static_start_address   = string
+    static_end_address     = string    
+  })
+  }

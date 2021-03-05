@@ -46,19 +46,11 @@ variable "mac_prefix" {
 
 }
 
-variable "loadbalancer_network" {
-  type        = string
-  description = "This is the name of the loadbalancer network for cluster ingress and access"
-  default     = ""
-}
-
 variable "vm_dns_addresses" {
   type        = list(string)
   description = "List of DNS servers to use for your OpenShift Nodes"
   default     = ["8.8.8.8", "8.8.4.4"]
 }
-
-
 
 /////////
 // OpenShift cluster variables
@@ -72,10 +64,6 @@ variable "cluster_id" {
 variable "base_domain" {
   type        = string
   description = "The base DNS zone to add the sub zone to."
-}
-
-variable "machine_cidr" {
-  type = string
 }
 
 /////////
@@ -216,11 +204,6 @@ variable "loadbalancer_lb_ip_address" {
   default = ""
 }
 
-variable "loadbalancer_lb_machine_cidr" {
-  type    = string
-  default = ""
-}
-
 variable "openshift_pull_secret" {
   type = string
 }
@@ -258,36 +241,6 @@ variable "create_vms_only" {
   default     = false
 }
 
-variable "public_bastion_ip" {
-  type        = string
-  default     = ""
-}
-
-variable "bastion_password" {
-  type        = string
-  default     = ""
-}
-variable "internal_bastion_ip" {
-  type        = string
-  default     = ""
-}
-
-variable "terraform_ocp_repo" {
-  type        = string
-  default     = ""
-}
-variable "rhel_key" {
-  type        = string
-  default     = ""
-}
-
-
-
-//variable "openshift_console_url" {
-//  type    = string
-//  default = ""
-//}
-
 variable "airgapped"  {
   type        = map(string)
   description = "test  variable for airgapped instead of separate vars"
@@ -314,11 +267,17 @@ variable "proxy_config" {
   }
 }
 
-variable "vcd_edge_gateway" {
+variable "initialization_info" {
   type = object ({
-    network_name          = string
-    static_start_address  = string
-    static_end_address    = string
-    cluster_public_ip     = string  
+    public_bastion_ip      = string
+    bastion_password       = string
+    internal_bastion_ip    = string
+    terraform_ocp_repo     = string  
+    rhel_key               = string
+    machine_cidr           = string
+    network_name           = string
+    cluster_public_ip      = string
+    static_start_address   = string
+    static_end_address     = string    
   })
 }

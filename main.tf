@@ -7,7 +7,7 @@ locals {
   mirror_repo_ip      = [var.airgapped["mirror_ip"]]
   mirror_repo_fqdn    = [var.airgapped["mirror_fqdn"]]
   app_name            = "${var.cluster_id}-${var.base_domain}"
-  vcd_net_name        = var.vcd_edge_gateway["network_name"]
+  vcd_net_name        = var.initialization_info["network_name"]
   cluster_domain      = "${var.cluster_id}.${var.base_domain}"
   bootstrap_fqdns     = ["bootstrap-00.${local.cluster_domain}"]
   lb_fqdns            = ["lb-00.${local.cluster_domain}"]
@@ -38,7 +38,7 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   vapp_name         = local.app_name
-  org_network_name  = var.vcd_edge_gateway["network_name"]
+  org_network_name  = var.initialization_info["network_name"]
   depends_on = [vcd_vapp.app_name]
 }
 
@@ -84,7 +84,7 @@ module "network" {
   vcd_vdc       = var.vcd_vdc
   cluster_id    = var.cluster_id
   base_domain   = var.base_domain
-  vcd_edge_gateway = var.vcd_edge_gateway
+  initialization_info = var.initialization_info
   vcd_url       = var.vcd_url 
   public_bastion_ip = var.public_bastion_ip
    
@@ -169,12 +169,12 @@ module "lb" {
   cluster_id  = var.cluster_id
    
   loadbalancer_ip   = var.loadbalancer_lb_ip_address
-  loadbalancer_cidr = var.loadbalancer_lb_machine_cidr
+  loadbalancer_cidr = var.initialization_info["machine_cidr"]
 
   hostnames_ip_addresses  = zipmap(local.lb_fqdns, [var.lb_ip_address])
-  machine_cidr            = var.machine_cidr
-  network_id              = var.vcd_edge_gateway["network_name"]
-  loadbalancer_network_id = var.loadbalancer_network 
+  machine_cidr            = var.initialization_info["machine_cidr"]
+  network_id              = var.initialization_info["network_name"]
+  loadbalancer_network_id = var.initialization_info["network_name"] 
 
    vcd_catalog             = var.vcd_catalog
    lb_template             = var.lb_template
@@ -196,7 +196,7 @@ module "ignition" {
   cluster_cidr        = var.openshift_cluster_cidr
   cluster_hostprefix  = var.openshift_host_prefix
   cluster_servicecidr = var.openshift_service_cidr
-  machine_cidr        = var.machine_cidr
+  machine_cidr        = var.initialization_info["machine_cidr"]
   pull_secret         = var.openshift_pull_secret
   openshift_version   = var.openshift_version
   total_node_count    = var.compute_count + var.storage_count
@@ -222,8 +222,8 @@ module "bootstrap" {
 
   create_vms_only = var.create_vms_only
   cluster_domain = local.cluster_domain
-  machine_cidr   = var.machine_cidr
-  network_id              = var.vcd_edge_gateway["network_name"]
+  machine_cidr            = var.initialization_info["machine_cidr"]
+  network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -249,8 +249,8 @@ module "bootstrap_vms_only" {
 
   create_vms_only = var.create_vms_only
   cluster_domain = local.cluster_domain
-  machine_cidr   = var.machine_cidr
-  network_id              = var.vcd_edge_gateway["network_name"]
+  machine_cidr            = var.initialization_info["machine_cidr"]
+  network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -277,7 +277,7 @@ module "control_plane_vm" {
   create_vms_only = var.create_vms_only
   count = var.create_vms_only ? 0 : 1
   ignition = module.ignition.master_ignition
-  network_id              = var.vcd_edge_gateway["network_name"]
+  network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -286,7 +286,7 @@ module "control_plane_vm" {
 
 
   cluster_domain = local.cluster_domain
-  machine_cidr   = var.machine_cidr
+  machine_cidr   = var.initialization_info["machine_cidr"]
 
   num_cpus      = var.control_plane_num_cpus
   memory        = var.control_plane_memory
@@ -307,7 +307,7 @@ module "control_plane_vm_vms_only" {
   count = var.create_vms_only ? 1 : 0
   create_vms_only = var.create_vms_only
   ignition = local.no_ignition 
-  network_id              = var.vcd_edge_gateway["network_name"]
+  network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -316,7 +316,7 @@ module "control_plane_vm_vms_only" {
 
 
   cluster_domain = local.cluster_domain
-  machine_cidr   = var.machine_cidr
+  machine_cidr   = var.initialization_info["machine_cidr"]
 
   num_cpus      = var.control_plane_num_cpus
   memory        = var.control_plane_memory
@@ -340,8 +340,8 @@ module "compute_vm" {
   ignition = module.ignition.worker_ignition
 
   cluster_domain = local.cluster_domain
-  machine_cidr   = var.machine_cidr
-  network_id              = var.vcd_edge_gateway["network_name"]
+  machine_cidr            = var.initialization_info["machine_cidr"]
+  network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -369,8 +369,8 @@ module "compute_vm_vms_only" {
   ignition = local.no_ignition
 
   cluster_domain = local.cluster_domain
-  machine_cidr   = var.machine_cidr
-  network_id              = var.vcd_edge_gateway["network_name"]
+  machine_cidr            = var.initialization_info["machine_cidr"]
+  network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -397,7 +397,7 @@ module "storage_vm" {
   create_vms_only = var.create_vms_only
   count = var.create_vms_only ? 0 : 1
   ignition =  module.ignition.worker_ignition
-  network_id              = var.vcd_edge_gateway["network_name"]
+  network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -405,7 +405,7 @@ module "storage_vm" {
   rhcos_template          = var.rhcos_template
 
   cluster_domain = local.cluster_domain
-  machine_cidr   = var.machine_cidr
+  machine_cidr   = var.initialization_info["machine_cidr"]
 
   num_cpus      = var.storage_num_cpus
   memory        = var.storage_memory
@@ -426,7 +426,7 @@ module "storage_vm_vms_only" {
   create_vms_only = var.create_vms_only
   count = var.create_vms_only ? 1 : 0
   ignition = local.no_ignition
-  network_id              = var.vcd_edge_gateway["network_name"]
+  network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
   vcd_org                 = var.vcd_org 
@@ -434,7 +434,7 @@ module "storage_vm_vms_only" {
   rhcos_template          = var.rhcos_template
 
   cluster_domain = local.cluster_domain
-  machine_cidr   = var.machine_cidr
+  machine_cidr   = var.initialization_info["machine_cidr"]
 
   num_cpus      = var.storage_num_cpus
   memory        = var.storage_memory

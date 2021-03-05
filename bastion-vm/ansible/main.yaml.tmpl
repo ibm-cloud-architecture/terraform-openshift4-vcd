@@ -1,8 +1,7 @@
 ---
 - hosts: all
   gather_facts: False
-  vars:
-     myvars: "{{ lookup('file', './ansible_vars.json') }}"
+
   tasks:
     # register the VM
     - name: Prepare RHEL host entitlement enablement
@@ -79,6 +78,12 @@
         src: ${nginx_repo_dir}/default.conf
         dest: /etc/nginx/conf.d/default.conf
         mode: '0644'
+    #upload the nginx config
+    - name: Nginx - config - Copy file with owner and permissions
+      ansible.builtin.copy:
+        src: ${nginx_repo_dir}/nginx.conf
+        dest: /etc/nginx/nginx.conf
+        mode: '0644'
 
   
     - name: enable ngix
@@ -86,12 +91,6 @@
         name: nginx
         state: restarted
         enabled: yes
-    # Pull secret copy
-    - name: Pull Secret - Copy file 
-      ansible.builtin.copy:
-        src: ${openshift_pull_secret}
-        dest: /root/.pull-secret
-        mode: '0644'
 
  
  # terraform cli
@@ -133,4 +132,39 @@
       git:
         repo: "${terraform_ocp_repo}"
         dest: /opt/terraform
+
+     #upload the terraform.tfvars config
+    - name: terraform.tfvars - Copy file with owner and permissions
+      ansible.builtin.copy:
+         src: ${terraform_root}/terraform.tfvars
+         dest: /opt/terraform
+         mode: '0644'
+  
+      # Pull secret copy
     
+    - name: copy pull secret if there
+      block:
+        - name: Pull Secret - Copy file 
+          ansible.builtin.copy:
+            src: ${openshift_pull_secret}
+            dest: ${openshift_pull_secret}
+            mode: '0644'
+      rescue:
+        - name: no secret error
+          ansible.builtin.debug:
+            msg: 'pull secret not found'      
+
+    %{if additional_trust_bundle != ""}
+    - name: copy pull secret if there
+      block:
+        - name: additional trust bundle - Copy file 
+          ansible.builtin.copy:
+            src: ${additional_trust_bundle}
+            dest: ${additional_trust_bundle}
+            mode: '0644'
+      rescue:
+        - name: no secret error
+          ansible.builtin.debug:
+            msg: 'trust bundle not found'
+    %{endif}  
+             
