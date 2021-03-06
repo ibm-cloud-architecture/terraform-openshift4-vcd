@@ -22,6 +22,7 @@ variable "vcd_org" {
 variable "vcd_url" {
   type        = string
   description = "This is the vcd url for the environment."
+  default     = "https://daldir01.vmware-solutions.cloud.ibm.com/api"
 }
 variable "vcd_catalog" {
   type        = string
@@ -206,6 +207,7 @@ variable "loadbalancer_lb_ip_address" {
 
 variable "openshift_pull_secret" {
   type = string
+  default = "~/.pull-secret"
 }
 
 variable "openshift_cluster_cidr" {
