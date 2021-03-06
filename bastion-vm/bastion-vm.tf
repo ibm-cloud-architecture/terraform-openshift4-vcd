@@ -170,7 +170,7 @@ resource "vcd_nsxv_snat" "snat_priv" {
 resource "vcd_vapp" "bastion" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
-  name = "bastion"
+  name = "bastion-${var.vcd_vdc}-${var.cluster_id}"
 }
 # Associate the route network with the Vapp
 resource "vcd_vapp_org_network" "vappOrgNet" {
