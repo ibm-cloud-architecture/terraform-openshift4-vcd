@@ -1,5 +1,11 @@
 
 # OpenShift UPI Deployment with Static IPs on VMWare Cloud Director
+## Overview
+Deploy OpenShift 4.6 and later on VMWare Cloud Director using static IP addresses for CoreOS nodes.  The `ignition` module will inject code into the cluster that will automatically approve all node CSRs.  This runs only once at cluster creation.  You can delete the `ibm-post-deployment` namespace once your cluster is up and running.
+
+**NOTE**: This requires OpenShift 4.6 or later, if you're looking for 4.5 or earlier, see the [VCD Toolkit](https://github.com/vmware-ibm-jil/vcd_toolkit_for_openshift) or the `terraform-openshift4-vmware pre-4.6` [branch](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware/tree/pre-4.6)
+
+**NOTE**: Requires terraform 0.13 or later.  
 
 **Change History:**
   - 3/5/2021:
@@ -31,12 +37,7 @@ The benefits of this code vs. the VCD Toolkit are:
   - Automatic approval of outstanding CSR's.  No more manual step.
   - Less manual steps overall.  Does not require multiple steps of running scripts, then terraform then more scripts. Just set variables, run terraform, then start VM's.
 
-## Overview
-Deploy OpenShift 4.6 and later on VMWare Cloud Director using static IP addresses for CoreOS nodes.  The `ignition` module will inject code into the cluster that will automatically approve all node CSRs.  This runs only once at cluster creation.  You can delete the `ibm-post-deployment` namespace once your cluster is up and running.
 
-**NOTE**: This requires OpenShift 4.6 or later, if you're looking for 4.5 or earlier, see the [VCD Toolkit](https://github.com/vmware-ibm-jil/vcd_toolkit_for_openshift) or the `terraform-openshift4-vmware pre-4.6` [branch](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware/tree/pre-4.6)
-
-**NOTE**: Requires terraform 0.13 or later.
 
 ## Architecture
 
@@ -45,7 +46,7 @@ OpenShift 4.6 User-Provided Infrastructure
 ![topology](./media/vcd_arch.png)
 
 ## Installation Process
-## Ordering
+## Order a VCD
 You will order a **VMware Solutions Shared** instance in IBM Cloud(below).  When you order a new instance, a **DataCenter** is created in vCloud Director.  It takes about an hour.
 
 #### Procedure:
@@ -95,11 +96,11 @@ When you create a cluster, the FW will be set up as follows.
 DHCP is not enabled on the Network as it will interfere with the DHCP server running in the cluster. If you have previously enabled it for use in the vcd toolkit, you should now disable it.
 
 # Installing the Bastion
-You will need a "Host" machine to perform the initial Bastion install and configuration. This process has only been tested on a RHEL8 Linux machine but should work on any machine that supports the required software. You should have the following installed on your Host:
- - ansible
+You will need a "Host" machine to perform the initial Bastion install and configuration. This process has only been tested on a RHEL8 Linux machine but may work on other linux based systems that support the required software. You should have the following installed on your Host:
+ - ansible [instructions here](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
  - git
- - terraform
- - ssh
+ - terraform [instructons here](https://www.terraform.io/downloads.html)
+
 
 On your Host, clone the git repository https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd. After cloning the repo
 ```
@@ -107,7 +108,7 @@ git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd
 cd terraform_openshift4-vcd
 cp terraform.tfvars.example terraform.tfvars
 ```
-You will need to edit terraform.tfvars as appropriate, setting up all the information necessary to create your cluster. You will need to set the vcd information as well as public ip's, etc. This file will eventually be copied to the newly created Bastion. 
+You will need to edit terraform.tfvars as appropriate, setting up all the information necessary to create your cluster. You will need to set the vcd information as well as public ip's, etc. This file will eventually be copied to the newly created Bastion.
 ```
 terraform init
 terraform -chdir=bastion-vm destroy --var-file="../terraform.tfvars" --auto-approve
