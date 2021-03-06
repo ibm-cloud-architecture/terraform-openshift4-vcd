@@ -9,12 +9,12 @@ Deploy OpenShift 4.6 and later on VMWare Cloud Director using static IP addresse
 
 **Change History:**
   - 3/5/2021:
-    - **Due to networking changes and updated configurations and software on the Bastion, it is recommended that you not reuse an existing VDC and Bastion. If you really need or want to reuse your existing VDC, you should delete all the existing DNAT, SNAT and any FW rules that you created. There should be a Default rule to Deny all public and private access**
+    - **Due to networking changes and updated configurations and software on the Bastion, it is recommended that you not reuse an existing VDC and Bastion. If you really need or want to reuse your existing VDC, you should delete the existing Bastion as well as all the existing DNAT, SNAT and any FW rules that you created. There should be a Default rule to Deny all public and private access**
     - Added full creation of Bastion and all networking including creation of vdc network, fw rules, dnat and snat rules.
     - Full install and configure all software on Bastion including dnsmasq, ansible, terraform, oc client, nginx web server for ignition
     - Load terraform repo and terraform.tfvars onto Bastion
     - Load pull-secret and additionalTrustBundle cert if present on host machine.
-    - Create any fw and dnat rules, Bastion /etc/hosts and dsnmasq.conf automatically when you create a new clusters.
+    - When creating an OCP Cluster, all fw, dnat rules, Bastion /etc/hosts and dsnmasq.conf updates are performed when you create the cluster.
 
 
   - 2/18/2021:
@@ -45,7 +45,7 @@ OpenShift 4.6 User-Provided Infrastructure
 
 ![topology](./media/vcd_arch.png)
 
-## Installation Process
+# Installation Process
 ## Order a VCD
 You will order a **VMware Solutions Shared** instance in IBM Cloud(below).  When you order a new instance, a **DataCenter** is created in vCloud Director.  It takes about an hour.
 
@@ -54,18 +54,36 @@ You will order a **VMware Solutions Shared** instance in IBM Cloud(below).  When
 * name your virtual data center
 * pick the resource group.  
 * agree to the terms and click `Create`
-* then in VMware Solutions > Resources you should see your VMWare Solutions Shared being created.  After an hour or less it will be **ready to use**
+* then in VMware Solutions > Resources you should see your VMWare Solutions Shared being created.  After an hour or less it will be **ready to use**You will need to edit terraform.tfvars as appropriate, setting up all the information necessary to create your cluster. You will need to set the vcd information as well as public ip's, etc. This file will eventually be copied to the newly created Bastion.
 
-### First time setup
-* click on the VMWare Shared Solution instance named from the Resources list
-* set your admin password, and save it
-* click the button to launch your  **vCloud Director console**
-* we recommend that you create individual Users/passwords for each person accessing the environment
+
+#### Initial VCD setup
+* Click on the VMWare Shared Solution instance named from the Resources list
+* Set your admin password, and save it
+* Click the button to launch your  **vCloud Director console**
+* We recommend that you create individual Users/passwords for each person accessing the environment
+* Make note of the 5 public ip address on the screen. You will need to use them later to access the Bastion and your OCP clusters
 * Note: You don't need any Private network Endpoints unless you want to access the VDC from other IBM Cloud accounts over Private network
 
+# Installing the Bastion and initial network configuration
+## Setup Host Machine
+You will need a "Host" machine to perform the initial Bastion install and configuration. This process has only been tested on a RHEL8 Linux machine but may work on other linux based systems that support the required software. You should have the following installed on your Host:
+ - ansible [instructions here](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
+ - git
+ - terraform [instructons here](https://www.terraform.io/downloads.html)
 
-## Choose an Image Catalog
-We need a catalog of VM images to use for our OpenShift VMs.
+
+On your Host, clone the git repository. After cloning the repo, You will need to edit `terraform.tfvars` as appropriate, setting up all the information necessary to create your cluster. You will need to set the vcd information as well as public ip's, etc. Instructions on gathering key pieces of informaton are below.
+
+```
+git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd
+cd terraform_openshift4-vcd
+cp terraform.tfvars.example terraform.tfvars
+```
+Edit terraform.tfvars per the terraform variables section
+## Gather Information for terraform.tfvars
+#### Find vApp Template from the Image Catalog
+We need a catalog of VM images to use for our OpenShift VMs and the Bastion.
 Fortunately IBM provides a set of images that are tailored to work for OpenShift deployments.
 To browse the available images:
 * From your vCloud Director console, click on **Libraries** in the header menu.
@@ -73,13 +91,14 @@ To browse the available images:
 * There may be several images in the list that we can use, pick the one that matches the version of OCP that you intend to install:
   * rhcos OpenShift 4.6.8 - OpenShift CoreOS template
   * rhcos OpenShift 4.7.0 - OpenShift CoreOS template
+  * RedHat-8-Template-Official
 * If you want to add your own Catalogs and more, see the [documentation about catalogs](#about-catalogs)
 
-## Networking
+#### Networking Info
 VCD Networking is covered in general in the [Operator Guide/Networking](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-networking). Below is the specific network configuration required.
 
 
-The Bastion installation process will now create the Networking entries necessary for the environment. You simply need to pick
+The Bastion installation process will now create all the Networking entries necessary for the environment. You simply need to pick
  - a **Network Name** (ex. ocpnet)
  - a **Gateway/CIDR** (ex. 172.16.0.1/24)
  - an **external** ip for use by the Bastion
@@ -95,26 +114,8 @@ When you create a cluster, the FW will be set up as follows.
 
 DHCP is not enabled on the Network as it will interfere with the DHCP server running in the cluster. If you have previously enabled it for use in the vcd toolkit, you should now disable it.
 
-# Installing the Bastion
-You will need a "Host" machine to perform the initial Bastion install and configuration. This process has only been tested on a RHEL8 Linux machine but may work on other linux based systems that support the required software. You should have the following installed on your Host:
- - ansible [instructions here](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
- - git
- - terraform [instructons here](https://www.terraform.io/downloads.html)
 
-
-On your Host, clone the git repository https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd. After cloning the repo
-```
-git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd
-cd terraform_openshift4-vcd
-cp terraform.tfvars.example terraform.tfvars
-```
-You will need to edit terraform.tfvars as appropriate, setting up all the information necessary to create your cluster. You will need to set the vcd information as well as public ip's, etc. This file will eventually be copied to the newly created Bastion.
-```
-terraform init
-terraform -chdir=bastion-vm destroy --var-file="../terraform.tfvars" --auto-approve
-
-```
-### Choosing an External IP  for your cluster and Bastion
+#### Choosing an External IP  for your cluster and Bastion and retrieving the Red Hat Activation key
 Configure the Edge Service Gateway (ESG) to provide inbound and outbound connectivity.  For a network overview diagram, followed by general Edge setup instruction, see: https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-create-network
 
 Each vCloud Datacenter comes with 5 IBM Cloud public IP addresses which we can use for SNAT and DNAT translations in and out of the datacenter instance.  VMWare vCloud calls these `sub-allocated` addresses.
@@ -125,6 +126,7 @@ Gather the following information that you will need when configuring the ESG:
 
 
 - Take an unused IP and set `cluster_public_ip` and for `public_bastion_ip`
+- The Red Hat Activation key can be retrieved from this screen to populate `rhel_key`
 
 
 - Your terraform.tfvars entries should look something like this:    
@@ -135,7 +137,7 @@ Gather the following information that you will need when configuring the ESG:
     public_bastion_ip = "161.xxx.xx.xxx"
     bastion_password = "OCP4All"
     internal_bastion_ip = "172.16.0.10"
-    terraform_ocp_repo = "https://github.com/slipsibm/terraform-openshift4-vcd"
+    terraform_ocp_repo = "https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd"
     rhel_key = "xxxxxxxxxxxxxxxxxxxxxx"
     machine_cidr = "172.16.0.1/24"
     network_name      = "ocpnet"
@@ -144,24 +146,85 @@ Gather the following information that you will need when configuring the ESG:
     }
 ```
 
-#### Use SSH Key rather than password authentication (optional)
-The Bastion install process will create an ssh key and place it in  `~/.ssh/bastion_id`  
+#### Retrieve pull secret from Red Hat sites
+Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) and place in a file on the Bastion Server. Default location is `~/.pull-secret`
 
-For login to Bastion, you can choose to use SSH Keys and disable password login:
-  - edit /etc/ssh/sshd_config and set password authentication to no
-  - add your bastion_id.pub ssh key to .ssh/authorised_keys on bastion
+## Perform Bastion install
+Once you have finished editing your terraform.tfvars file you can execute the following commands. Terraform will now create the Bastion, install and configure all necessary software and perform all network customizations associated with the Bastion. The terraform.tfvars file will be copied to the Bastion server. The pull secret and additionalTrustBundle will be copied to the Bastion if they were specified in terraform.tfvars and are in the specified location on the Host machine. If you plan to create the pull secret and additionalTrustBundle on the Bastion directly and didn't put them on your Host, ignore the error messages about the copy failing.
+```
+terraform init
+terraform -chdir=bastion-vm plan --var-file="../terraform.tfvars"
+terraform -chdir=bastion-vm apply --var-file="../terraform.tfvars" --auto-approve
+```
 
-#### Move SSH to higher port (optional)
-If you want to move your ssh port to a higher port to slow down hackers that are constantly looking to hack your server at port 22 then do the following:
-1. Edit /etc/ssh/sshd_config and uncomment the line that currently reads #Port 22 and change to your desired port and save file. `systemctl stop sshd` `systemctl start sshd`
-2. `semanage port -a -t ssh_port_t -p tcp <your new port number>`
-3. Enter:   
-`firewall-cmd --add-port=<your new port>/tcp --zone=public --permanent`  
-`firewall-cmd --reload`
-1. Update your edge FW rule for your Bastion with your new port. (replace port 22 with your new port)
+The result looks something like this:
+```
+null_resource.setup_bastion (local-exec): PLAY RECAP *********************************************************************
+null_resource.setup_bastion (local-exec): 150.239.22.38              : ok=26   changed=26   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
+null_resource.setup_bastion: Creation complete after 3m32s [id=1639642181061551613]
 
-- One the **Client** that you will access the OCP Console, (your Mac, PC, etc.) add name resolution to direct console to the **Public IP** of the LoadBalancer in /etc/hosts on the client that will login to the Console UI.
+Apply complete! Resources: 6 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+login_bastion = "Next Step login to Bastion via: ssh root@1xxx.xx.xx.38"
+```
+#### Login to Bastion
+Use the generated command to login to the Bastion
+`ssh root@1xxx.xx.xx.38`
+The result should look somthing like this below. You can ignore the messages about registering the Red Hat VM with the activation key as this was done as part of the provisioning
+
+```
+To register the Red Hat VM with your RHEL activation key in IBM RHEL Capsule Server, you must enable VM access to connect to the IBM service network.  For more information, see Enabling VM access to IBM Cloud Services by using the private network (https://cloud.ibm.com/docs/services/vmwaresolutions?topic=vmware-solutions-shared_vcd-ops-guide#shared_vcd-ops-guide-enable-access).
+
+Complete the following steps to register the Red Hat VM with your RHEL activation key. For more information about accessing instance details, see Viewing Virtual Data Center instances (https://cloud.ibm.com/docs/services/vmwaresolutions?topic=vmware-solutions-shared_managing#shared_managing-viewing).
+
+1) From the IBM Cloud for VMware Solutions console, click the instance name in the VMware Solutions Shared instance table.
+
+2) On the instance details page, locate and make note of the Red Hat activation key.
+
+3) Run the following commands from the Red Hat VM:
+
+rpm -ivh http://52.117.132.7/pub/katello-ca-consumer-latest.noarch.rpm
+
+uuid=`uuidgen`
+
+echo '{"dmi.system.uuid": "'$uuid'"}' > /etc/rhsm/facts/uuid_override.facts
+
+subscription-manager register --org="customer" --activationkey="${activation_key}" --force
+Where:
+${activation_key} is the Red Hat activation key that is located on the instance details page.
+
+Last login: Sat Mar  6 01:50:40 2021 from 24.34.132.100
+[root@vm-rhel8 ~]#
+
+```
+You can look to make sure that your pull secret was copied:
+```
+[root@vm-rhel8 ~]# ls
+airgap.crt  pull-secret
+[root@vm-rhel8 ~]#
+
+```
+You can now go to the vcd directory. It is now placed in /opt/terraform. You will find your terraform.tfvars in the directory. You can inspect it to ensure that it is complete.
+```
+[root@vm-rhel8 ~]# cd /opt/terraform/
+[root@vm-rhel8 terraform]# ls
+bastion-vm      haproxy.conf  lb       media    output.tf  storage  terraform.tfvars          variables.tf  vm
+csr-approve.sh  ignition      main.tf  network  README.md  temp     terraform.tfvars.example  versions.tf
+[root@vm-rhel8 terraform]#
+
+```
+If your terraform.tfvars file is complete, you can run the commands to create your cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too.
+```
+terraform init
+terraform apply --auto-approve
+```
+
+#### Client setup
+
+On the **Client** that you will access the OCP Console, (your Mac, PC, etc.) add name resolution to direct console to the **Public IP** of the LoadBalancer in /etc/hosts on the client that will login to the Console UI.
   As an example:
 ```
   1.2.3.4 api.ocp44-myprefix.my.com
@@ -179,24 +242,9 @@ Change to this:
 `$ sudo chmod ugo+r /etc/hosts
 $ ls -l /etc/hosts
 -rw-r--r--  1 root  wheel  622  1 Feb 08:57 /etc/hosts`
-#### Install Terraform scripts
-```bash
-git clone https://github.com/slipsibm/terraform-openshift4-vcd
-cd terraform-openshift4-vcd
-cp terraform.tfvars.example terraform.tfvars
-```
-#### Retrieve pull secret from Red Hat sites
-Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) and place in a file on the Bastion Server. Default location is `~/.pull-secret`   
 
-Update your `terraform.tfvars` with your environment values.  See `terraform.tfvars.example`
 
-After your `terraform.tfvars` has been updated, execute the following terraform commands:
 
-```
-terraform init
-terraform plan
-terraform apply
-```
 
 #### terraform variables
 
@@ -211,11 +259,9 @@ terraform apply
 | rhcos_template | Name of CoreOS OVA template from prereq #2 | string | - |
 | lb_template | VCD Network for OpenShift nodes                   | string | - |
 | vcd_catalog   | Name of VCD Catalog containing your templates  | string  |  Public Catalog |
-| vm_network | **deprecated- replaced by network_name in vcd_edge_gateway definition**     |- | - ||   |   |   |   |
-| loadbalancer_network       | VCD Network for Loadbalancer/DNS VM                      | string | -                              |
 | vm_dns_addresses           | List of DNS servers to use for your OpenShift Nodes          | list   | 8.8.8.8, 8.8.4.4               |
+|mac_address_prefix   |  The prefix used to create mac addresses for dhcp reservations. The last 2 digits are derived from the last 2 digits of the ip address of a given machine. The final octet of the ip address for the vm's should not be over 99. |  string |  00:50:56:01:30 |
 | base_domain                | Base domain for your OpenShift Cluster                       | string | -                              |
-| machine_cidr | CIDR for your CoreOS VMs in `subnet/mask` format.            | string | -                              |
 | bootstrap_ip_address|IP Address for bootstrap node|string|-|
 | control_plane_count          | Number of control plane VMs to create                        | string | 3                |
 | control_plane_memory         | Memory, in MB, to allocate to control plane VMs              | string | 16384            |
@@ -234,16 +280,24 @@ terraform apply
 | lb_ip_address                | IP Address for LoadBalancer VM on same subnet as `machine_cidr` | string | -                |
 | loadbalancer_lb_ip_address   | IP Address for LoadBalancer VM for secondary NIC on same subnet as `loadbalancer_lb_machine_cidr` | string | -                |
 | loadbalancer_lb_machine_cidr | CIDR for your LoadBalancer CoreOS VMs in `subnet/mask` format | string | -                |
-| openshift_pull_secret        | Path to your OpenShift [pull secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) | string | -                |
+| openshift_pull_secret        | Path to your OpenShift [pull secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) | string |~/.pull-secret               |
 | openshift_cluster_cidr       | CIDR for pods in the OpenShift SDN                           | string | 10.128.0.0/14    |
 | openshift_service_cidr       | CIDR for services in the OpenShift SDN                       | string | 172.30.0.0/16    |
 | openshift_host_prefix        | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23               |
 | create_loadbalancer_vm | Create the LoadBalancer VM and use it as a DNS server for your cluster.  If set to `false` you must provide a valid pre-configured LoadBalancer for your `api` and `*.apps` endpoints and DNS Zone for your `cluster_id`.`base_domain`. | bool | false |
-|create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
-|**vcd_edge_gateway object** |   |   |   |
-|external_gateway_interface |  Name of the Gateway Interface for external access (typically something like `xxx10-xxx-tenant-external`)  | String  |   |
-|network_name   | Network name that you created within your VCD. (ex. ocpnet)  |  string |  - |
 | cluster_public_ip |Public IP address to be used for your OCP Cluster Console   |  string |   |
+|create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
+|**initialization_info object** |   |   |   |
+|public_bastion_ip |  Choose 1 of the 5 Public ip's for ssh access to the Bastion.| String  |   |
+| machine_cidr | CIDR for your CoreOS VMs in `subnet/mask` format.            | string | -                              |
+|internal_bastion_ip   |  The internal ip for the Bastion. Must be assigned an ip address within your machine_addr range. (ex. 172.16.0.10) | string  |   |
+|bastion_password   |  Initial Password for Bastion |  string |   |
+|terraform_ocp_repo   |  The github repo to be deployed to the Bastion (usually https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd) | string  |   |
+| rhel_key  |  Red Hat Activation key used to register the Bastion.   |  string |   |
+|network_name   |  The network name that will be used for your Bastion and OCP cluster (ex. ocpnet) | string  |   |
+|static_start_address   |  The start of the reserved static ip range on your network. (ex. 172.16.0.150) | string  |   |
+|static_end_address   |  The end of the reserved static ip range on your network (ex. 172.16.0.200) |  string |   |
+|bastion_template   |  The vApp Template name to use for your Bastion (ex. RedHat-8-Template-Official ) |  string |   |
 |**airgapped object** | (only necessary for airgapped install)  |   |   |
 |  enabled | set to true for airgapped, false for regular install  |  bool |  false |
 |ocp_ver_rel   | Full version and release loaded into your mirror (ex. 4.6.15)  | string  | -  |
@@ -262,13 +316,13 @@ Apply complete! Resources: 31 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-export_kubeconfig = "export KUBECONFIG=/root/terraform-openshift4-vcd/installer/testinf/auth/kubeconfig"
+export_kubeconfig = "export KUBECONFIG=/opt/terraform-openshift4-vcd/installer/testinf/auth/kubeconfig"
 kubeadmin_user_info = [
   "kubeadmin",
   "6y9pL-RPoTq-SKADP-M6K5S",
 ]
 openshift_console_url = "https://console-openshift-console.apps.testinf.cdastu.com"
-public_ip = "150.238.224.81"
+public_ip = "xxx.yyy.zz.81"
 
 ```
 Once you power on the machines it should take about 20 mins for your cluster to become active. To debug see **Debugging the OCP installation** below.
@@ -375,6 +429,21 @@ oc get routes console -n openshift-console
 
 
 ## Optional Steps:
+#### Use SSH Key rather than password authentication for Bastion login (optional)
+The Bastion install process will create an ssh key and place it in  `~/.ssh/bastion_id`  
+
+For login to Bastion, you can choose to use SSH Keys and disable password login:
+  - edit /etc/ssh/sshd_config and set password authentication to no
+  - add your bastion_id.pub ssh key to .ssh/authorised_keys on bastion
+
+#### Move SSH to higher port (optional)
+If you want to move your ssh port to a higher port to slow down hackers that are constantly looking to hack your server at port 22 then do the following:
+1. Edit /etc/ssh/sshd_config and uncomment the line that currently reads #Port 22 and change to your desired port and save file. `systemctl stop sshd` `systemctl start sshd`
+2. `semanage port -a -t ssh_port_t -p tcp <your new port number>`
+3. Enter:   
+`firewall-cmd --add-port=<your new port>/tcp --zone=public --permanent`  
+`firewall-cmd --reload`
+1. Update your edge FW rule for your Bastion with your new port. (replace port 22 with your new port)
 ### Add an NFS Server to provide Persistent storage.
 -  [Here is an article on how to set this up](https://medium.com/faun/openshift-dynamic-nfs-persistent-volume-using-nfs-client-provisioner-fcbb8c9344e). Make the NFS Storage Class the default Storage Class   
 
