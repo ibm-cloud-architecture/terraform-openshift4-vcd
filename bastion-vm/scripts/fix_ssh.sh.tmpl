@@ -2,7 +2,7 @@ sleep 90
 echo "waiting 1 min for vm to boot"
 ssh-keygen -t ed25519 -N ''  -f ~/.ssh/id_bastion <<< n
 ssh-keygen -R ${public_bastion_ip}
-ssh-agent bash
-ssh-add ~/.ssh/id_bastion
+#ssh-agent bash
+#ssh-add ~/.ssh/id_bastion
 sshpass -p ${bastion_password} ssh-copy-id -o StrictHostKeyChecking=no -i ~/.ssh/id_bastion root@${public_bastion_ip} -f 
 

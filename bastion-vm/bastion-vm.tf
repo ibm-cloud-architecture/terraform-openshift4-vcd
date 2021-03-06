@@ -9,16 +9,7 @@ provider "vcd" {
   logging              = true
 }
 #retrieve edge gateway name
- locals {
-    ansible_directory = "/tmp"
-    nginx_repo        = "${path.cwd}/bastion-vm/ansible"
-    service_network_name      =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-service02" : "fra04-w02-service01"
-    external_network_name     =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-tenant-external" : "fra04-w02-tenant-external"
-    xlate_ip                  =  substr(var.vcd_url,8,3) == "dal" ? "52.117.132.225" :  "52.117.132.220"
-    login_to_bastion          =  "Next Step login to Bastion via: ssh root@${var.initialization_info["public_bastion_ip"]}" 
-    additional_trust_bundle   =  var.airgapped["additionalTrustBundle"]
-   
- }
+
 data "vcd_resource_list" "edge_gateway_name" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
@@ -26,6 +17,24 @@ data "vcd_resource_list" "edge_gateway_name" {
   resource_type = "vcd_edgegateway" # find gateway name
   list_mode     = "name"
 }
+data "vcd_edgegateway" "mygateway" {
+  org          = var.vcd_org
+  vdc          = var.vcd_vdc
+  name          = element(data.vcd_resource_list.edge_gateway_name.list,1)
+
+}
+ locals {
+    ansible_directory = "/tmp"
+    nginx_repo        = "${path.cwd}/bastion-vm/ansible"
+    service_network_name      =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-service02" : "fra04-w02-service01"
+    external_network_name     =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-tenant-external" : "fra04-w02-tenant-external"
+//    xlate_ip                  =  substr(var.vcd_url,8,3) == "dal" ? "52.117.132.225" :  "52.117.132.220"
+    xlate_private_ip          =  element(data.vcd_edgegateway.mygateway.external_network_ips,1)
+    xlate_public_ip           =  element(data.vcd_edgegateway.mygateway.external_network_ips,2)
+    login_to_bastion          =  "Next Step login to Bastion via: ssh -i ~/.ssh/id_bastion root@${var.initialization_info["public_bastion_ip"]}" 
+    additional_trust_bundle   =  var.airgapped["additionalTrustBundle"]
+   
+ }
 
 resource "vcd_network_routed" "net" {
   org          = var.vcd_org
@@ -140,7 +149,7 @@ resource "vcd_nsxv_snat" "snat_pub" {
   network_type = "ext"
   
   original_address   = var.initialization_info["machine_cidr"]
-  translated_address = var.initialization_info["public_bastion_ip"]
+  translated_address = local.xlate_public_ip
   description = "Outbound Public SNAT Rule"
     depends_on = [
       vcd_vapp_org_network.vappOrgNet,
@@ -154,7 +163,7 @@ resource "vcd_nsxv_snat" "snat_priv" {
   network_type = "ext"
   
   original_address   = var.initialization_info["machine_cidr"]
-  translated_address = local.xlate_ip
+  translated_address = local.xlate_private_ip
   description = "Outbound Private SNAT Rule"
     depends_on = [
       vcd_vapp_org_network.vappOrgNet,
@@ -230,7 +239,7 @@ resource "vcd_vapp_vm" "bastion" {
 
  data "template_file" "ansible_inventory" {
   template = <<EOF
-${var.initialization_info["public_bastion_ip"]} ansible_connection=ssh ansible_user=root ansible_python_interpreter="/usr/libexec/platform-python" 
+${var.initialization_info["public_bastion_ip"]} ansible_connection=ssh ansible_ssh_private_key_file=~/.ssh/id_bastion ansible_user=root ansible_python_interpreter="/usr/libexec/platform-python" 
 EOF
 }
 
