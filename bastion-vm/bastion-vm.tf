@@ -14,7 +14,7 @@ provider "vcd" {
     nginx_repo        = "${path.cwd}/bastion-vm/ansible"
     service_network_name      =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-service02" : "fra04-w02-service01"
     external_network_name     =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-tenant-external" : "fra04-w02-tenant-external"
-    xlate_ip                  =  substr(var.vcd_url,8,3) == "dal" ? "52.117.132.198" :  "52.117.132.220"
+    xlate_ip                  =  substr(var.vcd_url,8,3) == "dal" ? "52.117.132.225" :  "52.117.132.220"
     login_to_bastion          =  "Next Step login to Bastion via: ssh root@${var.initialization_info["public_bastion_ip"]}" 
     additional_trust_bundle   =  var.airgapped["additionalTrustBundle"]
    
