@@ -53,7 +53,7 @@ resource "vcd_vapp" "app_name" {
 resource "tls_private_key" "installkey" {
   algorithm = "RSA"
   rsa_bits  = 4096
-  
+
   depends_on = [vcd_vapp_org_network.vappOrgNet]
 }
 
@@ -77,7 +77,7 @@ module "network" {
       var.compute_ip_addresses,
       var.storage_ip_addresses
       ])
-  airgapped     = var.airgapped   
+  airgapped     = var.airgapped
   network_lb_ip_address = var.lb_ip_address
   vcd_password  = var.vcd_password
   vcd_org       = var.vcd_org
@@ -85,9 +85,9 @@ module "network" {
   cluster_id    = var.cluster_id
   base_domain   = var.base_domain
   initialization_info = var.initialization_info
-  vcd_url       = var.vcd_url 
+  vcd_url       = var.vcd_url
   cluster_public_ip = var.cluster_public_ip
-   
+
   depends_on = [
      local_file.write_public_key
   ]
@@ -130,7 +130,7 @@ module "lb" {
       var.compute_ip_addresses,
       var.storage_ip_addresses
     )
- ) 
+ )
 
   rev_dns_ip_addresses = zipmap(
     concat(
@@ -149,7 +149,7 @@ module "lb" {
       var.compute_ip_addresses,
       var.storage_ip_addresses
     )
- ) 
+ )
   dhcp_ip_addresses = zipmap(
     concat(
       local.bootstrap_fqdns,
@@ -163,27 +163,27 @@ module "lb" {
       var.compute_ip_addresses,
       var.storage_ip_addresses
     )
- ) 
+ )
 
   mac_prefix = var.mac_prefix
   cluster_id  = var.cluster_id
-   
-  loadbalancer_ip   = var.loadbalancer_lb_ip_address
+
+  loadbalancer_ip   = var.lb_ip_address
   loadbalancer_cidr = var.initialization_info["machine_cidr"]
 
   hostnames_ip_addresses  = zipmap(local.lb_fqdns, [var.lb_ip_address])
   machine_cidr            = var.initialization_info["machine_cidr"]
   network_id              = var.initialization_info["network_name"]
-  loadbalancer_network_id = var.initialization_info["network_name"] 
+  loadbalancer_network_id = var.initialization_info["network_name"]
 
    vcd_catalog             = var.vcd_catalog
    rhcos_template          = var.rhcos_template
-  
+
    num_cpus                = 2
    vcd_vdc                 = var.vcd_vdc
-   vcd_org                 = var.vcd_org 
+   vcd_org                 = var.vcd_org
    app_name                = local.app_name
-   
+
    depends_on = [
       module.network
   ]
@@ -202,13 +202,13 @@ module "ignition" {
   total_node_count    = var.compute_count + var.storage_count
   storage_fqdns       = local.storage_fqdns
   storage_count       = var.storage_count
-  airgapped           = var.airgapped   
+  airgapped           = var.airgapped
   depends_on = [
      local_file.write_public_key,
      module.network
   ]
  }
- 
+
 module "bootstrap" {
   source = "./vm"
   mac_prefix = var.mac_prefix
@@ -226,7 +226,7 @@ module "bootstrap" {
   network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
-  vcd_org                 = var.vcd_org 
+  vcd_org                 = var.vcd_org
   app_name                = local.app_name
   rhcos_template          = var.rhcos_template
   num_cpus      = 2
@@ -241,7 +241,7 @@ module "bootstrap_vms_only" {
   source = "./vm"
   mac_prefix = var.mac_prefix
   count = var.create_vms_only ? 1 : 0
-  ignition = local.no_ignition 
+  ignition = local.no_ignition
   hostnames_ip_addresses = zipmap(
     local.bootstrap_fqdns,
     [var.bootstrap_ip_address]
@@ -253,7 +253,7 @@ module "bootstrap_vms_only" {
   network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
-  vcd_org                 = var.vcd_org 
+  vcd_org                 = var.vcd_org
   app_name                = local.app_name
   rhcos_template          = var.rhcos_template
   num_cpus      = 2
@@ -273,14 +273,14 @@ module "control_plane_vm" {
     local.control_plane_fqdns,
     var.control_plane_ip_addresses
   )
-  
+
   create_vms_only = var.create_vms_only
   count = var.create_vms_only ? 0 : 1
   ignition = module.ignition.master_ignition
   network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
-  vcd_org                 = var.vcd_org 
+  vcd_org                 = var.vcd_org
   app_name                = local.app_name
   rhcos_template          = var.rhcos_template
 
@@ -295,7 +295,7 @@ module "control_plane_vm" {
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 //   depends_on = [
 //     module.bootstrap
-//   ]  
+//   ]
 }
 module "control_plane_vm_vms_only" {
   source = "./vm"
@@ -306,11 +306,11 @@ module "control_plane_vm_vms_only" {
   )
   count = var.create_vms_only ? 1 : 0
   create_vms_only = var.create_vms_only
-  ignition = local.no_ignition 
+  ignition = local.no_ignition
   network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
-  vcd_org                 = var.vcd_org 
+  vcd_org                 = var.vcd_org
   app_name                = local.app_name
   rhcos_template          = var.rhcos_template
 
@@ -325,7 +325,7 @@ module "control_plane_vm_vms_only" {
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
   depends_on = [
     module.bootstrap
-  ]  
+  ]
 }
 
 module "compute_vm" {
@@ -344,7 +344,7 @@ module "compute_vm" {
   network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
-  vcd_org                 = var.vcd_org 
+  vcd_org                 = var.vcd_org
   app_name                = local.app_name
   rhcos_template          = var.rhcos_template
 
@@ -373,7 +373,7 @@ module "compute_vm_vms_only" {
   network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
-  vcd_org                 = var.vcd_org 
+  vcd_org                 = var.vcd_org
   app_name                = local.app_name
   rhcos_template          = var.rhcos_template
 
@@ -389,7 +389,7 @@ module "compute_vm_vms_only" {
 
 module "storage_vm" {
   source = "./storage"
-  mac_prefix = var.mac_prefix 
+  mac_prefix = var.mac_prefix
   hostnames_ip_addresses = zipmap(
     local.storage_fqdns,
     var.storage_ip_addresses
@@ -400,7 +400,7 @@ module "storage_vm" {
   network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
-  vcd_org                 = var.vcd_org 
+  vcd_org                 = var.vcd_org
   app_name                = local.app_name
   rhcos_template          = var.rhcos_template
 
@@ -409,7 +409,7 @@ module "storage_vm" {
 
   num_cpus      = var.storage_num_cpus
   memory        = var.storage_memory
-  disk_size     = var.compute_disk 
+  disk_size     = var.compute_disk
   extra_disk_size    = var.storage_disk
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 //  depends_on = [
@@ -418,7 +418,7 @@ module "storage_vm" {
 }
 module "storage_vm_vms_only" {
   source = "./storage"
-  mac_prefix = var.mac_prefix 
+  mac_prefix = var.mac_prefix
   hostnames_ip_addresses = zipmap(
     local.storage_fqdns,
     var.storage_ip_addresses
@@ -429,7 +429,7 @@ module "storage_vm_vms_only" {
   network_id              = var.initialization_info["network_name"]
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
-  vcd_org                 = var.vcd_org 
+  vcd_org                 = var.vcd_org
   app_name                = local.app_name
   rhcos_template          = var.rhcos_template
 
@@ -438,7 +438,7 @@ module "storage_vm_vms_only" {
 
   num_cpus      = var.storage_num_cpus
   memory        = var.storage_memory
-  disk_size     = var.compute_disk 
+  disk_size     = var.compute_disk
   extra_disk_size    = var.storage_disk
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
   depends_on = [
