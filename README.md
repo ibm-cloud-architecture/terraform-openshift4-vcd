@@ -266,7 +266,6 @@ $ ls -l /etc/hosts
 | cluster_id                   | VCD Cluster where OpenShift will be deployed             | string | - |
 | vcd_org   |  VCD Org from VCD Console screen |  string |   |
 | rhcos_template | Name of CoreOS OVA template from prereq #2 | string | - |
-| lb_template | VCD Network for OpenShift nodes                   | string | - |
 | vcd_catalog   | Name of VCD Catalog containing your templates  | string  |  Public Catalog |
 | vm_dns_addresses           | List of DNS servers to use for your OpenShift Nodes          | list   | 8.8.8.8, 8.8.4.4               |
 |mac_address_prefix   |  The prefix used to create mac addresses for dhcp reservations. The last 2 digits are derived from the last 2 digits of the ip address of a given machine. The final octet of the ip address for the vm's should not be over 99. |  string |  00:50:56:01:30 |
@@ -287,15 +286,13 @@ $ ls -l /etc/hosts
 | storage_num_cpus             | Number of CPUs to allocate for storage VMs                   | string | 16               |
 | storage_disk  | size in MB must be min of 2097152 to install OCS   | string  |  2097152 |
 | lb_ip_address                | IP Address for LoadBalancer VM on same subnet as `machine_cidr` | string | -                |
-| loadbalancer_lb_ip_address   | IP Address for LoadBalancer VM for secondary NIC on same subnet as `loadbalancer_lb_machine_cidr` | string | -                |
-| loadbalancer_lb_machine_cidr | CIDR for your LoadBalancer CoreOS VMs in `subnet/mask` format | string | -                |
 | openshift_pull_secret        | Path to your OpenShift [pull secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) | string |~/.pull-secret               |
 | openshift_cluster_cidr       | CIDR for pods in the OpenShift SDN                           | string | 10.128.0.0/14    |
 | openshift_service_cidr       | CIDR for services in the OpenShift SDN                       | string | 172.30.0.0/16    |
 | openshift_host_prefix        | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23               |
-| create_loadbalancer_vm | Create the LoadBalancer VM and use it as a DNS server for your cluster.  If set to `false` you must provide a valid pre-configured LoadBalancer for your `api` and `*.apps` endpoints and DNS Zone for your `cluster_id`.`base_domain`. | bool | false |
 | cluster_public_ip |Public IP address to be used for your OCP Cluster Console   |  string |   |
 |create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
+|additional_trust_bundle   |  name of file containing cert for mirror | string  |  - |
 |**initialization_info object** |   |   |   |
 |public_bastion_ip |  Choose 1 of the 5 Public ip's for ssh access to the Bastion.| String  |   |
 | machine_cidr | CIDR for your CoreOS VMs in `subnet/mask` format.            | string | -                              |
@@ -315,7 +312,6 @@ $ ls -l /etc/hosts
 | mirror_fqdn  | fqdn of the mirror host. Must match the name in the mirrors registry's cert  |  string | -  |
 |  mirror_port | port of the mirror  |string   | -  |
 |  mirror_repository |  name of repo in mirror containing OCP install images (currently should be set to `ocp4/openshift4` see RH Doc for details) |  string |  - |
-|additional_trust_bundle   |  name of file containing cert for mirror | string  |  - |
 
 
 
