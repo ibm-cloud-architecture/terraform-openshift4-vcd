@@ -23,7 +23,7 @@ variable "cluster_id" {
   type = string
 }
 
-variable "lb_template" {
+variable "rhcos_template" {
   type = string
 }
 

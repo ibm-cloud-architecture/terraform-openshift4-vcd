@@ -24,10 +24,6 @@ vcd_url = "https://fradir01.vmware-solutions.cloud.ibm.com/api"
 // Name of the RHCOS VM template to clone to create VMs for the cluster
 rhcos_template = "rhcos OpenShift 4.7.0"
 
-// Name of the LB VM template to clone to create VMs for the cluster
-lb_template = "rhcos OpenShift 4.7.0"
-
-
 // Name of the vcd Catalog
 vcd_catalog = "Public Catalog"
 
@@ -65,15 +61,8 @@ storage_count = 0
 storage_disk = 2097152
 //storage_ip_addresses = ["172.16.0.26", "172.16.0.27", "172.16.0.28"]
 
-
-
-
 // The IP address to assign to the loadbalancer VM.
 lb_ip_address = "172.16.0.19"
-
-
-// The IP address to assign to the public loadbalancer interface
-loadbalancer_lb_ip_address = "172.16.0.19"
 
 // including Bastion server for local DNS 161.26.0.10 is the DNS server for IBM Cloud Private Network so you can use things like NTP from IBM Cloud Private Network
 vm_dns_addresses = ["9.9.9.9","161.26.0.10"]
