@@ -177,7 +177,7 @@ module "lb" {
   loadbalancer_network_id = var.initialization_info["network_name"] 
 
    vcd_catalog             = var.vcd_catalog
-   lb_template             = var.lb_template
+   rhcos_template          = var.rhcos_template
   
    num_cpus                = 2
    vcd_vdc                 = var.vcd_vdc

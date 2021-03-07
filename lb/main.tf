@@ -75,7 +75,7 @@ resource "vcd_vapp_vm" "loadbalancer" {
   memory           = var.memory
   vapp_name= var.app_name
   catalog_name= var.vcd_catalog
-  template_name=var.lb_template
+  template_name=var.rhcos_template
   power_on= true
 
   expose_hardware_virtualization = false # needs to be false for LB 
