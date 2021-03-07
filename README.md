@@ -9,7 +9,7 @@ Deploy OpenShift 4.6 and later on VMWare Cloud Director using static IP addresse
 
 **Change History:**
   - 3/5/2021:
-    - **Due to networking changes and updated configurations and software on the Bastion, it is recommended that you not reuse an existing VDC and Bastion. If you really need or want to reuse your existing VDC, you should delete the existing Bastion as well as all the existing DNAT, SNAT and any FW rules that you created. There should be a Default rule to Deny all public and private access**
+    - **Due to networking changes and updated configurations and software on the Bastion, it is recommended that you not reuse an existing VDC and Bastion. You will also need to update your `terraform.tfvars`. There are several new required variables.**
     - Added full creation of Bastion and all networking including creation of vdc network, fw rules, dnat and snat rules.
     - Full install and configure all software on Bastion including dnsmasq, ansible, terraform, oc client, nginx web server for ignition
     - Load terraform repo and terraform.tfvars onto Bastion
