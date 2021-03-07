@@ -143,6 +143,7 @@ Gather the following information that you will need when configuring the ESG:
     network_name      = "ocpnet"
     static_start_address    = "172.16.0.150"
     static_end_address      = "172.16.0.220"
+    run_cluster_install     = true
     }
 ```
 
@@ -151,6 +152,8 @@ Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/
 
 ## Perform Bastion install
 Once you have finished editing your terraform.tfvars file you can execute the following commands. Terraform will now create the Bastion, install and configure all necessary software and perform all network customizations associated with the Bastion. The terraform.tfvars file will be copied to the Bastion server. The pull secret and additionalTrustBundle will be copied to the Bastion if they were specified in terraform.tfvars and are in the specified location on the Host machine. If you plan to create the pull secret and additionalTrustBundle on the Bastion directly and didn't put them on your Host, ignore the error messages about the copy failing.
+If you `set run_cluster_install     = true`, your OCP cluster will be created automatically once the Bastion is configured. The results of the install can be found either on the Bastion in `/root/cluster_install.log` or on your Host machine in `~/cluster_install.log`.
+
 ```
 terraform init
 terraform -chdir=bastion-vm plan --var-file="../terraform.tfvars"
@@ -170,6 +173,12 @@ Outputs:
 
 login_bastion = "Next Step login to Bastion via: ssh root@1xxx.xx.xx.38"
 ```
+
+
+If you requested that the cluster be installed and it completed successfully, you can skip directly to the **Client Setup** section of the readme as there is no additional commands to run on the Bastion. You can still login to the Bastion to monitor the completion of the OpenShift install.
+
+If the cluster install fails, you wil need to login to the Bastion to correct any errors there and initiate the restart of the install by following the **Login to Bastion** instructions below.
+
 #### Login to Bastion
 Use the generated command to login to the Bastion
 `ssh root@1xxx.xx.xx.38`
@@ -298,6 +307,7 @@ $ ls -l /etc/hosts
 |static_start_address   |  The start of the reserved static ip range on your network. (ex. 172.16.0.150) | string  |   |
 |static_end_address   |  The end of the reserved static ip range on your network (ex. 172.16.0.200) |  string |   |
 |bastion_template   |  The vApp Template name to use for your Bastion (ex. RedHat-8-Template-Official ) |  string |   |
+|run_create_cluster   |  true or false, if true, the cluster install will be initiated without logging on to the Bastion. The output of the install will be placed in. If the install fails, you can log in to the Bastion and look in /root/cluster_install.log for errors.The install log should normally be transfered back to your Host machine even if the install fails| bool  |   |
 |**airgapped object** | (only necessary for airgapped install)  |   |   |
 |  enabled | set to true for airgapped, false for regular install  |  bool |  false |
 |ocp_ver_rel   | Full version and release loaded into your mirror (ex. 4.6.15)  | string  | -  |
