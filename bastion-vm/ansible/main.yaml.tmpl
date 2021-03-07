@@ -94,7 +94,7 @@
 
  
  # terraform cli
-    - name: repo add 
+    - name: add terraform repo 
       shell: "yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo"
 
     - name: install terraform
@@ -128,13 +128,13 @@
       shell: "firewall-cmd --reload"
     
     # check out git repo with OCP terraform script
-    - name: git checkout
+    - name: git checkout ${terraform_ocp_repo}
       git:
         repo: "${terraform_ocp_repo}"
         dest: /opt/terraform
 
      #upload the terraform.tfvars config
-    - name: terraform.tfvars - Copy file with owner and permissions
+    - name: terraform.tfvars - copy 
       ansible.builtin.copy:
          src: ${terraform_root}/terraform.tfvars
          dest: /opt/terraform
@@ -166,5 +166,20 @@
         - name: no secret error
           ansible.builtin.debug:
             msg: 'trust bundle not found'
-    %{endif}  
+    %{endif} 
+    - name: Copy run cluster install exec
+      ansible.builtin.copy:
+        src: ${nginx_repo_dir}/run_cluster_install.sh
+        dest: /root/run_cluster_install.sh
+        mode: '0755'
+           
+    %{if run_cluster_install}
+    - name: run cluster install
+      shell: "/root/run_cluster_install.sh >> /root/cluster_install.log" 
+    - name: retrieve cluster install log
+      ansible.builtin.fetch:
+        src: /root/cluster_install.log
+        dest: ~/cluster_install.log
+        flat: yes
+    %{endif}
              

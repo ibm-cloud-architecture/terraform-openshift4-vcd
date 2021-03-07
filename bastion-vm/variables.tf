@@ -81,5 +81,6 @@ variable "initialization_info" {
     static_start_address   = string
     static_end_address     = string 
     bastion_template       = string
+    run_cluster_install    = bool
   })
   }
