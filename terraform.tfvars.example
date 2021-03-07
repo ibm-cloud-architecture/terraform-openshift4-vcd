@@ -85,18 +85,18 @@ openshift_version="4.7"
 airgapped = {
       enabled = false
 // ocp_ver_rel has to match version.release that you loaded in mirror
-      ocp_ver_rel = "4.6.15" 
+      ocp_ver_rel = "4.6.15"
       mirror_ip = "172.16.0.10"
       mirror_fqdn = "mirror.airgapped.com"
       mirror_port = "5000"
       mirror_repository = "ocp4/openshift4"
-      additionalTrustBundle = "~/airgap.crt"      
+      additionalTrustBundle = "~/airgap.crt"
       }
 
 
 //public IP for your cluster pick one of the 5 available
 cluster_public_ip       = "161.xxx.xx.xxx"
- 
+
 initialization_info     = {
     public_bastion_ip = "161.x.y.y"
     bastion_password = "OCP4All"
@@ -108,4 +108,5 @@ initialization_info     = {
     static_start_address    = "172.16.0.150"
     static_end_address      = "172.16.0.220"
     bastion_template        = "RedHat-8-Template-Official"
+    run_cluster_install     = true 
     }
