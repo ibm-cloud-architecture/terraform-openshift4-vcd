@@ -147,25 +147,29 @@
         - name: Pull Secret - Copy file 
           ansible.builtin.copy:
             src: ${openshift_pull_secret}
-            dest: ${openshift_pull_secret}
+            dest: ${pull_secret_dest}/
             mode: '0644'
       rescue:
         - name: no secret error
           ansible.builtin.debug:
-            msg: 'pull secret not found'      
+            msg: 'Pull secret ${openshift_pull_secret} not found' 
+        - name: force error
+          ansible.builtin.command: /bin/false            
 
     %{if additional_trust_bundle != ""}
-    - name: copy pull secret if there
+    - name: copy additional trust bundle if defined
       block:
         - name: additional trust bundle - Copy file 
           ansible.builtin.copy:
             src: ${additional_trust_bundle}
-            dest: ${additional_trust_bundle}
+            dest: ${additional_trust_bundle_dest}/
             mode: '0644'
       rescue:
-        - name: no secret error
+        - name: trust bundle error message
           ansible.builtin.debug:
-            msg: 'trust bundle not found'
+            msg: 'trust bundle ${additional_trust_bundle} not found '
+        - name: force error
+          ansible.builtin.command: /bin/false
     %{endif} 
     - name: Copy run cluster install exec
       ansible.builtin.copy:

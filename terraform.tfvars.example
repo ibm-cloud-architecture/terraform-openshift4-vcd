@@ -79,7 +79,9 @@ loadbalancer_lb_ip_address = "172.16.0.19"
 vm_dns_addresses = ["9.9.9.9","161.26.0.10"]
 
 openshift_pull_secret = "~/pull-secret"
-openshift_version="4.7"
+openshift_version="4.6"
+additionalTrustBundle = ""
+
 
 // airgapped block see readme for details on airgapped
 airgapped = {
@@ -90,7 +92,6 @@ airgapped = {
       mirror_fqdn = "mirror.airgapped.com"
       mirror_port = "5000"
       mirror_repository = "ocp4/openshift4"
-      additionalTrustBundle = "~/airgap.crt"
       }
 
 

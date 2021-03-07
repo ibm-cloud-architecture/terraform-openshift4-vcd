@@ -25,14 +25,14 @@ data "vcd_edgegateway" "mygateway" {
 }
  locals {
     ansible_directory = "/tmp"
+    additional_trust_bundle_dest = dirname(var.additionalTrustBundle)
+    pull_secret_dest = dirname(var.openshift_pull_secret)
     nginx_repo        = "${path.cwd}/bastion-vm/ansible"
     service_network_name      =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-service02" : "fra04-w02-service01"
     external_network_name     =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-tenant-external" : "fra04-w02-tenant-external"
     xlate_private_ip          =  element(data.vcd_edgegateway.mygateway.external_network_ips,1)
     xlate_public_ip           =  element(data.vcd_edgegateway.mygateway.external_network_ips,2)
     login_to_bastion          =  "Next Step login to Bastion via: ssh -i ~/.ssh/id_bastion root@${var.initialization_info["public_bastion_ip"]}" 
-    additional_trust_bundle   =  var.airgapped["additionalTrustBundle"]
-   
  }
 
 resource "vcd_network_routed" "net" {
@@ -255,8 +255,10 @@ EOF
          terraform_ocp_repo = var.initialization_info["terraform_ocp_repo"]
          nginx_repo_dir = local.nginx_repo
          openshift_pull_secret = var.openshift_pull_secret
+         pull_secret_dest   = local.pull_secret_dest
          terraform_root = path.cwd
-         additional_trust_bundle   =  var.airgapped["additionalTrustBundle"]
+         additional_trust_bundle   =  var.additionalTrustBundle
+         additional_trust_bundle_dest   = local.additional_trust_bundle_dest 
          run_cluster_install       =  var.initialization_info["run_cluster_install"]
          
        }

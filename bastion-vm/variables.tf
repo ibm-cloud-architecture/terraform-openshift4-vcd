@@ -22,37 +22,231 @@ variable "vcd_org" {
 variable "vcd_url" {
   type        = string
   description = "This is the vcd url for the environment."
+  default     = "https://daldir01.vmware-solutions.cloud.ibm.com/api"
+}
+variable "vcd_catalog" {
+  type        = string
+  description = "This is the vcd catalog to use for the environment."
+  default     = "Public Catalog"
 }
 
-variable "vcd_catalog"{
+variable "lb_template" {
   type        = string
-  description = "name of template catalog"
+  description = "This is the name of the LB template to clone."
 }
 
-variable "base_domain"{
+variable "rhcos_template" {
   type        = string
-  description = "base domain of cluster"
+  description = "This is the name of the RHCOS template to clone."
 }
 
-variable "cluster_id"{
+variable "mac_prefix" {
   type        = string
-  description = "cluster id/name"
+  description = "Prefix for creating MAC addresses for control, compute and storage nodes (first five parts. MAC address is created by taking this prefix appending it with the final part of the ip address"
+  default     = "00:50:56:01:30"
+
 }
 
-variable "openshift_version"{
-  type        = string
-  description = "openshift version"
+variable "vm_dns_addresses" {
+  type        = list(string)
+  description = "List of DNS servers to use for your OpenShift Nodes"
+  default     = ["8.8.8.8", "8.8.4.4"]
 }
 
-variable "lb_ip_address"{
+/////////
+// OpenShift cluster variables
+/////////
+
+variable "cluster_id" {
   type        = string
+  description = "This cluster id must be of max length 27 and must have only alphanumeric or hyphen characters."
 }
 
-variable "openshift_pull_secret"     {
+variable "base_domain" {
   type        = string
-  }
-variable "cluster_public_ip" {
+  description = "The base DNS zone to add the sub zone to."
+}
+
+/////////
+// Bootstrap machine variables
+/////////
+variable "bootstrap_ip_address" {
+  type    = string
+  default = ""
+}
+
+variable "bootstrap_mac_address" {
+  type    = string
+  default = ""
+}
+variable "bootstrap_disk" {
+  type    = string
+  default = ""
+}
+
+variable "lb_ip_address" {
+  type    = string
+  default = ""
+}
+variable "lb_mac_address" {
+  type    = string
+  default = ""
+}
+
+
+///////////
+// control-plane machine variables
+///////////
+
+
+variable "control_plane_count" {
+  type    = string
+  default = "3"
+}
+
+variable "control_plane_ip_addresses" {
+  type    = list(string)
+  default = []
+}
+
+variable "control_plane_mac_addresses" {
+  type    = list(string)
+  default = []
+}
+variable "control_plane_memory" {
+  type    = string
+  default = "32768"
+}
+
+variable "control_plane_num_cpus" {
+  type    = string
+  default = "8"
+}
+variable "control_disk" {
+  type    = string
+}
+
+
+
+
+//////////
+// compute machine variables
+//////////
+
+
+variable "compute_count" {
+  type    = string
+  default = "6"
+}
+
+variable "compute_ip_addresses" {
+  type    = list(string)
+  default = []
+}
+
+variable "compute_mac_addresses" {
+  type    = list(string)
+  default = []
+}
+
+variable "compute_memory" {
+  type    = string
+  default = "32768"
+}
+
+variable "compute_num_cpus" {
+  type    = string
+  default = "16"
+}
+variable "compute_disk" {
+  type    = string
+}
+
+
+
+//////////
+// storage machine variables
+//////////
+
+variable "storage_count" {
+  type    = string
+  default = "0"
+}
+
+variable "storage_ip_addresses" {
+  type    = list(string)
+  default = []
+}
+
+
+variable "storage_memory" {
+  type    = string
+  default = "65536"
+}
+
+variable "storage_num_cpus" {
+  type    = string
+  default = "16"
+}
+
+variable "storage_disk" {
+  type    = string
+  default = "2097152"
+}
+
+
+//////////
+// loadbalancer machine variables
+// used to configure an extra nic for the loadbalancer
+//////////
+
+variable "loadbalancer_lb_ip_address" {
+  type    = string
+  default = ""
+}
+
+variable "openshift_pull_secret" {
+  type = string
+  default = "~/.pull-secret"
+}
+
+variable "openshift_cluster_cidr" {
+  type    = string
+  default = "10.128.0.0/14"
+}
+
+variable "openshift_service_cidr" {
+  type    = string
+  default = "172.30.0.0/16"
+}
+
+variable "openshift_host_prefix" {
+  type    = string
+  default = 23
+}
+
+variable "openshift_version" {
   type        = string
+  description = "Specify the OpenShift version you want to deploy.  Must be 4.6 or later to use this automation"
+  default     = "4.6"
+}
+
+variable "create_loadbalancer_vm" {
+  type        = bool
+  description = "Create a LoadBalancer and DNS VM for your cluster"
+  default     = true
+}
+
+variable "create_vms_only" {
+  type        = bool
+  description = "only create vms no OpenShift Install"
+  default     = false
+}
+
+variable "additionalTrustBundle" {
+  type        =  string
+  description = "certificate file used for airgapped install registry or proxy server"
+  default     = ""
   }
 
 variable "airgapped"  {
@@ -65,8 +259,21 @@ variable "airgapped"  {
          mirror_fqdn = ""
          mirror_port = ""
          mirror_repository = ""
-         additionalTrustBundle = ""         
          }
+}
+
+variable "proxy_config" {
+  type = map(string)
+  default = {
+    enabled               = false
+    httpProxy             = ""
+    httpsProxy            = ""
+    noProxy               = ""
+  }
+}
+
+variable "cluster_public_ip" {
+  type                     = string
 }
 
 variable "initialization_info" {
@@ -79,8 +286,8 @@ variable "initialization_info" {
     machine_cidr           = string
     network_name           = string
     static_start_address   = string
-    static_end_address     = string 
+    static_end_address     = string
     bastion_template       = string
     run_cluster_install    = bool
   })
-  }
+}

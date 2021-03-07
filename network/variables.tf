@@ -49,6 +49,13 @@ variable "base_domain" {
   type        = string
 }
 
+variable "additionalTrustBundle" {
+  type        = string
+  description = "certificate file used for airgapped install registry or proxy server"
+  default = ""
+  }
+
+
 variable "airgapped"  {
   type        = map(string)
   description = "test  variable for airgapped instead of separate vars"
@@ -58,7 +65,6 @@ variable "airgapped"  {
          mirror_fqdn = ""
          mirror_port = ""
          mirror_repository = ""
-         additionalTrustBundle = ""         
          }
 }
 

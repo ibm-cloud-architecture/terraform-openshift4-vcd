@@ -234,7 +234,7 @@ variable "openshift_version" {
 variable "create_loadbalancer_vm" {
   type        = bool
   description = "Create a LoadBalancer and DNS VM for your cluster"
-  default     = false
+  default     = true
 }
 
 variable "create_vms_only" {
@@ -242,6 +242,12 @@ variable "create_vms_only" {
   description = "only create vms no OpenShift Install"
   default     = false
 }
+
+variable "additionalTrustBundle" {
+  type        =  string
+  description = "certificate file used for airgapped install registry or proxy server"
+  default = ""
+  }
 
 variable "airgapped"  {
   type        = map(string)
@@ -253,7 +259,6 @@ variable "airgapped"  {
          mirror_fqdn = ""
          mirror_port = ""
          mirror_repository = ""
-         additionalTrustBundle = ""         
          }
 }
 
