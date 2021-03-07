@@ -30,11 +30,6 @@ variable "vcd_catalog" {
   default     = "Public Catalog"
 }
 
-variable "lb_template" {
-  type        = string
-  description = "This is the name of the LB template to clone."
-}
-
 variable "rhcos_template" {
   type        = string
   description = "This is the name of the RHCOS template to clone."
@@ -200,10 +195,6 @@ variable "storage_disk" {
 // used to configure an extra nic for the loadbalancer
 //////////
 
-variable "loadbalancer_lb_ip_address" {
-  type    = string
-  default = ""
-}
 
 variable "openshift_pull_secret" {
   type = string
