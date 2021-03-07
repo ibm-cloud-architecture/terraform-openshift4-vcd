@@ -174,12 +174,19 @@
         mode: '0755'
            
     %{if run_cluster_install}
-    - name: run cluster install
-      shell: "/root/run_cluster_install.sh >> /root/cluster_install.log" 
-    - name: retrieve cluster install log
-      ansible.builtin.fetch:
-        src: /root/cluster_install.log
-        dest: ~/cluster_install.log
-        flat: yes
+    - name: run cluster install block
+      block:
+        - name: run cluster install
+          shell: "/root/run_cluster_install.sh >> /root/cluster_install.log" 
+      rescue:
+        - name: cluster install failed
+          ansible.builtin.debug:
+            msg: 'Cluster Install failed. Check ~/cluster_install.log for details'   
+      always:
+        - name: retrieve cluster_install.log
+          ansible.builtin.fetch:
+            src: /root/cluster_install.log
+            dest: ~/cluster_install.log
+            flat: yes        
     %{endif}
              
