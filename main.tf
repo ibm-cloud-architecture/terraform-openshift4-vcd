@@ -455,7 +455,7 @@ module "storage_vm_vms_only" {
 
 data "template_file" "write_final_args" {
   template = <<EOF
-Kubeadmin         : User: kubeadmin password: data.local_file.kubeadmin_password.content
+Kubeadmin         : User: kubeadmin password: ${data.local_file.kubeadmin_password.content}
 Public IP         : ${var.cluster_public_ip}
 OpenShift Console : ${local.openshift_console_url}
 Export KUBECONFIG : ${local.export_kubeconfig}
@@ -469,7 +469,7 @@ EOF
 }
 resource "local_file" "write_final_args" {
   content  = data.template_file.write_final_args.rendered
-  filename = "~/${var.cluster_id}info.txt"
+  filename = "/root/${var.cluster_id}info.txt"
   depends_on = [
     module.ignition,
   ]

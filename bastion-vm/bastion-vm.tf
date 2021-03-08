@@ -304,3 +304,10 @@ resource "null_resource" "setup_ssh" {
         vcd_vapp_vm.bastion 
   ]
 }
+
+  data "local_file" "read_final_args" {
+  filename = pathexpand("~/${var.cluster_id}info.txt")
+  depends_on = [
+    null_resource.setup_bastion
+  ]
+}
