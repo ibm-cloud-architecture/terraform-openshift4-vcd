@@ -15,6 +15,6 @@ output "export_kubeconfig" {
 }
 
 output "output_file" {
-  value = data.local_file.write_final_args.content
+  value = data.local_file.write_final_args.rendered)
 }  
   
