@@ -294,9 +294,9 @@ module "control_plane_vm" {
   disk_size    = var.control_disk
 
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
-//   depends_on = [
-//     module.bootstrap
-//   ]
+   depends_on = [
+     module.bootstrap
+   ]
 }
 module "control_plane_vm_vms_only" {
   source = "./vm"
@@ -354,9 +354,9 @@ module "compute_vm" {
   disk_size    = var.compute_disk
 
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
-//     depends_on = [
-//       module.control_plane_vm
-//   ]
+     depends_on = [
+       module.bootstrap
+   ]
 }
 module "compute_vm_vms_only" {
   source = "./vm"
@@ -413,9 +413,9 @@ module "storage_vm" {
   disk_size     = var.compute_disk
   extra_disk_size    = var.storage_disk
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
-//  depends_on = [
-//      module.control_plane_vm
-//  ]
+  depends_on = [
+      module.bootstrap
+  ]
 }
 module "storage_vm_vms_only" {
   source = "./storage"
