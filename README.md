@@ -114,6 +114,26 @@ When you create a cluster, the FW will be set up as follows.
 
 DHCP is not enabled on the Network as it will interfere with the DHCP server running in the cluster. If you have previously enabled it for use in the vcd toolkit, you should now disable it.
 
+You will need to assign static ip addresses, within the Gateway/CIDR range that you defined, for the loadbalance, control plane and workers. You will see sections in `terraform.tfvars`. **The ip addresses can't be defined above x.y.z.99 within your CIDR Range**. These definitions look like this:
+
+```
+// The number of compute VMs to create. Default is 3.
+compute_count = 3
+compute_disk =250000
+
+// The IP addresses to assign to the compute VMs. The length of this list must
+// match the value of compute_count.
+     compute_ip_addresses = ["172.16.0.74","172.16.0.75"]
+
+
+// Storage Nodes disk size must be at least 2097152 (2TB) if you want to install OCS
+
+storage_count = 0
+storage_disk = 2097152
+//storage_ip_addresses = ["172.16.0.76", "172.16.0.77", "172.16.0.78"]
+//storage_ip_addresses = ["172.16.0.35"]
+
+```
 
 #### Choosing an External IP  for your cluster and Bastion and retrieving the Red Hat Activation key
 Configure the Edge Service Gateway (ESG) to provide inbound and outbound connectivity.  For a network overview diagram, followed by general Edge setup instruction, see: https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-create-network
