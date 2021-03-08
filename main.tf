@@ -469,7 +469,7 @@ EOF
 }
 resource "local_file" "write_final_args" {
   content  = data.template_file.write_final_args.rendered
-  filename = "/tmp/${var.cluster_id}info.txt"
+  filename = "/root/${var.cluster_id}info.txt"
   depends_on = [
     module.ignition,
   ]

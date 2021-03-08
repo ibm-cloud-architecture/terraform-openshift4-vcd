@@ -184,7 +184,7 @@
           shell: "/root/run_cluster_install.sh >> /root/cluster_install.log" 
         - name: retrieve cluster_install.log
           ansible.builtin.fetch:
-            src: /tmp/${cluster_id}info.txt
+            src: /root/${cluster_id}info.txt
             dest: ~/${cluster_id}info.txt
             flat: yes                              
       rescue:
