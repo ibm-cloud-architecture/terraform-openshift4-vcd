@@ -4,11 +4,10 @@
 # Sample configuration file for ISC dhcpd
 #
 subnet ${element(split(".", element(split("/",machine_cidr),0)),0)}.${element(split(".", element(split("/",machine_cidr),0)),1)}.${element(split(".", element(split("/",machine_cidr),0)),2)}.0 netmask 255.255.255.0 {
-# range  172.16.0.150 172.16.0.225;
   option domain-name-servers  ${lb_ip_address};
   option domain-name "${cluster_domain}";
   option routers ${element(split("/", machine_cidr), 0)};
-  option broadcast-address 172.16.0.254;
+  option broadcast-address ${element(split(".", element(split("/",machine_cidr),0)),0)}.${element(split(".", element(split("/",machine_cidr),0)),1)}.${element(split(".", element(split("/",machine_cidr),0)),2)}.254;
   default-lease-time 600;
   max-lease-time 7200;
 }
