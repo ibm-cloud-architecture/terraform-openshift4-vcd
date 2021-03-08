@@ -20,9 +20,11 @@ vcd_org = "long currently 33 character string retrieved from vdc console"
 // url for the vcd. (this is frankfurt)
 vcd_url = "https://fradir01.vmware-solutions.cloud.ibm.com/api"
 
+// make sure you change the template when you change the version
+openshift_version="4.6"
 
 // Name of the RHCOS VM template to clone to create VMs for the cluster
-rhcos_template = "rhcos OpenShift 4.7.0"
+rhcos_template = "rhcos OpenShift 4.6.8"
 
 // Name of the vcd Catalog
 vcd_catalog = "Public Catalog"
@@ -68,7 +70,6 @@ lb_ip_address = "172.16.0.19"
 vm_dns_addresses = ["9.9.9.9","161.26.0.10"]
 
 openshift_pull_secret = "~/pull-secret"
-openshift_version="4.6"
 additionalTrustBundle = ""
 
 
