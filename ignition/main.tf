@@ -2,7 +2,7 @@
 locals {
   installerdir = "${path.cwd}/installer/${var.cluster_id}"
   openshift_installer_url = "${var.openshift_installer_url}/latest-${var.openshift_version}"
-  bootstrap_ignition_url = "http://${var.iternal_bastion_ip}/installer/${var.cluster_id}/bootstrap.ign"
+  bootstrap_ignition_url = "http://${var.initialization_info["internal_bastion_ip"]}/installer/${var.cluster_id}/bootstrap.ign"
   mirror_fqdn = var.airgapped["mirror_fqdn"]
   mirror_port = var.airgapped["mirror_port"]
   mirror_repository = var.airgapped["mirror_repository"]

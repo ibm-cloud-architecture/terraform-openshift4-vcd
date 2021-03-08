@@ -203,6 +203,7 @@ module "ignition" {
   storage_fqdns       = local.storage_fqdns
   storage_count       = var.storage_count
   airgapped           = var.airgapped
+  initialization_info = var.initialization_info
   depends_on = [
      local_file.write_public_key,
      module.network
