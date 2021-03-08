@@ -1,5 +1,4 @@
-output "login_bastion" {
-  value = local.login_to_bastion
+output "output_file" {
+  value = data.local_file.read_final_args.content
 }  
-
-
+  
