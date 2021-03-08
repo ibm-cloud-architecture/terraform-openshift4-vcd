@@ -336,19 +336,26 @@ $ ls -l /etc/hosts
 
 
 #### Let OpenShift finish the installation:
-Once terraform has completed sucessfully, you will see several pieces of information display. As sample is below:
+Once terraform has completed sucessfully, you will see several pieces of information display. This data will also be written to `/root/<cluster_id>info.txt` on the Bastion and to` ~/<cluster_id>info.txt` on the Host computer. As sample is below:
 ```
-Apply complete! Resources: 31 added, 0 changed, 0 destroyed.
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-export_kubeconfig = "export KUBECONFIG=/opt/terraform-openshift4-vcd/installer/testinf/auth/kubeconfig"
-kubeadmin_user_info = [
-  "kubeadmin",
-  "6y9pL-RPoTq-SKADP-M6K5S",
-]
-openshift_console_url = "https://console-openshift-console.apps.testinf.cdastu.com"
-public_ip = "xxx.yyy.zz.81"
+output_file = <<EOT
+Kubeadmin         : User: kubeadmin password: rfbyV-ggmCs-oSKfT-Bfkjt
+Public IP         : 161.156.27.227
+OpenShift Console : https://console-openshift-console.apps.testfra.cdastu.com
+Export KUBECONFIG : export KUBECONFIG=/opt/terraform/installer/testfra/auth/kubeconfig
+
+Host File Entries:
+
+161.156.27.227  console-openshift-console.apps.testfra.cdastu.com
+161.156.27.227  oauth-openshift.apps.apps.testfra.cdastu.com
+
+
+EOT
+
 
 ```
 Once you power on the machines it should take about 20 mins for your cluster to become active. To debug see **Debugging the OCP installation** below.
