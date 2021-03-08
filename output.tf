@@ -13,3 +13,8 @@ output "openshift_console_url" {
 output "export_kubeconfig" {
   value = local.export_kubeconfig 
 }
+
+output "output_file" {
+  value = data.local_file.kubeadmin_password.content
+}  
+  
