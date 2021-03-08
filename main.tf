@@ -452,3 +452,25 @@ module "storage_vm_vms_only" {
     module.ignition
   ]
 }
+
+data "template_file" "write_final_args" {
+  template = <<EOF
+Kubeadmin         : User: kubeadmin password: data.local_file.kubeadmin_password.content
+Public IP         : ${var.cluster_public_ip}
+OpenShift Console : ${local.openshift_console_url}
+Export KUBECONFIG : ${local.export_kubeconfig}
+
+Host File Entries:
+
+${var.cluster_public_ip}  console-openshift-console.apps.${var.cluster_id}.${var.base_domain}
+${var.cluster_public_ip}  oauth-openshift.apps.apps.${var.cluster_id}.${var.base_domain}
+
+EOF
+}
+resource "local_file" "write_final_args" {
+  content  = data.template_file.write_final_args.rendered
+  filename = "~/${var.cluster_id}info.txt"
+  depends_on = [
+    module.ignition,
+  ]
+}

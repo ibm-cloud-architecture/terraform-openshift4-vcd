@@ -182,6 +182,11 @@
       block:
         - name: run cluster install
           shell: "/root/run_cluster_install.sh >> /root/cluster_install.log" 
+        - name: retrieve cluster_install.log
+          ansible.builtin.fetch:
+            src: /root/${cluster_id}info.txt
+            dest: ~/${cluster_id}info.txt
+            flat: yes                              
       rescue:
         - name: cluster install failed
           ansible.builtin.debug:
@@ -191,6 +196,7 @@
           ansible.builtin.fetch:
             src: /root/cluster_install.log
             dest: ~/cluster_install.log
-            flat: yes        
+            flat: yes 
+
     %{endif}
              
