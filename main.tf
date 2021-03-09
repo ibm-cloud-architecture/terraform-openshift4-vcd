@@ -464,7 +464,7 @@ Host File Entries:
 
 ${var.cluster_public_ip}  console-openshift-console.apps.${var.cluster_id}.${var.base_domain}
 ${var.cluster_public_ip}  oauth-openshift.apps.${var.cluster_id}.${var.base_domain}
-
+${var.cluster_public_ip}  api.${var.cluster_id}.${var.base_domain}
 EOF
 }
 resource "local_file" "write_final_args" {
