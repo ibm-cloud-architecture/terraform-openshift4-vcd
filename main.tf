@@ -463,7 +463,7 @@ Export KUBECONFIG : ${local.export_kubeconfig}
 Host File Entries:
 
 ${var.cluster_public_ip}  console-openshift-console.apps.${var.cluster_id}.${var.base_domain}
-${var.cluster_public_ip}  oauth-openshift.apps.apps.${var.cluster_id}.${var.base_domain}
+${var.cluster_public_ip}  oauth-openshift.apps.${var.cluster_id}.${var.base_domain}
 
 EOF
 }
