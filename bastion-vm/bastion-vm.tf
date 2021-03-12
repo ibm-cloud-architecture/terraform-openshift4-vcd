@@ -194,7 +194,7 @@ resource "vcd_vapp_vm" "bastion" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   vapp_name     = vcd_vapp.bastion.name
-  name          = "testbastion"
+  name          = "bastion-${var.vcd_vdc}-${var.cluster_id}"
   depends_on = [
     vcd_vapp_org_network.vappOrgNet,
     vcd_nsxv_dnat.dnat,
@@ -208,7 +208,7 @@ resource "vcd_vapp_vm" "bastion" {
   cpus          = 2
   cpu_cores     = 1
   guest_properties = {
-    "guest.hostname" = "testbastion"
+    "guest.hostname" = "bastion-${var.vcd_vdc}-${var.cluster_id}"
   }
   metadata = {
     role    = "bastion"
