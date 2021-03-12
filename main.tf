@@ -460,7 +460,7 @@ This information stored in: /root/${var.cluster_id}info.txt on the Bastion and t
 **********************************************************************************************************************
 
 Kubeadmin         : User: kubeadmin password: ${data.local_file.kubeadmin_password.content}
-Bastion Public IP : ${var.initialization_info["public_bastion_ip"]}   ssh -i ~/.ssh/id_bastion.pub root@${var.initialization_info["public_bastion_ip"]}  
+Bastion Public IP : ${var.initialization_info["public_bastion_ip"]}   ssh -i ~/.ssh/id_bastion root@${var.initialization_info["public_bastion_ip"]}  
 Bastion Privat IP : ${var.initialization_info["internal_bastion_ip"]}
 Public IP         : ${var.cluster_public_ip}
 OpenShift Console : ${local.openshift_console_url}
