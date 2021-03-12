@@ -200,9 +200,10 @@ spec:
 EOF
 }
 
+// change filename to yaml from bkup to enable this function
 resource "local_file" "post_deployment_08" {
   content  = data.template_file.post_deployment_08.rendered
-  filename = "${local.installerdir}/manifests/99_08-post-deployment.yaml"
+  filename = "${local.installerdir}/manifests/99_08-post-deployment.bkup"
   depends_on = [
     null_resource.generate_manifests,
   ]

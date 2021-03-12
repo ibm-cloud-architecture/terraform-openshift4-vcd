@@ -455,6 +455,10 @@ module "storage_vm_vms_only" {
 
 data "template_file" "write_final_args" {
   template = <<EOF
+**********************************************************************************************************************  
+This information stored in: /root/${var.cluster_id}info.txt on the Bastion and the Home Directory of the Host Machine.   
+**********************************************************************************************************************
+
 Kubeadmin         : User: kubeadmin password: ${data.local_file.kubeadmin_password.content}
 Public IP         : ${var.cluster_public_ip}
 OpenShift Console : ${local.openshift_console_url}
