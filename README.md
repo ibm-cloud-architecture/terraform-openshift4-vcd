@@ -67,7 +67,7 @@ You will order a **VMware Solutions Shared** instance in IBM Cloud(below).  When
 
 # Installing the Bastion and initial network configuration
 ## Setup Host Machine
-You will need a "Host" machine to perform the initial Bastion install and configuration. This process has only been tested on a RHEL8 Linux machine but may work on other linux based systems that support the required software. You should have the following installed on your Host:
+You will need a "Host" machine to perform the initial Bastion install and configuration. This process has only been tested on a RHEL8 Linux machine and a Mac but may work on other linux based systems that support the required software. You should have the following installed on your Host:
  - ansible [instructions here](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
  - git
  - terraform [instructons here](https://www.terraform.io/downloads.html)
@@ -175,7 +175,7 @@ Once you have finished editing your terraform.tfvars file you can execute the fo
 If you set `run_cluster_install     = true`, your OCP cluster will be created automatically once the Bastion is configured. The results of the install can be found either on the Bastion in `/root/cluster_install.log` or on your Host machine in `~/cluster_install.log`.
 
 ```
-terraform init
+terraform -chdir=bastion-vm init --var-file="../terraform.tfvars"
 terraform -chdir=bastion-vm plan --var-file="../terraform.tfvars"
 terraform -chdir=bastion-vm apply --var-file="../terraform.tfvars" --auto-approve
 ```
@@ -287,7 +287,7 @@ $ ls -l /etc/hosts
 | vcd_org   |  VCD Org from VCD Console screen |  string |   |
 | rhcos_template | Name of CoreOS OVA template from prereq #2 | string | - |
 | vcd_catalog   | Name of VCD Catalog containing your templates  | string  |  Public Catalog |
-| vm_dns_addresses           | List of DNS servers to use for your OpenShift Nodes          | list   | 8.8.8.8, 8.8.4.4               |
+| vm_dns_addresses           | List of DNS servers to use for your OpenShift Nodes (161.26.0.10 is the IBM Cloud Private Network Internal DNS Sever in case you go airgap)          | list   | 8.8.8.8, 161.26.0.10               |
 |mac_address_prefix   |  The prefix used to create mac addresses for dhcp reservations. The last 2 digits are derived from the last 2 digits of the ip address of a given machine. The final octet of the ip address for the vm's should not be over 99. |  string |  00:50:56:01:30 |
 | base_domain                | Base domain for your OpenShift Cluster                       | string | -                              |
 | bootstrap_ip_address|IP Address for bootstrap node|string|-|
@@ -325,6 +325,7 @@ $ ls -l /etc/hosts
 |static_end_address   |  The end of the reserved static ip range on your network (ex. 172.16.0.200) |  string |   |
 |bastion_template   |  The vApp Template name to use for your Bastion (ex. RedHat-8-Template-Official ) |  string |   |
 |run_cluster_install   |  true or false, if true, the cluster install will be initiated without logging on to the Bastion. The output of the install will be placed in. If the install fails, you can log in to the Bastion and look in /root/cluster_install.log for errors.The install log should normally be transfered back to your Host machine even if the install fails| bool  |   |
+|start_vms   | Start VM's after cluster install (true or false)  |  bool |   |
 |**airgapped object** | (only necessary for airgapped install)  |   |   |
 |  enabled | set to true for airgapped, false for regular install  |  bool |  false |
 |ocp_ver_rel   | Full version and release loaded into your mirror (ex. 4.6.15)  | string  | -  |
