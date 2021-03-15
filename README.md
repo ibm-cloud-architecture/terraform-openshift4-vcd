@@ -325,7 +325,7 @@ $ ls -l /etc/hosts
 |static_end_address   |  The end of the reserved static ip range on your network (ex. 172.16.0.200) |  string |   |
 |bastion_template   |  The vApp Template name to use for your Bastion (ex. RedHat-8-Template-Official ) |  string |   |
 |run_cluster_install   |  true or false, if true, the cluster install will be initiated without logging on to the Bastion. The output of the install will be placed in. If the install fails, you can log in to the Bastion and look in /root/cluster_install.log for errors.The install log should normally be transfered back to your Host machine even if the install fails| bool  |   |
-|start_vms   | Start VM's after cluster install (true or false)  |  bool |   |
+|start_vms   | False, not implemented yet)  |  bool |  false |
 |**airgapped object** | (only necessary for airgapped install)  |   |   |
 |  enabled | set to true for airgapped, false for regular install  |  bool |  false |
 |ocp_ver_rel   | Full version and release loaded into your mirror (ex. 4.6.15)  | string  | -  |
