@@ -3,11 +3,7 @@
 #   version = "0.0.0"
 # }
 
-locals {
-   datacenter = substr(var.vcd_url,8,3)
-   vg_gateway = substr(var.vcd_url,8,3) == "dal" ? "dal" : "fra"
-//    rule_id = ""
-  }
+
 
 provider "vcd" {
   user                 = var.vcd_user
@@ -18,69 +14,46 @@ provider "vcd" {
   allow_unverified_ssl = true
   logging              = true
 }
-output "datacenter" {
-  value = local.vg_gateway
-}
 
 
 
-
-data "vcd_resource_list" "edge_gateway_name" {
+resource "vcd_vapp_vm" "bastion" { 
   org          = var.vcd_org
   vdc          = var.vcd_vdc
-  name          = "edge_gateway-name"
-  resource_type = "vcd_edgegateway" # Finds all networks, regardless of their type
-  list_mode     = "name"
+  vapp_name     = "bastion-${var.vcd_vdc}-${var.cluster_id}"
+  name          = "test-${var.vcd_vdc}-${var.cluster_id}"
+  catalog_name  = var.vcd_catalog
+  template_name = var.initialization_info["bastion_template"]
+  memory        = 8192
+  cpus          = 2
+  cpu_cores     = 1
+  guest_properties = {
+    "guest.hostname" = "test-${var.vcd_vdc}-${var.cluster_id}"
+  }
+  metadata = {
+    role    = "bastion"
+    env     = "ocp"
+    version = "v1"
+  }
+  # Assign IP address on the routed network 
+  network {
+    type               = "org"
+    name               = var.initialization_info["network_name"]
+    ip_allocation_mode = "MANUAL"
+    ip                 = "172.16.0.110"
+    is_primary         = true
+    connected          = true
+  }
+  # define Password for the vm. The the script could use it to do the ssh-copy-id to upload the ssh key
+   customization {
+    allow_local_admin_password = true 
+    auto_generate_password = false
+    admin_password = var.initialization_info["bastion_password"]
+  }
+  power_on = true
+
 }
 
-# Shows the list of all networks with the corresponding import command
-output "gateway_list" {
-  value = data.vcd_resource_list.edge_gateway_name.list
-}
-
-data "vcd_edgegateway" "mygateway" {
-  org          = var.vcd_org
-  vdc          = var.vcd_vdc
-  name          = element(data.vcd_resource_list.edge_gateway_name.list,1)
-
-}
-locals {
-     external_ip1 = element(data.vcd_edgegateway.mygateway.external_network_ips,1)
-     external_ip2 = element(data.vcd_edgegateway.mygateway.external_network_ips,2)
-     display_msg = "default external: ${data.vcd_edgegateway.mygateway.default_external_network_ip} external network ips: ${local.external_ip1} ,${local.external_ip2} "
-}
-
-# Shows the list of all networks with the corresponding import command
-output "edge_gateway_id" {
-  value = local.display_msg
-}  
-
-# Get the name of the default gateway from the data source
-# and use it to establish a second data source
-//data "vcd_external_network" "external_network1" {
-//  name = data.vcd_edgegateway.mygateway.external_network.name 
-//}
-
-//# From the second data source we extract the basic networking info
-//output "gateway" {
-//  value = data.vcd_external_network.external_network1.ip_scope.0.gateway
-//}
-
-
-
-
-
-
-
-
-
-data "vcd_resource_list" "resource_list" {
-  org          = var.vcd_org
-  vdc          = var.vcd_vdc
-  name          = "resource_list"
-  resource_type = "resources" # Finds all networks, regardless of their type
-  list_mode     = "name"
-}
 
 //# Shows the list of all networks with the corresponding import command
 //output "resource_list" {

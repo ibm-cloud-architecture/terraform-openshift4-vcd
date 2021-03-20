@@ -3,6 +3,16 @@
   gather_facts: False
 
   tasks:
+    - name: set hostname to bastion-${vcd}-${cluster_id}
+      ansible.builtin.hostname:
+        name: bastion-${vcd}-${cluster_id}
+        
+    - name: update etc hosts file
+      ansible.builtin.replace:
+        path: /etc/hosts
+        regexp: '(\s+)vm-rhel8(\s+)'
+        replace: '\1bastion-${vcd}-${cluster_id}\2'
+        
     # register the VM
     - name: Prepare RHEL host entitlement enablement
       shell: "rpm -ivh --replacepkgs http://52.117.132.7/pub/katello-ca-consumer-latest.noarch.rpm"
@@ -58,6 +68,8 @@
           - tar
           - yum-utils
           - ansible
+          - podman
+          - docker
         state: latest
 
     # nginx as http server

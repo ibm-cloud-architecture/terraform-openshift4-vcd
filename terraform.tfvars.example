@@ -49,25 +49,25 @@ control_disk = 250000
 
 
 // The number of compute VMs to create. Default is 3.
-compute_count = 2
+compute_count = 3
 compute_disk =250000
 
 // The IP addresses to assign to the compute VMs. The length of this list must
 // match the value of compute_count.
-     compute_ip_addresses = ["172.16.0.24","172.16.0.25"]
+     compute_ip_addresses = ["172.16.0.24","172.16.0.25","172.16.0.26"]
 
 
 // Storage Nodes disk size must be at least 2097152 (2TB) if you want to install OCS and set storage count to 3
 
 storage_count = 0
 storage_disk = 2097152
-//storage_ip_addresses = ["172.16.0.26", "172.16.0.27", "172.16.0.28"]
+//storage_ip_addresses = ["172.16.0.27", "172.16.0.28", "172.16.0.29"]
 
 // The IP address to assign to the loadbalancer VM.
 lb_ip_address = "172.16.0.19"
 
 // including Bastion server for local DNS 161.26.0.10 is the DNS server for IBM Cloud Private Network so you can use things like NTP from IBM Cloud Private Network
-vm_dns_addresses = ["9.9.9.9","161.26.0.10"]
+vm_dns_addresses = ["8.8.8.8","161.26.0.10"]
 
 openshift_pull_secret = "~/pull-secret"
 additionalTrustBundle = ""
@@ -77,7 +77,7 @@ additionalTrustBundle = ""
 airgapped = {
       enabled = false
 // ocp_ver_rel has to match version.release that you loaded in mirror
-      ocp_ver_rel = "4.6.15"
+      ocp_ver_rel = "x.x.x"
       mirror_ip = "172.16.0.10"
       mirror_fqdn = "mirror.airgapped.com"
       mirror_port = "5000"
@@ -99,5 +99,6 @@ initialization_info     = {
     static_start_address    = "172.16.0.150"
     static_end_address      = "172.16.0.220"
     bastion_template        = "RedHat-8-Template-Official"
-    run_cluster_install     = true 
+    run_cluster_install     = true
+    start_vms               = false
     }

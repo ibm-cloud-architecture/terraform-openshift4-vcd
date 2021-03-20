@@ -207,14 +207,8 @@ resource "vcd_vapp_vm" "bastion" {
   memory        = 8192
   cpus          = 2
   cpu_cores     = 1
-  guest_properties = {
-    "guest.hostname" = "bastion-${var.vcd_vdc}-${var.cluster_id}"
-  }
-  metadata = {
-    role    = "bastion"
-    env     = "ocp"
-    version = "v1"
-  }
+  
+
   # Assign IP address on the routed network 
   network {
     type               = "org"
@@ -246,6 +240,7 @@ EOF
        template = file ("${path.module}/ansible/main.yaml.tmpl")
        
        vars ={
+         vcd                  = var.vcd_vdc
          public_bastion_ip    = var.initialization_info["public_bastion_ip"]
          rhel_key      = var.initialization_info["rhel_key"]
          cluster_id    = var.cluster_id
@@ -309,5 +304,13 @@ resource "null_resource" "setup_ssh" {
   filename = pathexpand("~/${var.cluster_id}info.txt")
   depends_on = [
     null_resource.setup_bastion
+  ]
+}
+
+resource "local_file" "write_args" {
+  content  = local.login_to_bastion
+  filename = pathexpand("~/${var.cluster_id}info.txt")
+  depends_on = [
+         null_resource.setup_ssh 
   ]
 }
