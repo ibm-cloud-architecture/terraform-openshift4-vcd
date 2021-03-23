@@ -111,7 +111,7 @@ variable "control_plane_mac_addresses" {
 }
 variable "control_plane_memory" {
   type    = string
-  default = "32768"
+  default = "16384"
 }
 
 variable "control_plane_num_cpus" {
