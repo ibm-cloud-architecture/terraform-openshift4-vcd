@@ -96,6 +96,7 @@ module "lb" {
   count = var.create_loadbalancer_vm ? 1 : 0
   source        = "./lb"
   lb_ip_address = var.lb_ip_address
+  initialization_info = var.initialization_info
 
   api_backend_addresses = flatten([
     var.bootstrap_ip_address,
@@ -233,6 +234,7 @@ module "bootstrap" {
   num_cpus      = 2
   memory        = 8192
   disk_size    = var.bootstrap_disk
+  initialization_info = var.initialization_info
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
   depends_on = [
    module.network
@@ -260,6 +262,7 @@ module "bootstrap_vms_only" {
   num_cpus      = 2
   memory        = 8192
   disk_size    = var.bootstrap_disk
+  initialization_info = var.initialization_info
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
   depends_on = [
    module.ignition
@@ -292,6 +295,7 @@ module "control_plane_vm" {
   num_cpus      = var.control_plane_num_cpus
   memory        = var.control_plane_memory
   disk_size    = var.control_disk
+  initialization_info = var.initialization_info
 
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
    depends_on = [
@@ -322,6 +326,7 @@ module "control_plane_vm_vms_only" {
   num_cpus      = var.control_plane_num_cpus
   memory        = var.control_plane_memory
   disk_size    = var.control_disk
+  initialization_info = var.initialization_info
 
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
   depends_on = [
@@ -352,6 +357,7 @@ module "compute_vm" {
   num_cpus      = var.compute_num_cpus
   memory        = var.compute_memory
   disk_size    = var.compute_disk
+  initialization_info = var.initialization_info
 
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
      depends_on = [
@@ -381,6 +387,7 @@ module "compute_vm_vms_only" {
   num_cpus      = var.compute_num_cpus
   memory        = var.compute_memory
   disk_size    = var.compute_disk
+  initialization_info = var.initialization_info
 
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
     depends_on = [
@@ -411,6 +418,8 @@ module "storage_vm" {
   num_cpus      = var.storage_num_cpus
   memory        = var.storage_memory
   disk_size     = var.compute_disk
+  initialization_info = var.initialization_info
+  
   extra_disk_size    = var.storage_disk
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
   depends_on = [
@@ -440,6 +449,8 @@ module "storage_vm_vms_only" {
   num_cpus      = var.storage_num_cpus
   memory        = var.storage_memory
   disk_size     = var.compute_disk
+  initialization_info = var.initialization_info
+  
   extra_disk_size    = var.storage_disk
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
   depends_on = [
