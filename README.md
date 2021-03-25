@@ -279,7 +279,7 @@ $ ls -l /etc/hosts
 
 | Variable                     | Description                                                  | Type | Default |
 | ---------------------------- | ------------------------------------------------------------ | ---- | ------- |
-| vcd_url               | url for the VDC api                    | string | https://daldir01.vmware-solutions.cloud.ibm.com/api |
+| vcd_url               | for now either https://daldir01.vmware-solutions.cloud.ibm.com/api or https://fradir01.vmware-solutions.cloud.ibm.com/api api                    | string |  |
 | vcd_user                     | VCD username                                             | string | - |
 | vcd_password             | VCD password                                             | string | - |
 | vcd_vdc                      | VCD VDC name          | string | - |
@@ -297,22 +297,23 @@ $ ls -l /etc/hosts
 | control_disk  | size in MB   | string  |  - |
 | compute_ip_addresses|List of IP addresses for your compute nodes|list|-|
 | compute_count|Number of compute VMs to create|string|3|
-| compute_memory|Memory, in MB, to allocate to compute VMs|string|8192|
+| compute_memory|Memory, in MB, to allocate to compute VMs|string|16384|
 | compute_num_cpus|Number of CPUs to allocate for compute VMs|string|3|
 | compute_disk  | size in MB   | string  |  - |
-| storage_ip_addresses|List of IP addresses for your storage nodes|list|`Empty`|
+| storage_ip_addresses|List of IP addresses for your storage nodes|list|-|
 | storage_count|Number of storage VMs to create|string|0|
 | storage_memory               | Memory, in MB to allocate to storage VMs                     | string | 65536            |
 | storage_num_cpus             | Number of CPUs to allocate for storage VMs                   | string | 16               |
-| storage_disk  | size in MB must be min of 2097152 to install OCS   | string  |  2097152 |
+| storage_disk  | See OCS doc for sizing info   | string  |  512000 |
 | lb_ip_address                | IP Address for LoadBalancer VM on same subnet as `machine_cidr` | string | -                |
-| openshift_pull_secret        | Path to your OpenShift [pull secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) | string |~/.pull-secret               |
+| openshift_pull_secret        | Path to your OpenShift [pull secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) | string |              |
 | openshift_cluster_cidr       | CIDR for pods in the OpenShift SDN                           | string | 10.128.0.0/14    |
 | openshift_service_cidr       | CIDR for services in the OpenShift SDN                       | string | 172.30.0.0/16    |
 | openshift_host_prefix        | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23               |
 | cluster_public_ip |Public IP address to be used for your OCP Cluster Console   |  string |   |
 |create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
-|additional_trust_bundle   |  name of file containing cert for mirror | string  |  - |
+|openshift_version   |  The version of OpenShift you want to install | string  | 4.6  |
+|additional_trust_bundle   |  name of file containing cert for mirror. Read OCP restricted network install doc. Cert name should match DNS name.  | string  |  - |
 |**initialization_info object** |   |   |   |
 |public_bastion_ip |  Choose 1 of the 5 Public ip's for ssh access to the Bastion.| String  |   |
 | machine_cidr | CIDR for your CoreOS VMs in `subnet/mask` format.            | string | -                              |
