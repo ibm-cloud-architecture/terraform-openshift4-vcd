@@ -530,3 +530,9 @@ You should keep your installer/cluster_id directory because the ssh keys that yo
 If you delete your cluster and want to reinstall, you will need to remove the installer/cluster_id directory or the install will likely fail when you start the VM's. You will see messages referencing x.509 certificate errors in the logs of the bootstrap and other servers if you forget to delete the directory.
 
 `rm -rf installer/<your cluster id>`
+
+You don't need to recreate your Bastion everytime you want to create a cluster but if you want to recreate you your Bastion, you should first delete any clusters by issuing
+ `terraform destroy` followed by
+ `terraform -chdir=bastion-vm apply --var-file="../terraform.tfvars" --auto-approve` on your Host machine.
+
+ If you delete the Bastion via some other method, remember to delete the FW, DNAT and SNAT rule associated with the Bastion. They will be tagged with references to the Bastion
