@@ -470,12 +470,13 @@ data "template_file" "write_final_args" {
 This information stored in: /root/${var.cluster_id}info.txt on the Bastion and the Home Directory of the Host Machine.   
 **********************************************************************************************************************
 
-Kubeadmin         : User: kubeadmin password: ${data.local_file.kubeadmin_password.content}
-Bastion Public IP : ${var.initialization_info["public_bastion_ip"]}   ssh -i ~/.ssh/id_bastion root@${var.initialization_info["public_bastion_ip"]}  
-Bastion Privat IP : ${var.initialization_info["internal_bastion_ip"]}
-Public IP         : ${var.cluster_public_ip}
-OpenShift Console : ${local.openshift_console_url}
-Export KUBECONFIG : ${local.export_kubeconfig}
+Kubeadmin                      : User: kubeadmin password: ${data.local_file.kubeadmin_password.content}
+Bastion Public IP              : ${var.initialization_info["public_bastion_ip"]}   ssh -i ~/.ssh/id_bastion root@${var.initialization_info["public_bastion_ip"]}  
+Bastion Privat IP              : ${var.initialization_info["internal_bastion_ip"]}
+Login to Bootstrap from Bastion: ssh -i ${path.cwd}/installer/${var.cluster_id}/openshift_rsa core@${var.bootstrap_ip_address}
+Public IP                      : ${var.cluster_public_ip}
+OpenShift Console              : ${local.openshift_console_url}
+Export KUBECONFIG              : ${local.export_kubeconfig}
 
 Host File Entries:
 
