@@ -6,7 +6,7 @@
 *.tfstate.*
 
 # .tfvars files
-*.tfvars
+*.tfvars*
 
 # Mac stuff
 .DS_Store
@@ -22,3 +22,4 @@ makefile
 **/go-vcloud-director.log
 tmp.txt
 crash.log
+.docker*

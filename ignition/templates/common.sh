@@ -68,7 +68,7 @@ function check-prereqs {
 }
 
 function get-compute-node-count {
-  oc get nodes --selector=node-role.kubernetes.io/worker | awk 'NR>1' | wc -l | sed -e 's/^[ \t]*//'
+    oc get nodes --selector=node-role.kubernetes.io/worker | awk 'NR>1' | wc -l | sed -e 's/^[ \t]*//'
 }
 
 # The approve-node-bootstrapper-csrs() approves the first round of CSRs that appear

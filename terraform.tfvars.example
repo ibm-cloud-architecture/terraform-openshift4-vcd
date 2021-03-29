@@ -4,58 +4,31 @@
 
 // ID identifying the cluster to create. Use your username so that resources created can be tracked back to you.
 
-cluster_id = "your-cluster-name"
+cluster_id = "<your cluster id"
 
 // Base domain from which the cluster domain is a subdomain.
-base_domain = "your-basedomain.com"
+base_domain = "<your base domain>"
 
 // Name of the VDC.
-vcd_vdc = "your-vdc"
+vcd_vdc = "<your vdc name>"
 
 // User on the vSphere server.
 vcd_user = "admin"
 
-// Password of the user on the vSphere server.
-vcd_password = "your vdc password"
+// Password of the user on vcd.
+vcd_password = "<your password>"
 
 // Name of the VCD organization. Found on the VCD console, Data Centers tab
-vcd_org = "long vorg is from vcloud director console"
+vcd_org = "<your org id>"
 
-// url for the vcd. (this is dallas)
+// url for the vcd. (this is dal)
 vcd_url = "https://daldir01.vmware-solutions.cloud.ibm.com/api"
 
 
-// Name of the RHCOS VM template to clone to create VMs for the cluster
-rhcos_template = "rhcos OpenShift 4.6.8"
-
-// Name of the LB VM template to clone to create VMs for the cluster
-lb_template = "rhcos OpenShift 4.6.8"
 
 
 // Name of the vcd Catalog
 vcd_catalog = "Public Catalog"
-
-// Name of the VM Network for your cluster nodes
-vm_network = "ocpnet"
-
-// Name of the VM Network for loadbalancer NIC in loadbalancer.
-loadbalancer_network = "ocpnet"
-
-
-//Prefix for creating MAC addresses for control, compute and storage nodes (first five parts)
-// MAC address is created by taking this prefix appending it with the final part of the ip address
-// the MAC addresses are generated for the DHCP Reservations based on the IP address.
-// do not use IP addresses higher than 99 in the last position
-mac_prefix="00:50:56:01:20"
-
-// The machine_cidr where IP addresses will be assigned for cluster nodes.
-// Additionally, IPAM will assign IPs based on the network ID.
-machine_cidr = "172.16.0.1/24"
-
-// The number of control plane VMs to create. Default is 3.
-control_plane_count = 3
-control_disk = 250000
-
 
 
 // Set bootstrap_ip, control_plane_ip, and compute_ip if you want to use static
@@ -63,44 +36,73 @@ control_disk = 250000
 
 // The IP address to assign to the bootstrap VM.
 bootstrap_disk = 250000
-bootstrap_ip_address = "172.16.0.20"
+bootstrap_ip_address = "172.16.0.70"
 
+
+// The number of control plane VMs to create. Default is 3.
+control_plane_count = 3
+control_disk = 250000
 // The IP addresses to assign to the control plane VMs. The length of this list
 // must match the value of control_plane_count.
-  control_plane_ip_addresses = ["172.16.0.21", "172.16.0.22", "172.16.0.23"]
+  control_plane_ip_addresses = ["172.16.0.71", "172.16.0.72", "172.16.0.73"]
+//    control_plane_ip_addresses = ["172.16.0.51"]
+
 
 
 
 // The number of compute VMs to create. Default is 3.
-compute_count = 3
+compute_count = 2
 compute_disk =250000
 
 // The IP addresses to assign to the compute VMs. The length of this list must
 // match the value of compute_count.
-    compute_ip_addresses = ["172.16.0.24","172.16.0.25","172.16.0.26"]
-//    compute_ip_addresses = ["172.16.0.24"]
+   compute_ip_addresses = ["172.16.0.74","172.16.0.75"]
 
 
 // Storage Nodes disk size must be at least 2097152 (2TB) if you want to install OCS
 
 storage_count = 0
-storage_disk = 2097152
-// storage_ip_addresses = ["172.16.0.35", "172.16.0.36", "172.16.0.37"]
-
+storage_disk = 512000
+storage_ip_addresses = ["172.16.0.80", "172.16.0.81", "172.16.0.82"]
 
 
 // The IP address to assign to the loadbalancer VM.
-lb_ip_address = "172.16.0.19"
-
-
-// The IP address to assign to the public loadbalancer interface
-loadbalancer_lb_ip_address = "172.16.0.19"
-loadbalancer_lb_machine_cidr = "172.16.0.1/24"
-
+lb_ip_address = "172.16.0.69"
 
 // including Bastion server for local DNS
-vm_dns_addresses = ["172.16.0.10","9.9.9.9"]
+vm_dns_addresses = ["9.9.9.9","161.26.0.10","172.16.0.10"]
 
-openshift_pull_secret = "~/.pull-secret"
-create_loadbalancer_vm = true
-create_vms_only = false
+//openshift_pull_secret = ""
+openshift_pull_secret = "<your pull secret location>"
+// additionalTrustBundle = "<your trust bundle cert if airgapped>"      
+
+
+openshift_version="4.6"
+// Name of the RHCOS VM template to clone to create VMs for the cluster
+rhcos_template = "rhcos OpenShift 4.6.8"
+
+// airgapped block
+airgapped = {
+      enabled = false
+      ocp_ver_rel = "<your version.release>"
+      mirror_ip = "<ip of mirror>" 
+      mirror_fqdn = "<fqdn of mirror>"
+      mirror_port = "<port of mirror>"
+      mirror_repository = "ocp4/openshift4"
+      }
+
+cluster_public_ip       = "x.x.x.x"
+ 
+initialization_info     = {
+    public_bastion_ip = "y.y.y.y"
+    bastion_password = "<password for bastion>"
+    internal_bastion_ip = "172.16.0.10"
+    terraform_ocp_repo = "https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd"
+    rhel_key = "<redhat license key from vcd screen>"
+    machine_cidr = "172.16.0.0/16"
+    network_name      = "ocpnet"
+    static_start_address    = "172.16.0.150"
+    static_end_address      = "172.16.0.220"
+    bastion_template        = "RedHat-8-Template-Official"
+    run_cluster_install     = true
+    }

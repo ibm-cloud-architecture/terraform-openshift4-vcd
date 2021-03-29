@@ -20,3 +20,17 @@ rules:
     - signers
   verbs:
     - approve
+- apiGroups:
+    - machineconfiguration.openshift.io
+    - config.openshift.io
+    - ''
+  resources:
+    - machineconfigpools
+    - machineconfiguration
+    - operatorhubs
+    - nodes    
+  verbs:
+    - list
+    - update
+    - get
+    - patch

@@ -80,3 +80,19 @@ variable "create_vms_only" {
 // variable "staticip_file_vm" {
 //  type = string
 // }
+
+variable "initialization_info" {
+  type = object ({
+    public_bastion_ip      = string
+    bastion_password       = string
+    internal_bastion_ip    = string
+    terraform_ocp_repo     = string  
+    rhel_key               = string
+    machine_cidr           = string
+    network_name           = string
+    static_start_address   = string
+    static_end_address     = string
+    bastion_template       = string
+    run_cluster_install    = bool
+  })
+}

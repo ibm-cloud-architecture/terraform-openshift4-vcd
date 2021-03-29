@@ -19,7 +19,11 @@ variable "lb_ip_address" {
   type = string
 }
 
-variable "lb_template" {
+variable "cluster_id" {
+  type = string
+}
+
+variable "rhcos_template" {
   type = string
 }
 
@@ -35,7 +39,7 @@ variable "ssh_public_key" {
   type = string
 }
 
-variable "vm_dns_addresses" {
+variable "dns_addresses" {
   type = list(string)
 }
 
@@ -50,10 +54,16 @@ variable "control_plane_ips" {
 variable "dns_ip_addresses" {
   type = map(string)
 }
-variable "dhcp_mac_addresses" {
-  type = list(string)
+variable "rev_dns_ip_addresses" {
+  type = map(string)
+}
+variable "dhcp_ip_addresses" {
+  type = map(string)
 }
 
+variable "mac_prefix" {
+  type = string
+}
 
 variable "loadbalancer_ip" {
   type    = string
@@ -84,9 +94,6 @@ variable "ignition" {
   default = ""
 }
 
-variable "dns_addresses" {
-  type = list(string)
-}
 
 variable "network_id" {
   type = string
@@ -121,3 +128,28 @@ variable "extra_disk_size" {
   default = 0
 }
 
+variable "repo_ip" {
+  type    = list(string)
+  default = []
+}
+
+variable "repo_fqdn" {
+  type    = list(string)
+  default = []
+}
+
+variable "initialization_info" {
+  type = object ({
+    public_bastion_ip      = string
+    bastion_password       = string
+    internal_bastion_ip    = string
+    terraform_ocp_repo     = string  
+    rhel_key               = string
+    machine_cidr           = string
+    network_name           = string
+    static_start_address   = string
+    static_end_address     = string
+    bastion_template       = string
+    run_cluster_install    = bool
+  })
+}

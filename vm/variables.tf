@@ -1,8 +1,13 @@
-variable "hostnames_mac_addresses" {
+variable "hostnames_ip_addresses" {
   type = map(string)
 }
 
 variable "ignition" {
+  type    = string
+  default = ""
+}
+
+variable "mac_prefix" {
   type    = string
   default = ""
 }
@@ -68,6 +73,26 @@ variable "nested_hv_enabled" {
 variable "network_id" {
   type = string
 }
+variable "create_vms_only" {
+  type = bool
+  default = false
+}
 // variable "staticip_file_vm" {
 //  type = string
 // }
+
+variable "initialization_info" {
+  type = object ({
+    public_bastion_ip      = string
+    bastion_password       = string
+    internal_bastion_ip    = string
+    terraform_ocp_repo     = string  
+    rhel_key               = string
+    machine_cidr           = string
+    network_name           = string
+    static_start_address   = string
+    static_end_address     = string
+    bastion_template       = string
+    run_cluster_install    = bool
+  })
+}

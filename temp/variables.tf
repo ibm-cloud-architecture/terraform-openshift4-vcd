@@ -22,6 +22,7 @@ variable "vcd_org" {
 variable "vcd_url" {
   type        = string
   description = "This is the vcd url for the environment."
+  default     = "https://daldir01.vmware-solutions.cloud.ibm.com/api"
 }
 variable "vcd_catalog" {
   type        = string
@@ -45,7 +46,7 @@ variable "mac_prefix" {
 variable "vm_dns_addresses" {
   type        = list(string)
   description = "List of DNS servers to use for your OpenShift Nodes"
-  default     = ["8.8.8.8", "161.26.0.10"]
+  default     = ["8.8.8.8", "8.8.4.4"]
 }
 
 /////////
@@ -110,12 +111,12 @@ variable "control_plane_mac_addresses" {
 }
 variable "control_plane_memory" {
   type    = string
-  default = "16384"
+  default = "32768"
 }
 
 variable "control_plane_num_cpus" {
   type    = string
-  default = "4"
+  default = "8"
 }
 variable "control_disk" {
   type    = string
@@ -131,7 +132,7 @@ variable "control_disk" {
 
 variable "compute_count" {
   type    = string
-  default = "3"
+  default = "6"
 }
 
 variable "compute_ip_addresses" {
@@ -146,12 +147,12 @@ variable "compute_mac_addresses" {
 
 variable "compute_memory" {
   type    = string
-  default = "16384"
+  default = "32768"
 }
 
 variable "compute_num_cpus" {
   type    = string
-  default = "4"
+  default = "16"
 }
 variable "compute_disk" {
   type    = string
@@ -186,7 +187,7 @@ variable "storage_num_cpus" {
 
 variable "storage_disk" {
   type    = string
-  default = "512000"
+  default = "2097152"
 }
 
 
@@ -198,6 +199,7 @@ variable "storage_disk" {
 
 variable "openshift_pull_secret" {
   type = string
+  default = "~/.pull-secret"
 }
 
 variable "openshift_cluster_cidr" {
@@ -271,7 +273,7 @@ variable "initialization_info" {
     public_bastion_ip      = string
     bastion_password       = string
     internal_bastion_ip    = string
-    terraform_ocp_repo     = string
+    terraform_ocp_repo     = string  
     rhel_key               = string
     machine_cidr           = string
     network_name           = string
@@ -279,5 +281,6 @@ variable "initialization_info" {
     static_end_address     = string
     bastion_template       = string
     run_cluster_install    = bool
+    start_vms              = bool
   })
 }
