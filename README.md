@@ -312,6 +312,7 @@ $ ls -l /etc/hosts
 | openshift_host_prefix        | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23               |
 | cluster_public_ip |Public IP address to be used for your OCP Cluster Console   |  string |   |
 |create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
+|bastion_disk   |disk size of bastion disk   | string  |  ~200GB |
 |openshift_version   |  The version of OpenShift you want to install | string  | 4.6  |
 |additional_trust_bundle   |  name of file containing cert for mirror. Read OCP restricted network install doc. Cert name should match DNS name.  | string  |  - |
 |**initialization_info object** |   |   |   |
@@ -503,6 +504,10 @@ In order for the accept CSR code to work, you will have to
 `podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest`
 
 You should edit your pull secret and remove the section that refers to `cloud.openshift.com`. This removes Telemetry and Health Reporting. If you don't do this before installation, you will get an error in the insights operator. After installation, go [here](https://docs.openshift.com/container-platform/4.6/support/remote_health_monitoring/opting-out-of-remote-health-reporting.html) for instructions to disable Telemetry Reporting.
+
+Run this command to stop OpenShift from looking for Operators from the Online source.  
+
+`oc patch OperatorHub cluster --type json  -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'`
 
 You may receive an Alert stating `Cluster version operator has not retrieved updates in xh xxm 17s. Failure reason RemoteFailed . For more information refer to https://console-openshift-console.apps.<cluster_id>.<base_domain>.com/settings/cluster/` this is normal and can be ignored.
 
