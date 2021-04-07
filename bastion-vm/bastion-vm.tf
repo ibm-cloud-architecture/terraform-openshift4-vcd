@@ -208,7 +208,12 @@ resource "vcd_vapp_vm" "bastion" {
   cpus          = 2
   cpu_cores     = 1
   
-
+  override_template_disk {
+    bus_type           = "paravirtual"
+    size_in_mb         = var.bastion_disk
+    bus_number         = 0
+    unit_number        = 0
+}
   # Assign IP address on the routed network 
   network {
     type               = "org"

@@ -266,6 +266,12 @@ variable "cluster_public_ip" {
   type        = string
 }
 
+variable "bastion_disk" {
+  type                     = string
+  default                  = "200000"
+}
+
+
 variable "initialization_info" {
   type = object ({
     public_bastion_ip      = string
