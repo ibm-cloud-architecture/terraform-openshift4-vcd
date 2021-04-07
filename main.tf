@@ -111,7 +111,7 @@ module "lb" {
   bootstrap_ip      = var.bootstrap_ip_address
   control_plane_ips = var.control_plane_ip_addresses
 
-  dns_addresses = var.create_loadbalancer_vm ? concat([var.lb_ip_address],local.mirror_repo_ip,var.vm_dns_addresses) : var.vm_dns_addresses
+  dns_addresses = var.airgapped["enabled"] ? concat([var.lb_ip_address],local.mirror_repo_ip,var.vm_dns_addresses) : var.vm_dns_addresses
 
 
   dns_ip_addresses = zipmap(
