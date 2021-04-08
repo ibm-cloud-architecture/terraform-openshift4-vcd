@@ -530,7 +530,6 @@ airgapped = {
       mirror_fqdn = "bastion.airgapfull.cdastu.com"
       mirror_port = "5000"
       mirror_repository = "ocp4/openshift4"
-      additionalTrustBundle = "~/airgap.crt"      
       }
 ```
 ### Deleting Cluster (and reinstalling)
