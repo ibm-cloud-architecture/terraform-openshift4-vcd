@@ -23,8 +23,8 @@ platform:
   none: {}  
 pullSecret: '${chomp(file(var.pull_secret))}'
 sshKey: '${var.ssh_public_key}'
-%{if var.airgapped["additionalTrustBundle"] != ""}
-${indent(2, "additionalTrustBundle: |\n${file(var.airgapped["additionalTrustBundle"])}")}
+%{if var.additionalTrustBundle != ""}
+${indent(2, "additionalTrustBundle: |\n${file(var.additionalTrustBundle)}")}
 %{endif}
 %{if var.airgapped["enabled"]}imageContentSources:
 - mirrors:
