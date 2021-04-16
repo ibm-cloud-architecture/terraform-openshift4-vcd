@@ -1,5 +1,5 @@
 locals {
-  disks      = compact(list(var.disk_size, var.extra_disk_size == 0 ? "" : var.extra_disk_size))
+  disks      = compact(tolist([var.disk_size, var.extra_disk_size == 0 ? "" : var.extra_disk_size]))
   dual_homed = var.loadbalancer_network_id == "" ? false : true
   disk_sizes = zipmap(
     range(length(local.disks)),
