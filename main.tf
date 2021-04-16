@@ -205,6 +205,7 @@ module "ignition" {
   storage_count       = var.storage_count
   airgapped           = var.airgapped
   initialization_info = var.initialization_info
+  additionalTrustBundle = var.additionalTrustBundle
   depends_on = [
      local_file.write_public_key,
      module.network
