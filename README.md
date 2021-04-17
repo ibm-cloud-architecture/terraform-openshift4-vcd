@@ -14,6 +14,11 @@ This toolkit performs an OpenShift UPI type install and will provision CoreOS no
 **NOTE**: Requires terraform 0.13 or later.  
 
 **Change History:**
+  - 4/17/2021:
+    - Updated terraform code to fix errors caused by deprecated functions in terraform .15
+    - Fixed bug in Airgapped install where additionalTrustBundle cert was not copied into install-config.yaml
+    - Placed note on in Airgapped section of readme on how to trust mirror cert on bastion.
+    - Added new variable **bastion_disk** which you can set to increase the size of the disk on the bastion so you can host NFS, Mirrors, etc. Default size is 200GB
   - 3/5/2021:
     - **Due to networking changes and updated configurations and software on the Bastion, it is recommended that you not reuse an existing VDC and Bastion. You will also need to update your `terraform.tfvars`. There are several new required variables.**
     - Added full creation of Bastion and all networking including creation of vdc network, fw rules, dnat and snat rules.
@@ -295,7 +300,7 @@ $ ls -l /etc/hosts
 | vcd_catalog   | Name of VCD Catalog containing your templates  | string  |  Public Catalog |
 | vm_dns_addresses           | List of DNS servers to use for your OpenShift Nodes (161.26.0.10 is the IBM Cloud Private Network Internal DNS Sever in case you go airgap)          | list   | 8.8.8.8, 161.26.0.10               |
 |mac_address_prefix   |  The prefix used to create mac addresses for dhcp reservations. The last 2 digits are derived from the last 2 digits of the ip address of a given machine. The final octet of the ip address for the vm's should not be over 99. |  string |  00:50:56:01:30 |
-| base_domain                | Base domain for your OpenShift Cluster                       | string | -                              |
+| base_domain                | Base domain for your OpenShift Cluster. **Note: Don't pick a base domain that is currently registered in Public DNS**.                       | string | -                              |
 | bootstrap_ip_address|IP Address for bootstrap node|string|-|
 | control_plane_count          | Number of control plane VMs to create                        | string | 3                |
 | control_plane_memory         | Memory, in MB, to allocate to control plane VMs              | string | 16384            |
@@ -502,7 +507,16 @@ If you want to move your ssh port to a higher port to slow down hackers that are
  - [Exposing the Registry](https://docs.openshift.com/container-platform/4.5/registry/securing-exposing-registry.html)
 
 ### Airgapped Installation
-You will need a registry to store your images. A simple registry can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).  
+You will need a registry to store your images. A simple registry can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).
+
+In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
+```
+cp <your mirror cert>/etc/pki/ca-trust/source/anchors/
+update-ca-trust
+trust list | grep -i "<hostname>"
+```
+The last command will check to see if the update was successful.
+
 You will need to create your own mirror or use an existing mirror to do an airgapped install. Instructions to create a mirror for OpenShift 4.6 can be found [here](https://docs.openshift.com/container-platform/4.6/installing/install_config/installing-restricted-networks-preparations.html#installing-restricted-networks-preparations).
 
 In order for the accept CSR code to work, you will have to  
