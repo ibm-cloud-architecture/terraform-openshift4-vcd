@@ -19,6 +19,7 @@ This toolkit performs an OpenShift UPI type install and will provision CoreOS no
     - Fixed bug in Airgapped install where additionalTrustBundle cert was not copied into install-config.yaml
     - Placed note on in Airgapped section of readme on how to trust mirror cert on bastion.
     - Added new variable **bastion_disk** which you can set to increase the size of the disk on the bastion so you can host NFS, Mirrors, etc. Default size is 200GB
+    - Add fips mode support, default is false
   - 3/5/2021:
     - **Due to networking changes and updated configurations and software on the Bastion, it is recommended that you not reuse an existing VDC and Bastion. You will also need to update your `terraform.tfvars`. There are several new required variables.**
     - Added full creation of Bastion and all networking including creation of vdc network, fw rules, dnat and snat rules.
@@ -325,6 +326,7 @@ $ ls -l /etc/hosts
 |create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
 |bastion_disk   |disk size of bastion disk   | string  |  ~200GB |
 |openshift_version   |  The version of OpenShift you want to install | string  | 4.6  |
+|fips   |  Allows you to set fips compliant mode for instal |  bool | false  |
 |additional_trust_bundle   |  name of file containing cert for mirror. Read OCP restricted network install doc. Cert name should match DNS name.  | string  |  - |
 |**initialization_info object** |   |   |   |
 |public_bastion_ip |  Choose 1 of the 5 Public ip's for ssh access to the Bastion.| String  |   |
