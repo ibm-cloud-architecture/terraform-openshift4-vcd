@@ -206,6 +206,7 @@ module "ignition" {
   airgapped           = var.airgapped
   initialization_info = var.initialization_info
   additionalTrustBundle = var.additionalTrustBundle
+  fips                = var.fips
   depends_on = [
      local_file.write_public_key,
      module.network

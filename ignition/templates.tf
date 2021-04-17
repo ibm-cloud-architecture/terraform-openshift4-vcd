@@ -20,7 +20,8 @@ networking:
   serviceNetwork:
   - ${var.cluster_servicecidr}
 platform:
-  none: {}  
+  none: {}
+fips: '${var.fips}'  
 pullSecret: '${chomp(file(var.pull_secret))}'
 sshKey: '${var.ssh_public_key}'
 %{if var.additionalTrustBundle != ""}
