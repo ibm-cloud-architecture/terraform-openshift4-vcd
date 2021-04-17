@@ -21,7 +21,7 @@ networking:
   - ${var.cluster_servicecidr}
 platform:
   none: {}
-fips: '${var.fips}'  
+fips: ${var.fips}  
 pullSecret: '${chomp(file(var.pull_secret))}'
 sshKey: '${var.ssh_public_key}'
 %{if var.additionalTrustBundle != ""}
@@ -57,7 +57,7 @@ while [ $ready_storage_nodes_count -lt ${var.storage_count} ]; do
    ready_storage_nodes_count=$(oc get nodes | awk '{print $1, $2}' | grep storage- | grep Ready | wc -l)
    echo "Ready storage nodes count: " $ready_storage_nodes_count
    sleep 10
-done   
+done
 oc patch OperatorHub cluster --type json  -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
 %{ for hostname in var.storage_fqdns ~}
 oc label node  ${hostname} node-role.kubernetes.io/infra=""
@@ -109,13 +109,13 @@ spec:
   containers:
   - name: csr-approve
     imagePullPolicy: Always
-    %{if var.airgapped["enabled"]}    
+    %{if var.airgapped["enabled"]}
     image: ${var.airgapped["mirror_fqdn"]}:${var.airgapped["mirror_port"]}/openshift/origin-cli:latest
-    %{else}    
+    %{else}
     image: quay.io/openshift/origin-cli:latest
     %{endif}
     command: ["/bin/sh", "-c"]
-    args: 
+    args:
       - "mkdir /tmp/csrs-rw && cp /tmp/csrs/*.sh /tmp/csrs-rw && cd /tmp/csrs-rw && ./approve-csrs.sh --wait-count 60 --nodes ${local.node_count}"
     volumeMounts:
       - name: approve-csrs
@@ -176,13 +176,13 @@ spec:
   containers:
   - name: user-cmds
     imagePullPolicy: Always
-    %{if var.airgapped["enabled"]}    
+    %{if var.airgapped["enabled"]}
     image: ${var.airgapped["mirror_fqdn"]}:${var.airgapped["mirror_port"]}/openshift/origin-cli:latest
-    %{else}    
+    %{else}
     image: quay.io/openshift/origin-cli:latest
     %{endif}
     command: ["/bin/sh", "-c"]
-    args: 
+    args:
       - "mkdir /tmp/user-cmds-rw && cp /tmp/user-cmds/*.sh /tmp/user-cmds-rw && cd /tmp/user-cmds-rw && ./post-install-user-cmds.sh "
     volumeMounts:
       - name: user-cmds
@@ -369,7 +369,7 @@ resource "local_file" "airgapped_registry_upgrades" {
 }
 
 data "template_file" "label_storage_nodes" {
-count = var.storage_count > 3 ? 1 : 0  
+count = var.storage_count > 3 ? 1 : 0
   template = <<EOF
 apiVersion: v1
 kind: Secret
@@ -389,13 +389,13 @@ spec:
   containers:
   - name: label-storage-nodes
     imagePullPolicy: Always
-    %{if var.airgapped["enabled"]}    
+    %{if var.airgapped["enabled"]}
     image: ${var.airgapped["mirror_fqdn"]}:${var.airgapped["mirror_port"]}/openshift/origin-cli:latest
-    %{else}    
+    %{else}
     image: quay.io/openshift/origin-cli:latest
     %{endif}
     command: ["/bin/sh", "-c"]
-    args: 
+    args:
       - "mkdir /tmp/label-nodes-rw && cp /tmp/label-nodes/*.sh /tmp/label-nodes-rw && cd /tmp/label-nodes-rw && ./label_storage_nodes.sh "
     volumeMounts:
       - name: label-nodes
@@ -415,7 +415,7 @@ EOF
 }
 
 resource "local_file" "label_storage_nodes" {
-  count = var.storage_count > 3 ? 1 : 0  
+  count = var.storage_count > 3 ? 1 : 0
   content  = data.template_file.label_storage_nodes[count.index].rendered
   filename = "${local.installerdir}/manifests/99_label_storage_nodes.yaml"
   depends_on = [
