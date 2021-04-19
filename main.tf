@@ -125,7 +125,7 @@ module "lb" {
     ),
     concat(
       local.repo_ip,
-      list(var.bootstrap_ip_address),
+      tolist([var.bootstrap_ip_address]),
       [for idx in range(length(local.api_lb_fqdns)) : var.lb_ip_address],
       var.control_plane_ip_addresses,
       var.compute_ip_addresses,
@@ -144,7 +144,7 @@ module "lb" {
     ),
     concat(
       local.repo_ip,
-      list(var.bootstrap_ip_address),
+      tolist([var.bootstrap_ip_address]),
       [for idx in range(length(local.rev_api_lb_fqdns)) : var.lb_ip_address],
       var.control_plane_ip_addresses,
       var.compute_ip_addresses,
@@ -159,7 +159,7 @@ module "lb" {
       local.storage_fqdns
     ),
     concat(
-      list(var.bootstrap_ip_address),
+      tolist([var.bootstrap_ip_address]),
       var.control_plane_ip_addresses,
       var.compute_ip_addresses,
       var.storage_ip_addresses
@@ -205,6 +205,8 @@ module "ignition" {
   storage_count       = var.storage_count
   airgapped           = var.airgapped
   initialization_info = var.initialization_info
+  additionalTrustBundle = var.additionalTrustBundle
+  fips                = var.fips
   depends_on = [
      local_file.write_public_key,
      module.network

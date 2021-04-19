@@ -63,6 +63,12 @@ variable "storage_count" {
   default = 0
 }
 
+
+variable "fips" {
+  type        = bool
+  description = "enable fips mode"
+}
+
 variable "additionalTrustBundle" {
   type     =   string
   description = "certificate file used for airgapped install registry or proxy server"

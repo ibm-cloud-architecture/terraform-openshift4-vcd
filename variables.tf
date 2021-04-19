@@ -233,6 +233,12 @@ variable "create_vms_only" {
   default     = false
 }
 
+variable "fips" {
+  type        = bool
+  description = "install with fips mode"
+  default     = false
+}
+
 variable "additionalTrustBundle" {
   type        =  string
   description = "certificate file used for airgapped install registry or proxy server"
