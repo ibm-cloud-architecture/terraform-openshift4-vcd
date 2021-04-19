@@ -326,7 +326,7 @@ $ ls -l /etc/hosts
 |create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
 |bastion_disk   |disk size of bastion disk   | string  |  ~200GB |
 |openshift_version   |  The version of OpenShift you want to install | string  | 4.6  |
-|fips   |  Allows you to set fips compliant mode for instal |  bool | false  |
+|fips   |  Allows you to set fips compliant mode for install |  bool | false  |
 |additional_trust_bundle   |  name of file containing cert for mirror. Read OCP restricted network install doc. Cert name should match DNS name.  | string  |  - |
 |**initialization_info object** |   |   |   |
 |public_bastion_ip |  Choose 1 of the 5 Public ip's for ssh access to the Bastion.| String  |   |
