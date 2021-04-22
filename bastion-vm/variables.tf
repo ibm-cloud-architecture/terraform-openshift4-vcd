@@ -240,6 +240,12 @@ variable "additionalTrustBundle" {
   default     = ""
   }
 
+variable "fips" {
+  type        = bool
+  description = "install with fips mode"
+  default     = false
+}  
+
 variable "airgapped"  {
   type        = map(string)
   description = "test  variable for airgapped instead of separate vars"
