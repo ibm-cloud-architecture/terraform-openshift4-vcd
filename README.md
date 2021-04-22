@@ -521,10 +521,12 @@ The last command will check to see if the update was successful.
 
 You will need to create your own mirror or use an existing mirror to do an airgapped install. Instructions to create a mirror for OpenShift 4.6 can be found [here](https://docs.openshift.com/container-platform/4.6/installing/install_config/installing-restricted-networks-preparations.html#installing-restricted-networks-preparations).
 
-In order for the accept CSR code to work, you will have to  
-`podman pull quay.io/openshift/origin-cli:latest` and push to your repository
-`podman tag quay.io/openshift/origin-cli:latest <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest`  
-`podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest`
+In order for the accept CSR code to work, you will have to:
+```  
+podman pull quay.io/openshift/origin-cli:latest
+podman tag quay.io/openshift/origin-cli:latest <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest  
+podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
+````
 
 **Disable Telemetry:** You should edit your pull secret and remove the section that refers to `cloud.openshift.com`. This removes Telemetry and Health Reporting. If you don't do this before installation, you will get an error in the insights operator. After installation, go [here](https://docs.openshift.com/container-platform/4.6/support/remote_health_monitoring/opting-out-of-remote-health-reporting.html) for instructions to disable Telemetry Reporting.
 
