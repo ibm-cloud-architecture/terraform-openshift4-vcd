@@ -188,7 +188,30 @@
         src: ${nginx_repo_dir}/run_cluster_install.sh
         dest: /root/run_cluster_install.sh
         mode: '0755'
-           
+    - name: Copy extend disk partition
+      ansible.builtin.copy:
+        src: ${nginx_repo_dir}/extend-disk.sh
+        dest: /root/extend-disk.sh
+        mode: '0755'   
+    - name: run extend-disk block
+      block:
+        - name: run extend-disk
+          shell: "/root/extend-disk.sh >> /root/extend-disk.log" 
+        - name: retrieve extend-disk.log
+          ansible.builtin.fetch:
+            src: /root/extend-disk.log
+            dest: ~/extend-disk.log
+            flat: yes                              
+      rescue:
+        - name: extend disk failed
+          ansible.builtin.debug:
+            msg: 'extend disk failed. Check ~/extend-disk.log for details'   
+      always:
+        - name: retrieve cluster_install.log
+          ansible.builtin.fetch:
+            src: /root/extend-disk.log
+            dest: ~/extend-disk.log
+            flat: yes   
     %{if run_cluster_install}
     - name: run cluster install block
       block:
