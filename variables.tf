@@ -239,6 +239,13 @@ variable "fips" {
   default     = false
 }
 
+variable "user_service_network_name" {
+  type        = string
+  description = "user provided service network name"
+  default     = ""
+}
+
+
 variable "additionalTrustBundle" {
   type        =  string
   description = "certificate file used for airgapped install registry or proxy server"

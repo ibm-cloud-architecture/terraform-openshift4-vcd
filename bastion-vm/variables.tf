@@ -246,6 +246,13 @@ variable "fips" {
   default     = false
 }  
 
+variable "user_service_network_name" {
+  type        = string
+  description = "user provided service network name"
+  default     = ""
+}
+
+
 variable "airgapped"  {
   type        = map(string)
   description = "test  variable for airgapped instead of separate vars"
