@@ -249,13 +249,11 @@ variable "fips" {
 variable "user_service_network_name" {
   type        = string
   description = "user provided service network name"
-  default     = ""
 }
 
 variable "user_tenant_external_network_name" {
   type        = string
   description = "user provided tenant external network name"
-  default     = ""
 }
 
 variable "airgapped"  {
