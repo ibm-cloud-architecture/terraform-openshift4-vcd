@@ -49,6 +49,12 @@ variable "base_domain" {
   type        = string
 }
 
+
+variable "user_tenant_external_network_name" {
+  type        = string
+  description = "user provided tenant external network name"
+}
+
 variable "additionalTrustBundle" {
   type        = string
   description = "certificate file used for airgapped install registry or proxy server"

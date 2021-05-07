@@ -87,6 +87,7 @@ module "network" {
   initialization_info = var.initialization_info
   vcd_url       = var.vcd_url
   cluster_public_ip = var.cluster_public_ip
+  user_tenant_external_network_name = var.user_tenant_external_network_name
 
   depends_on = [
      local_file.write_public_key
