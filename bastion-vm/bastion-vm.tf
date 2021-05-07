@@ -128,7 +128,8 @@ resource "vcd_nsxv_dnat" "dnat" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
-  network_name =  local.external_network_name 
+//  network_name =  local.external_network_name 
+  network_name = var.user_tenant_external_network_name == "" ? local.external_network_name : var.user_tenant_external_network_name
   network_type = "ext"
   
   original_address   = var.initialization_info["public_bastion_ip"]
@@ -145,7 +146,8 @@ resource "vcd_nsxv_snat" "snat_pub" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
-  network_name = local.external_network_name
+//  network_name = local.external_network_name
+    network_name = var.user_tenant_external_network_name == "" ? local.external_network_name : var.user_tenant_external_network_name
   network_type = "ext"
   
   original_address   = var.initialization_info["machine_cidr"]
