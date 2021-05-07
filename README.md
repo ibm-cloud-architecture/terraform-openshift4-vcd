@@ -327,7 +327,7 @@ $ ls -l /etc/hosts
 |bastion_disk   |disk size of bastion disk   | string  |  ~200GB |
 |openshift_version   |  The version of OpenShift you want to install | string  | 4.6  |
 |fips   |  Allows you to set fips compliant mode for install |  bool | false  |
-|user_sevice_network_name   | Service network name from Edge / Networks & Subnets  |  string |  - ||additional_trust_bundle   |  name of file containing cert for mirror. Read OCP restricted network install doc. Cert name should match DNS name.  | string  |  - |
+|user_service_network_name   | Service network name from Edge / Networks & Subnets  |  string |  - ||additional_trust_bundle   |  name of file containing cert for mirror. Read OCP restricted network install doc. Cert name should match DNS name.  | string  |  - |
 |**initialization_info object** |   |   |   |
 |public_bastion_ip |  Choose 1 of the 5 Public ip's for ssh access to the Bastion.| String  |   |
 | machine_cidr | CIDR for your CoreOS VMs in `subnet/mask` format.            | string | -                              |
