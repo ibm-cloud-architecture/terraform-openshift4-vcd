@@ -14,6 +14,8 @@ This toolkit performs an OpenShift UPI type install and will provision CoreOS no
 **NOTE**: Requires terraform 0.13 or later.  
 
 **Change History:**
+  - 5/07/2021:
+      - Fixed issue with Edge Gateway Network selection in new Data centers. This fix requires 2 new variables to be added to your `terraform.tfvars` file. The 2 variables are `user_service_network_name` and `user_tenant_external_network_name`. See configuration info below for details.
   - 4/17/2021:
     - Updated terraform code to fix errors caused by deprecated functions in terraform .15
     - Fixed bug in Airgapped install where additionalTrustBundle cert was not copied into install-config.yaml
@@ -108,6 +110,13 @@ To browse the available images:
 
 #### Networking Info
 VCD Networking is covered in general in the [Operator Guide/Networking](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-networking). Below is the specific network configuration required.
+
+Go your VCD console Edge Gateway/External Networks/Networks & Subnets and gather Network the network names. You will need to set the following variables in your `terraform.tfvars` file:
+```
+user_service_network_name = "<the network name with the word 'Service' in it>"
+user_tenant_external_network_name  ="<the network name with the words 'tenant external' in it>"
+```
+![Edge Gateway Networks & Subnets](media/edge_gateway_networks.jpg)
 
 
 The Bastion installation process will now create all the Networking entries necessary for the environment. You simply need to pick
@@ -327,7 +336,9 @@ $ ls -l /etc/hosts
 |bastion_disk   |disk size of bastion disk   | string  |  ~200GB |
 |openshift_version   |  The version of OpenShift you want to install | string  | 4.6  |
 |fips   |  Allows you to set fips compliant mode for install |  bool | false  |
-|user_service_network_name   | Service network name from Edge / Networks & Subnets  |  string |  - ||additional_trust_bundle   |  name of file containing cert for mirror. Read OCP restricted network install doc. Cert name should match DNS name.  | string  |  - |
+|user_service_network_name   | Service network name from Edge / Networks & Subnets  |  string |  - |
+|user_tenant_external_network_name   | Tenant network name from Edge / Networks & Subnets  |  string | -  |
+|additional_trust_bundle   |  name of file containing cert for mirror. Read OCP restricted network install doc. Cert name should match DNS name.  | string  |  - |
 |**initialization_info object** |   |   |   |
 |public_bastion_ip |  Choose 1 of the 5 Public ip's for ssh access to the Bastion.| String  |   |
 | machine_cidr | CIDR for your CoreOS VMs in `subnet/mask` format.            | string | -                              |
