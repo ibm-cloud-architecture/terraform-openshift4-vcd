@@ -16,6 +16,7 @@ This toolkit performs an OpenShift UPI type install and will provision CoreOS no
 **Change History:**
   - 5/07/2021:
       - Fixed issue with Edge Gateway Network selection in new Data centers. This fix requires 2 new variables to be added to your `terraform.tfvars` file. The 2 variables are `user_service_network_name` and `user_tenant_external_network_name`. See configuration info below for details.
+      - Force a yum update of all packages on Bastion during build to resolve incompatibilities with newer packages
   - 4/17/2021:
     - Updated terraform code to fix errors caused by deprecated functions in terraform .15
     - Fixed bug in Airgapped install where additionalTrustBundle cert was not copied into install-config.yaml
