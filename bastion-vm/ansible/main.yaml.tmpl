@@ -29,6 +29,12 @@
     - name: enable RHEL host entitlement
       shell: "subscription-manager register --org=\"customer\" --activationkey=\"${rhel_key}\" --force"
       
+    # Upgrade all packages
+    - name: Upgrade all packages
+      yum:
+        name: '*'
+        state: latest
+    
     # configure DNS server on the vm
     - name: install dnsmasq
       yum:
