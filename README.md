@@ -89,7 +89,7 @@ On your Host, clone the git repository. After cloning the repo, You will need to
 
 ```
 git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd
-cd terraform_openshift4-vcd
+cd terraform-openshift4-vcd
 cp terraform.tfvars.example terraform.tfvars
 ```
 Edit terraform.tfvars per the terraform variables section
