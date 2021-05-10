@@ -525,7 +525,7 @@ You will need a registry to store your images. A simple registry can be found [h
 
 In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
 ```
-cp <your mirror cert>/etc/pki/ca-trust/source/anchors/
+cp <your mirror cert> /etc/pki/ca-trust/source/anchors/
 update-ca-trust
 trust list | grep -i "<hostname>"
 ```
