@@ -6,7 +6,8 @@
 locals {
     source_networks = [var.initialization_info["network_name"]]
     ansible_directory = "/tmp"
-    external_network_name     =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-tenant-external" : "fra04-w02-tenant-external"
+//    external_network_name     =  substr(var.vcd_url,8,3) == "dal" ? "dal10-w02-tenant-external" : "fra04-w02-tenant-external"
+      external_network_name     =  var.user_tenant_external_network_name
 
     rule_id = ""
   }

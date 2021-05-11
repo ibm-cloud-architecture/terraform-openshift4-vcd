@@ -85,9 +85,10 @@ resource "vcd_nsxv_firewall_rule" "bastion_private_outbound_allow" {
   source {
     org_networks = [var.initialization_info["network_name"]]
   }
+// temp code 
 
   destination {
-    gateway_interfaces = [local.service_network_name]
+    gateway_interfaces = [var.user_service_network_name == "" ? local.service_network_name : var.user_service_network_name]
   }
 
   service {
@@ -127,7 +128,8 @@ resource "vcd_nsxv_dnat" "dnat" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
-  network_name =  local.external_network_name 
+//  network_name =  local.external_network_name 
+  network_name = var.user_tenant_external_network_name == "" ? local.external_network_name : var.user_tenant_external_network_name
   network_type = "ext"
   
   original_address   = var.initialization_info["public_bastion_ip"]
@@ -144,7 +146,8 @@ resource "vcd_nsxv_snat" "snat_pub" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
-  network_name = local.external_network_name
+//  network_name = local.external_network_name
+    network_name = var.user_tenant_external_network_name == "" ? local.external_network_name : var.user_tenant_external_network_name
   network_type = "ext"
   
   original_address   = var.initialization_info["machine_cidr"]
@@ -158,7 +161,7 @@ resource "vcd_nsxv_snat" "snat_priv" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
   edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
-  network_name =  local.service_network_name 
+  network_name =  var.user_service_network_name == "" ? local.service_network_name : var.user_service_network_name 
   network_type = "ext"
   
   original_address   = var.initialization_info["machine_cidr"]
