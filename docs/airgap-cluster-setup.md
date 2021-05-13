@@ -209,7 +209,7 @@ csr-approve.sh  ignition      main.tf  network  README.md  temp     terraform.tf
 [root@vm-rhel8 terraform]#
 ```
 
-#### Airgapped Installation
+#### Setting up mirror registry
 You will need a registry to store your images. A simple registry can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).
 
 In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
@@ -229,17 +229,7 @@ podman tag quay.io/openshift/origin-cli:latest <mirror_fqdn>:<mirror_port>/opens
 podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
 ````
 
-**Disable Telemetry:** You should edit your pull secret and remove the section that refers to `cloud.openshift.com`. This removes Telemetry and Health Reporting. If you don't do this before installation, you will get an error in the insights operator. After installation, go [here](https://docs.openshift.com/container-platform/4.6/support/remote_health_monitoring/opting-out-of-remote-health-reporting.html) for instructions to disable Telemetry Reporting.
-
-Run this command to stop OpenShift from looking for Operators from the Online source.  
-
-`oc patch OperatorHub cluster --type json  -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'`
-
-You may receive an Alert stating `Cluster version operator has not retrieved updates in xh xxm 17s. Failure reason RemoteFailed . For more information refer to https://console-openshift-console.apps.<cluster_id>.<base_domain>.com/settings/cluster/` this is normal and can be ignored.
-
-You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
-
-You will need to follow the instructions carefully in order to setup imagesources for any operators that you want to install.
+#### Create the airgap cluster
 
 Next update your terraform.tfvars file to create the cluster and enable airgap install.  We will have to make 2 changes.
 
@@ -280,6 +270,20 @@ terraform init
 terraform apply --auto-approve
 ```
 
+#### Post install cluster configuration
+
+**Disable Telemetry:** You should edit your pull secret and remove the section that refers to `cloud.openshift.com`. This removes Telemetry and Health Reporting. If you don't do this before installation, you will get an error in the insights operator. After installation, go [here](https://docs.openshift.com/container-platform/4.6/support/remote_health_monitoring/opting-out-of-remote-health-reporting.html) for instructions to disable Telemetry Reporting.
+
+Run this command to stop OpenShift from looking for Operators from the Online source.  
+
+`oc patch OperatorHub cluster --type json  -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'`
+
+You may receive an Alert stating `Cluster version operator has not retrieved updates in xh xxm 17s. Failure reason RemoteFailed . For more information refer to https://console-openshift-console.apps.<cluster_id>.<base_domain>.com/settings/cluster/` this is normal and can be ignored.
+
+You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
+
+You will need to follow the instructions carefully in order to setup imagesources for any operators that you want to install.
+
 #### Client setup
 
 On the **Client** that you will access the OCP Console, (your Mac, PC, etc.) add name resolution to direct console to the **Public IP** of the LoadBalancer in /etc/hosts on the client that will login to the Console UI.
@@ -300,10 +304,6 @@ Change to this:
 `$ sudo chmod ugo+r /etc/hosts
 $ ls -l /etc/hosts
 -rw-r--r--  1 root  wheel  622  1 Feb 08:57 /etc/hosts`
-
-
-
-
 
 
 #### Let OpenShift finish the installation:
@@ -395,6 +395,20 @@ service-ca                                 4.5.22    True        False         F
 storage                                    4.5.22    True        False         False      53m
 
 ```
+
+#### tfvars configuration
+
+If you would like understand how to further configure your tfvars file, refer to the [this table](https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd/tree/patch-1#terraform-variables) for details on what all the properties mean.
+
+#### storage configuration
+
+If you need to configure a storageclass, there are a few options.  You can follow these instructions for these storageclasses:
+[NFS](https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd#add-an-nfs-server-to-provide-persistent-storage)
+
+[OCS](https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd#create-openshift-container-storage-cluster-for-persistent-storage)
+
+[rook-cephfs](abc)
+
 #### Debugging the OCP installation
 
 Refer to the steps in the main README in the https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd#debugging-the-ocp-installation section.
