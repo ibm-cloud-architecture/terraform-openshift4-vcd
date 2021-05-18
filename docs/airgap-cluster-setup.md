@@ -67,6 +67,13 @@ To browse the available images:
 #### Networking Info
 VCD Networking is covered in general in the [Operator Guide/Networking](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-networking). Below is the specific network configuration required.
 
+Go your VCD console Edge Gateway/External Networks/Networks & Subnets and gather Network the network names. You will need to set the following variables in your `terraform.tfvars` file:
+```
+user_service_network_name = "<the network name with the word 'Service' in it>"
+user_tenant_external_network_name  ="<the network name with the words 'tenant external' in it>"
+```
+![Edge Gateway Networks & Subnets](media/edge_gateway_networks.jpg)
+
 
 The Bastion installation process will now create all the Networking entries necessary for the environment. You simply need to pick
  - a **Network Name** (ex. ocpnet)
@@ -222,6 +229,8 @@ The last command will check to see if the update was successful.
 
 You will need to create your own mirror or use an existing mirror to do an airgapped install. Instructions to create a mirror for OpenShift 4.6 can be found [here](https://docs.openshift.com/container-platform/4.6/installing/install_config/installing-restricted-networks-preparations.html#installing-restricted-networks-preparations).
 
+After following the instructions above, you should have a pull secret file on your server.  You will need to know this path as it will be used to update the tfvars file in the next section.
+
 In order for the accept CSR code to work, you will have to:
 ```  
 podman pull quay.io/openshift/origin-cli:latest
@@ -231,7 +240,13 @@ podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
 
 #### Create the airgap cluster
 
-Next update your terraform.tfvars file to create the cluster and enable airgap install.  We will have to make 2 changes.
+Next update your terraform.tfvars file to create the cluster and enable airgap install. The `terraform.tfvars` file that needs to be updated for this step is located in the `/opt/terraform` directory of the bastion server. We will have to make changes in three sections.
+
+Update the redhat_pull_secret:
+
+```
+openshift_pull_secret = "<path to pull secret JSON file created in the previous section>"
+```
 
 Update the airgapped object based on the example below:
 
@@ -264,7 +279,8 @@ Update the initialization_info object to set `run_cluster_install` to true as sh
 
 
 
-If your terraform.tfvars file is complete, you can run the commands to create your cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too.
+If your terraform.tfvars file is complete, you can run the commands to create your cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from `/opt/terraform` dir on your bastion server.
+
 ```
 terraform init
 terraform apply --auto-approve
