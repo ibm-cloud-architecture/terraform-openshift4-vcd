@@ -117,7 +117,7 @@ Go your VCD console Edge Gateway/External Networks/Networks & Subnets and gather
 user_service_network_name = "<the network name with the word 'Service' in it>"
 user_tenant_external_network_name  ="<the network name with the words 'tenant external' in it>"
 ```
-![Edge Gateway Networks & Subnets](media/edge_gateway_networks.jpg)
+![Edge Gateway Networks & Subnets](media/edge_gateway_networks.png)
 
 
 The Bastion installation process will now create all the Networking entries necessary for the environment. You simply need to pick
