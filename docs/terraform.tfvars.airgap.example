@@ -29,7 +29,28 @@ openshift_pull_secret = "<your pull secret location>"
 user_service_network_name = "<the network name with the word 'Service' in it>"
 user_tenant_external_network_name  ="<the network name with the words 'tenant external' in it>"
 
-
+cluster_public_ip       = "x.x.x.x"
+ 
+initialization_info     = {
+    public_bastion_ip = "y.y.y.y"
+    bastion_password = "<password for bastion>"
+    rhel_key = "<redhat license key from vcd screen>"
+    network_name      = "ocpnet"
+    run_cluster_install     = false
+    // This is static param and not to be updated
+    internal_bastion_ip = "172.16.0.10"
+    // This is static param and not to be updated
+    terraform_ocp_repo = "https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd"
+    // This is static param and not to be updated
+    machine_cidr = "172.16.0.0/16"
+    // This is static param and not to be updated
+    static_start_address    = "172.16.0.150"
+    // This is static param and not to be updated
+    static_end_address      = "172.16.0.220"
+    // This is static param and not to be updated
+    bastion_template        = "RedHat-8-Template-Official" 
+    }
+    
 // ***********************************************************************************************************************
 // Section to be updated after Bastion server is setup, image mirror registry is setup and OCP release images are mirrored.
 // This is configured when you are ready to create OCP cluster from Bastion server.
@@ -76,27 +97,7 @@ airgapped = {
       mirror_repository = "ocp4/openshift4"
       }
 
-cluster_public_ip       = "x.x.x.x"
- 
-initialization_info     = {
-    public_bastion_ip = "y.y.y.y"
-    bastion_password = "<password for bastion>"
-    rhel_key = "<redhat license key from vcd screen>"
-    network_name      = "ocpnet"
-    run_cluster_install     = true
-    // This is static param and not to be updated
-    internal_bastion_ip = "172.16.0.10"
-    // This is static param and not to be updated
-    terraform_ocp_repo = "https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd"
-    // This is static param and not to be updated
-    machine_cidr = "172.16.0.0/16"
-    // This is static param and not to be updated
-    static_start_address    = "172.16.0.150"
-    // This is static param and not to be updated
-    static_end_address      = "172.16.0.220"
-    // This is static param and not to be updated
-    bastion_template        = "RedHat-8-Template-Official" 
-    }
+
 
 // *********************************************************
 // Static section that users typically do not need to update
