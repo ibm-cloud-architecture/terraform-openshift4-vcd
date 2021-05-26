@@ -75,9 +75,9 @@ compute_disk =250000
 
 // Storage Nodes disk size must be at least 2097152 (2TB) if you want to install OCS
 
-storage_count = 0
-storage_disk = 512000
-// storage_ip_addresses = ["172.16.0.80", "172.16.0.81", "172.16.0.82"]
+storage_count = 3
+storage_disk = 200000
+storage_ip_addresses = ["172.16.0.80", "172.16.0.81", "172.16.0.82"]
 
 // This is your mirror registry cert file path if your mirror image registry is secured with TLS. example '/opt/registry/certs/domain.crt'
 // additionalTrustBundle = "<your trust bundle cert if airgapped>"      
