@@ -60,6 +60,48 @@ OpenShift 4.6 User-Provided Infrastructure
 
 ![topology](./media/vcd_arch.png)
 
+## High Level Steps for setting up the cluster as online install
+----------------------------------------------------------------
+
+* [Step 1: Order a VCD](#)
+* [Step 2: Installing the Bastion and initial network configuration](#)
+  * [Step 2.1: Setup Host Machine](#)
+  * [Step 2.2: Gather Information for terraform.tfvars](#)
+  * [Step 2.3: Perform Bastion install](#)
+* [Step 3: Create the airgap cluster from Bastion](#)
+  * [Step 3.1: Create the airgap cluster](#)
+  * [Step 3.2: Client setup](#)
+  * [Step 3.3: Let OpenShift finish the installation](#)
+* [Step 4: Debugging the OCP installation](#)
+* [Step 5: Optional Steps](#)
+* [Step 6: Deleting Cluster (and reinstalling)](#)
+
+## High Level Steps for setting up the cluster as airgap install
+----------------------------------------------------------------
+
+* [Step 1: Order a VCD](#)
+* [Step 2: Installing the Bastion and initial network configuration](#)
+  * [Step 2.1: Setup Host Machine](#)
+  * [Step 2.2: Gather Information for terraform.tfvars](#)
+  * [Step 2.3: Perform Bastion install](#)
+* [Step 3: Setting up mirror registry on Bastion](#)
+  * [Step 3.1: Setting up mirror registry](#)
+  * [Step 3.2: Create a mirror for OpenShift 4.6 images](#)
+  * [Step 3.3: Create a mirror for OpenShift 4.6 images](#)
+* [Step 4: Create the airgap cluster from Bastion](#)
+  * [Step 4.1: Create the airgap cluster](#)
+  * [Step 4.2: Client setup](#)
+  * [Step 4.3: Let OpenShift finish the installation](#)
+* [Step 5: Post install cluster configuration](#)
+  * [Step 5.1: Mirror redhat operators catalog](#)
+* [Step 6: Storage configuration](#)
+* [Step 7: Debugging the OCP installation](#)
+* [Step 8: Optional Steps](#)
+* [Step 9: Deleting Cluster (and reinstalling)](#)
+
+
+
+
 # Installation Process
 ## Order a VCD
 You will order a **VMware Solutions Shared** instance in IBM Cloud(below).  When you order a new instance, a **DataCenter** is created in vCloud Director.  It takes about an hour.
