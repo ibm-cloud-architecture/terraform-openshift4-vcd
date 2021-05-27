@@ -74,6 +74,12 @@ OpenShift 4.6 User-Provided Infrastructure
     * [Step 2.3.4: Validate OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
 * [Step 3: Debugging the OCP installation](#debugging-the-ocp-installation)
 * [Step 4: Optional Steps](#optional-steps)
+  * [Step 4.1: Use SSH Key rather than password authentication for Bastion login](#use-ssh-key-rather-than-password-authentication-for-bastion-login-optional)
+  * [Step 4.2: Move SSH to higher port ](#move-ssh-to-higher-port-optional)
+  * [Step 4.3: Storage Configuration](#storage-configuration)
+    * [Step 4.3.1: Add an NFS Server to provide Persistent storage](#add-an-nfs-server-to-provide-persistent-storage)
+    * [Step 4.3.2: Create Openshift Container Storage Cluster for persistent storage](#create-openshift-container-storage-cluster-for-persistent-storage)
+    * [Step 4.3.3: Enable Registry](#enable-registry)
 * [Step 5: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
 
 ## High Level Steps for setting up the cluster as airgap install
