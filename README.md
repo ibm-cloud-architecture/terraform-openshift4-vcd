@@ -70,11 +70,11 @@ OpenShift 4.6 User-Provided Infrastructure
   * [Step 2.3: Perform Bastion install](#perform-bastion-install)
 * [Step 3: Create the airgap cluster from Bastion](#)
   * [Step 3.1: Create the airgap cluster](#)
-  * [Step 3.2: Client setup](#)
+  * [Step 3.2: Client setup](#client-setup)
   * [Step 3.3: Let OpenShift finish the installation](#)
-* [Step 4: Debugging the OCP installation](#)
-* [Step 5: Optional Steps](#)
-* [Step 6: Deleting Cluster (and reinstalling)](#)
+* [Step 4: Debugging the OCP installation](#debugging-the-ocp-installation)
+* [Step 5: Optional Steps](#optional-steps)
+* [Step 6: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
 
 ## High Level Steps for setting up the cluster as airgap install
 ----------------------------------------------------------------
@@ -87,16 +87,16 @@ OpenShift 4.6 User-Provided Infrastructure
 * [Step 3: Setting up mirror registry on Bastion](#)
   * [Step 3.1: Setting up mirror registry](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
   * [Step 3.2: Create a mirror for OpenShift 4.6 images](docs/airgap-cluster-setup.md#create-a-mirror-for-openshift-46-images)
-* [Step 4: Create the airgap cluster from Bastion](#)
+* [Step 4: Create the airgap cluster from Bastion](docs/airgap-cluster-setup.md#create-the-airgap-cluster)
   * [Step 4.1: Create the airgap cluster](docs/airgap-cluster-setup.md#create-the-airgap-cluster)
   * [Step 4.2: Client setup](#client-setup)
-  * [Step 4.3: Let OpenShift finish the installation](#)
-* [Step 5: Post install cluster configuration](#)
-  * [Step 5.1: Mirror redhat operators catalog](#)
-* [Step 6: Storage configuration](#)
-* [Step 7: Debugging the OCP installation](#)
-* [Step 8: Optional Steps](#)
-* [Step 9: Deleting Cluster (and reinstalling)](#)
+  * [Step 4.3: Let OpenShift finish the installation](#let-openshift-finish-the-installation)
+* [Step 5: Post install cluster configuration](docs/airgap-cluster-setup.md#post-install-cluster-configuration)
+  * [Step 5.1: Mirror redhat operators catalog](docs/airgap-cluster-setup.md#mirror-redhat-operators-catalog)
+* [Step 6: Storage configuration](docs/airgap-cluster-setup.md#storage-configuration)
+* [Step 7: Debugging the OCP installation](#debugging-the-ocp-installation)
+* [Step 8: Optional Steps](#optional-steps)
+* [Step 9: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
 
 
 
