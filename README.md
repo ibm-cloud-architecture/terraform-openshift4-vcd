@@ -63,7 +63,7 @@ OpenShift 4.6 User-Provided Infrastructure
 ## High Level Steps for setting up the cluster as online install
 ----------------------------------------------------------------
 
-* [Step 1: Order a VCD](#)
+* [Step 1: Order a VCD](#order-a-vcd)
 * [Step 2: Installing the Bastion and initial network configuration](#)
   * [Step 2.1: Setup Host Machine](#)
   * [Step 2.2: Gather Information for terraform.tfvars](#)
@@ -79,7 +79,7 @@ OpenShift 4.6 User-Provided Infrastructure
 ## High Level Steps for setting up the cluster as airgap install
 ----------------------------------------------------------------
 
-* [Step 1: Order a VCD](#)
+* [Step 1: Order a VCD](#order-a-vcd)
 * [Step 2: Installing the Bastion and initial network configuration](#)
   * [Step 2.1: Setup Host Machine](#)
   * [Step 2.2: Gather Information for terraform.tfvars](#)
