@@ -408,7 +408,7 @@ Run this command to stop OpenShift from looking for Operators from the Online so
 
 You may receive an Alert stating `Cluster version operator has not retrieved updates in xh xxm 17s. Failure reason RemoteFailed . For more information refer to https://console-openshift-console.apps.<cluster_id>.<base_domain>.com/settings/cluster/` this is normal and can be ignored.
 
-#### Mirror redhat operators catalog
+##### Mirror redhat operators catalog
 
 You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
 
