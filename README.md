@@ -70,10 +70,10 @@ OpenShift 4.6 User-Provided Infrastructure
   * [Step 2.3: Perform Bastion install and create the online ocp cluster](#perform-bastion-install)
   * [Step 2.4: Create the online ocp cluster](#create-the-ocp-cluster)
   * [Step 2.5: Client setup](#client-setup)
-  * [Step 3.3: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
-* [Step 4: Debugging the OCP installation](#debugging-the-ocp-installation)
-* [Step 5: Optional Steps](#optional-steps)
-* [Step 6: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
+  * [Step 2.6: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
+* [Step 3: Debugging the OCP installation](#debugging-the-ocp-installation)
+* [Step 4: Optional Steps](#optional-steps)
+* [Step 5: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
 
 ## High Level Steps for setting up the cluster as airgap install
 ----------------------------------------------------------------
@@ -89,7 +89,7 @@ OpenShift 4.6 User-Provided Infrastructure
 * [Step 4: Create the airgap cluster from Bastion](docs/airgap-cluster-setup.md#create-the-airgap-cluster-from-bastion-server)
   * [Step 4.1: Create the airgap cluster](docs/airgap-cluster-setup.md#create-the-airgap-cluster-from-bastion-server)
   * [Step 4.2: Client setup](#client-setup)
-  * [Step 4.3: Let OpenShift finish the installation](#let-openshift-finish-the-installation)
+  * [Step 4.3: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
 * [Step 5: Post install cluster configuration](docs/airgap-cluster-setup.md#post-install-cluster-configuration)
   * [Step 5.1: Mirror redhat operators catalog](docs/airgap-cluster-setup.md#mirror-redhat-operators-catalog)
 * [Step 6: Storage configuration](docs/airgap-cluster-setup.md#storage-configuration)
