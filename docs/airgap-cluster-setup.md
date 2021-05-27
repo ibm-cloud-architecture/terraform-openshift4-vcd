@@ -418,7 +418,7 @@ You will need to follow the instructions carefully in order to setup imagesource
 
 If you would like understand how to further configure your tfvars file, refer to the [this table](https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd/tree/patch-1#terraform-variables) for details on what all the properties mean.
 
-#### storage configuration
+#### Storage Configuration
 
 If you need to configure a storageclass, there are a few options.  You can follow these instructions for setting up NFS or rookcephfs [here](airgap-storage.md).
 
