@@ -64,7 +64,7 @@ OpenShift 4.6 User-Provided Infrastructure
 ----------------------------------------------------------------
 
 * [Step 1: Order a VCD](#order-a-vcd)
-* [Step 2: Installing the Bastion and initial network configuration](#)
+* [Step 2: Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
   * [Step 2.1: Setup Host Machine](#)
   * [Step 2.2: Gather Information for terraform.tfvars](#)
   * [Step 2.3: Perform Bastion install](#)
@@ -80,7 +80,7 @@ OpenShift 4.6 User-Provided Infrastructure
 ----------------------------------------------------------------
 
 * [Step 1: Order a VCD](#order-a-vcd)
-* [Step 2: Installing the Bastion and initial network configuration](#)
+* [Step 2: Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
   * [Step 2.1: Setup Host Machine](#)
   * [Step 2.2: Gather Information for terraform.tfvars](#)
   * [Step 2.3: Perform Bastion install](#)
