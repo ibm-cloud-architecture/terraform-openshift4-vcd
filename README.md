@@ -552,14 +552,14 @@ oc get routes console -n openshift-console
 
 
 ## Optional Steps:
-#### Use SSH Key rather than password authentication for Bastion login (optional)
+### Use SSH Key rather than password authentication for Bastion login (optional)
 The Bastion install process will create an ssh key and place it in  `~/.ssh/bastion_id`  
 
 For login to Bastion, you can choose to use SSH Keys and disable password login:
   - edit /etc/ssh/sshd_config and set password authentication to no
   - add your bastion_id.pub ssh key to .ssh/authorised_keys on bastion
 
-#### Move SSH to higher port (optional)
+### Move SSH to higher port (optional)
 If you want to move your ssh port to a higher port to slow down hackers that are constantly looking to hack your server at port 22 then do the following:
 1. Edit /etc/ssh/sshd_config and uncomment the line that currently reads #Port 22 and change to your desired port and save file. `systemctl stop sshd` `systemctl start sshd`
 2. `semanage port -a -t ssh_port_t -p tcp <your new port number>`
@@ -567,18 +567,21 @@ If you want to move your ssh port to a higher port to slow down hackers that are
 `firewall-cmd --add-port=<your new port>/tcp --zone=public --permanent`  
 `firewall-cmd --reload`
 1. Update your edge FW rule for your Bastion with your new port. (replace port 22 with your new port)
-### Add an NFS Server to provide Persistent storage.
+
+### Storage Configuration
+
+#### Add an NFS Server to provide Persistent storage.
 -  [Here is an article on how to set this up](https://medium.com/faun/openshift-dynamic-nfs-persistent-volume-using-nfs-client-provisioner-fcbb8c9344e). Make the NFS Storage Class the default Storage Class   
 
   `oc patch storageclass managed-nfs-storage -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'`
 
 
-### Create Openshift Container Storage Cluster for persistent storage.
+#### Create Openshift Container Storage Cluster for persistent storage.
  If you added storage nodes and want to add OCS instead of NFS for storage provisioner, Instructions here -> [Openshift Container Storage - Bare Metal Path](https://access.redhat.com/documentation/en-us/red_hat_openshift_container_storage/4.6/html-single/deploying_openshift_container_storage_using_bare_metal_infrastructure/index#installing-openshift-container-storage-operator-using-the-operator-hub_rhocs)
 
  `oc patch storageclass ocs-storagecluster-cephfs -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'`
 
-### Enable Registry
+#### Enable Registry
  - [Enable the OCP Image registry using your NFS Storage](https://docs.openshift.com/container-platform/4.5/registry/configuring_registry_storage/configuring-registry-storage-baremetal.html)
  - [Exposing the Registry](https://docs.openshift.com/container-platform/4.5/registry/securing-exposing-registry.html)
 
