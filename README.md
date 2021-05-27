@@ -422,7 +422,7 @@ $ ls -l /etc/hosts
 
 
 
-#### Let OpenShift finish the installation:
+#### Validating OpenShift cluster installation:
 Once terraform has completed sucessfully, you will see several pieces of information display. This data will also be written to `/root/<cluster_id>info.txt` on the Bastion and to` ~/<cluster_id>info.txt` on the Host computer. As sample is below:
 ```
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
