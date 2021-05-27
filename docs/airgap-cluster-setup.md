@@ -227,6 +227,7 @@ trust list | grep -i "<hostname>"
 ```
 The last command will check to see if the update was successful.
 
+#### Create a mirror for OpenShift 4.6 images
 You will need to create your own mirror or use an existing mirror to do an airgapped install. Instructions to create a mirror for OpenShift 4.6 can be found [here](https://docs.openshift.com/container-platform/4.6/installing/install_config/installing-restricted-networks-preparations.html#installing-restricted-networks-preparations).
 
 After following the instructions above, you should have a pull secret file on your server.  You will need to know this path as it will be used to update the tfvars file in the next section.
