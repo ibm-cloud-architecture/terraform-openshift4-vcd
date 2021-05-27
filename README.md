@@ -138,7 +138,7 @@ cp terraform.tfvars.example terraform.tfvars
 ```
 Edit terraform.tfvars per the terraform variables section
 ## Gather Information for terraform.tfvars
-#### Find vApp Template from the Image Catalog
+### Find vApp Template from the Image Catalog
 We need a catalog of VM images to use for our OpenShift VMs and the Bastion.
 Fortunately IBM provides a set of images that are tailored to work for OpenShift deployments.
 To browse the available images:
@@ -150,7 +150,7 @@ To browse the available images:
   * RedHat-8-Template-Official
 * If you want to add your own Catalogs and more, see the [documentation about catalogs](#about-catalogs)
 
-#### Networking Info
+### Networking Info
 VCD Networking is covered in general in the [Operator Guide/Networking](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-networking). Below is the specific network configuration required.
 
 Go your VCD console Edge Gateway/External Networks/Networks & Subnets and gather Network the network names. You will need to set the following variables in your `terraform.tfvars` file:
@@ -198,7 +198,7 @@ storage_disk = 2097152
 
 ```
 
-#### Choosing an External IP  for your cluster and Bastion and retrieving the Red Hat Activation key
+### Choosing an External IP  for your cluster and Bastion and retrieving the Red Hat Activation key
 Configure the Edge Service Gateway (ESG) to provide inbound and outbound connectivity.  For a network overview diagram, followed by general Edge setup instruction, see: https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-create-network
 
 Each vCloud Datacenter comes with 5 IBM Cloud public IP addresses which we can use for SNAT and DNAT translations in and out of the datacenter instance.  VMWare vCloud calls these `sub-allocated` addresses.
@@ -230,7 +230,7 @@ Gather the following information that you will need when configuring the ESG:
     }
 ```
 
-#### Retrieve pull secret from Red Hat sites
+### Retrieve pull secret from Red Hat sites
 Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) and place in a file on the Bastion Server. Default location is `~/.pull-secret`
 
 ## Perform Bastion install
