@@ -119,6 +119,11 @@ resource "vcd_nsxv_firewall_rule" "bastion_inbound_allow" {
     protocol = "tcp"
     port     = "22"
   }
+  service {
+    protocol = "tcp"
+    port     = "5000"
+  }
+
     depends_on = [
       vcd_vapp_org_network.vappOrgNet,
   ]
