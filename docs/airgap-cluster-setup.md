@@ -2,11 +2,9 @@
 ## Overview
 Deploy OpenShift on IBM Cloud VMWare Solutions based on VMWare Cloud Director.  This toolkit uses Terraform to automate the OpenShift installation process including the Edge Network configuration, Bastion host creation, OpenShift CoreOS bootstrap, loadbalancer, control and worker node creation. Once provisioned, the VMWare Cloud Director environment gives you complete control of all aspects of you OpenShift environment.
 
-The toolkit provides the flexibility to also configure "airgapped" clusters without Internet access.
+This document helps you to configure "airgapped" clusters without Internet access.
 
-See also [IBM Cloud VMWare Solutions Shared overview](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_overview)
-
-This toolkit performs an OpenShift UPI type install and will provision CoreOS nodes using static IP addresses. The `ignition` module will inject code into the cluster that will automatically approve all node CSRs.  This runs only once at cluster creation.  You can delete the `ibm-post-deployment` namespace once your cluster is up and running.
+Please follow the steps from main document to [high level steps to setup the airgap cluster](../README.md#high-level-steps-for-setting-up-the-cluster-as-airgap-install) using this toolkit
 
 **NOTE**: OpenShift 4.6 or later is supported. If you need 4.5 or earlier, see the [VCD Toolkit](https://github.com/vmware-ibm-jil/vcd_toolkit_for_openshift) or the `terraform-openshift4-vmware pre-4.6` [branch](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware/tree/pre-4.6)
 
