@@ -59,8 +59,32 @@ resource "vcd_nsxv_firewall_rule" "lb_allow" {
   }
 }
 
+resource "vcd_nsxv_firewall_rule" "mirror_allow" {
+// if airgapped, you need to allow access to mirrors public ip
+  count = var.airgapped["enabled"] ? 1 : 0 
+
+  org          = var.vcd_org
+  vdc          = var.vcd_vdc
+  edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
+  action       = "accept"
+  name         = "${var.cluster_id}_mirror_allow_rule"  
+  
+  source {
+    ip_addresses = ["any"]
+  }
+
+  destination {
+    ip_addresses = [var.airgapped["mirror_ip"]]
+  }
+
+  service {
+    protocol = "any"
+    port     = var.airgapped["mirror_port"]
+  }
+}
+
 resource "vcd_nsxv_firewall_rule" "cluster_allow" {
-// if airgapped, you need the lb to have access so it can get dhcpd, coredns and haproxy images
+// if not airgapped, you need the cluster to have access because the default is deny
   count = var.airgapped["enabled"] ? 0 : 1 
 
   org          = var.vcd_org
