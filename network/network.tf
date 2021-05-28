@@ -78,7 +78,7 @@ resource "vcd_nsxv_firewall_rule" "mirror_allow" {
   }
 
   service {
-    protocol = "any"
+    protocol = "tcp"
     port     = var.airgapped["mirror_port"]
   }
 }
