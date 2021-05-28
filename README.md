@@ -591,49 +591,7 @@ If you want to move your ssh port to a higher port to slow down hackers that are
  - [Enable the OCP Image registry using your NFS Storage](https://docs.openshift.com/container-platform/4.5/registry/configuring_registry_storage/configuring-registry-storage-baremetal.html)
  - [Exposing the Registry](https://docs.openshift.com/container-platform/4.5/registry/securing-exposing-registry.html)
 
-### Airgapped Installation
-You will need a registry to store your images. A simple registry can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).
 
-In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
-```
-cp <your mirror cert> /etc/pki/ca-trust/source/anchors/
-update-ca-trust
-trust list | grep -i "<hostname>"
-```
-The last command will check to see if the update was successful.
-
-You will need to create your own mirror or use an existing mirror to do an airgapped install. Instructions to create a mirror for OpenShift 4.6 can be found [here](https://docs.openshift.com/container-platform/4.6/installing/install_config/installing-restricted-networks-preparations.html#installing-restricted-networks-preparations).
-
-In order for the accept CSR code to work, you will have to:
-```  
-podman pull quay.io/openshift/origin-cli:latest
-podman tag quay.io/openshift/origin-cli:latest <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest  
-podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
-````
-
-**Disable Telemetry:** You should edit your pull secret and remove the section that refers to `cloud.openshift.com`. This removes Telemetry and Health Reporting. If you don't do this before installation, you will get an error in the insights operator. After installation, go [here](https://docs.openshift.com/container-platform/4.6/support/remote_health_monitoring/opting-out-of-remote-health-reporting.html) for instructions to disable Telemetry Reporting.
-
-Run this command to stop OpenShift from looking for Operators from the Online source.  
-
-`oc patch OperatorHub cluster --type json  -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'`
-
-You may receive an Alert stating `Cluster version operator has not retrieved updates in xh xxm 17s. Failure reason RemoteFailed . For more information refer to https://console-openshift-console.apps.<cluster_id>.<base_domain>.com/settings/cluster/` this is normal and can be ignored.
-
-You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
-
-You will need to follow the instructions carefully in order to setup imagesources for any operators that you want to install.
-
-An example of the airgapped object:
-```
-airgapped = {
-      enabled = true
-      ocp_ver_rel = "4.6.15"
-      mirror_ip = "172.16.0.10"
-      mirror_fqdn = "bastion.airgapfull.cdastu.com"
-      mirror_port = "5000"
-      mirror_repository = "ocp4/openshift4"
-      }
-```
 ### Deleting Cluster (and reinstalling)
 If you want to delete your cluster, you should use `terraform destroy` as this will delete you cluster and remove all resources on VCD, including FW rules. If you manually delete your cluster via the VCD Console, remember to delete the FW rules and DNAT rules associated with your cluster or the reinstall may fail. The FW and DNAT rules should be tagged with your cluster name in the name and/or description fields.
 
