@@ -78,6 +78,7 @@ module "network" {
       var.storage_ip_addresses
       ])
   airgapped     = var.airgapped
+  additionalTrustBundle = var.additionalTrustBundle
   network_lb_ip_address = var.lb_ip_address
   vcd_password  = var.vcd_password
   vcd_org       = var.vcd_org

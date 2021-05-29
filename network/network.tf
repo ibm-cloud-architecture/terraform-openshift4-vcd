@@ -151,7 +151,7 @@ resource "vcd_nsxv_dnat" "dnat" {
   connection: local
   gather_facts: False
   tasks:
-    - name: update hosts
+    - name: update /etc/hosts
       blockinfile:
          path: /etc/hosts
          block: |
@@ -172,7 +172,18 @@ resource "vcd_nsxv_dnat" "dnat" {
             address=/.apps.${var.cluster_id}.${var.base_domain}/${var.network_lb_ip_address}
          state: present
          marker_begin: "${var.cluster_id}"
-         marker_end: "${var.cluster_id}"         
+         marker_end: "${var.cluster_id}"  
+         
+ %{if var.airgapped["enabled"]}
+    - name: Copy Mirro Cert for trust
+      shell: "cp ${var.additionalTrustBundle} /etc/pki/ca-trust/source/anchors/."
+      args:
+        warn: no  
+    - name: Update trust cert store for mirror ca
+      shell: "update-ca-trust"
+      args:
+        warn: no          
+ %{endif}       
 EOF
 }
 
