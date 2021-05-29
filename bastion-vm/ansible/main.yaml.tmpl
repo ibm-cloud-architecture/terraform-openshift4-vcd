@@ -143,6 +143,9 @@
       shell: "firewall-cmd --add-port=53/udp --zone=public --permanent"
 
     - name: configure firewall
+      shell: "firewall-cmd --add-port=5000/tcp --zone=public --permanent"
+
+    - name: configure firewall
       shell: "firewall-cmd --reload"
     
     # check out git repo with OCP terraform script
