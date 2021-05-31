@@ -41,6 +41,7 @@ data "vcd_resource_list" "list_of_resources" {
   resource_type = "resources"
 //  list_mode = "name"
 }
+
 output "gateway_name" {
    value = data.vcd_edgegateway.mygateway.name
 }
