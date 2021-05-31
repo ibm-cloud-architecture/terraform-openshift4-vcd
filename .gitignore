@@ -20,6 +20,7 @@ makefile
 **/terraform.tfstate.d/*
 **/installer/*
 **/go-vcloud-director.log
+**/temp/*
 tmp.txt
 crash.log
 .docker*

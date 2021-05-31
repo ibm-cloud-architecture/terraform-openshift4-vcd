@@ -23,6 +23,20 @@ data "vcd_edgegateway" "mygateway" {
   name          = element(data.vcd_resource_list.edge_gateway_name.list,1)
 
 }
+
+// temp code
+data "vcd_resource_list" "list_of_nets" {
+  org          = var.vcd_org
+  vdc          = var.vcd_vdc
+  name = "list_of_nets"
+  resource_type = "network"
+  list_mode = "import"
+}
+output "net_list" {
+   value = data.vcd_resource_list.list_of_nets.list
+}
+// end temp code
+
  locals {
     ansible_directory = "/tmp"
     additional_trust_bundle_dest = dirname(var.additionalTrustBundle)
