@@ -1,0 +1,123 @@
+// *******************************************************
+// Update just this section first to setup bastion server 
+// *******************************************************
+
+// ID identifying the cluster to create. Use your username so that resources created can be tracked back to you.
+cluster_id = "<your cluster id>"
+
+// Base domain from which the cluster domain is a subdomain.  This can be any non globally resolved domain like myfakedomain1357.com
+base_domain = "<your base domain>"
+
+// Name of the VDC.
+vcd_vdc = "<your vdc name>"
+
+// User on the vSphere server.
+vcd_user = "<your vcd username>"
+
+// Password of the user on vcd.
+vcd_password = "<your vcd password>"
+
+// Name of the VCD organization. Found on the VCD console, Data Centers tab
+vcd_org = "<your org id>"
+
+// Uncomment this if setting up mirror on bastion.  Will need the space to store the images
+// bastion_disk=1024000
+
+// Your Openshift pull secret
+openshift_pull_secret = "<your pull secret location>"
+
+user_service_network_name = "<the network name with the word 'Service' in it>"
+user_tenant_external_network_name  ="<the network name with the words 'tenant external' in it>"
+
+cluster_public_ip       = "x.x.x.x"
+ 
+initialization_info     = {
+    public_bastion_ip = "y.y.y.y"
+    bastion_password = "<password for bastion>"
+    rhel_key = "<redhat license key from vcd screen>"
+    network_name      = "ocpnet"
+    run_cluster_install     = false
+    // This is static param and not to be updated
+    internal_bastion_ip = "172.16.0.10"
+    // This is static param and not to be updated
+    terraform_ocp_repo = "https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd"
+    // This is static param and not to be updated
+    machine_cidr = "172.16.0.0/16"
+    // This is static param and not to be updated
+    static_start_address    = "172.16.0.150"
+    // This is static param and not to be updated
+    static_end_address      = "172.16.0.220"
+    // This is static param and not to be updated
+    bastion_template        = "RedHat-8-Template-Official" 
+    }
+    
+// ***********************************************************************************************************************
+// Section to be updated after Bastion server is setup, image mirror registry is setup and OCP release images are mirrored.
+// This is configured when you are ready to create OCP cluster from Bastion server.
+// ***********************************************************************************************************************
+
+// The number of control plane VMs to create. Default is 3.
+control_plane_count = 3
+control_disk = 250000
+// The IP addresses to assign to the control plane VMs. The length of this list
+// must match the value of control_plane_count.
+  control_plane_ip_addresses = ["172.16.0.71", "172.16.0.72", "172.16.0.73"]
+//    control_plane_ip_addresses = ["172.16.0.51"]
+
+
+// The number of compute VMs to create. Default is 3.
+compute_count = 3
+compute_disk =250000
+
+// The IP addresses to assign to the compute VMs. The length of this list must
+// match the value of compute_count.
+   compute_ip_addresses = ["172.16.0.74","172.16.0.75","172.16.0.76"]
+
+// Storage Nodes disk size must be at least 2097152 (2TB) if you want to install OCS
+
+storage_count = 3
+storage_disk = 200000
+storage_ip_addresses = ["172.16.0.80", "172.16.0.81", "172.16.0.82"]
+
+// This is your mirror registry cert file path if your mirror image registry is secured with TLS. example '/opt/registry/certs/domain.crt'
+// additionalTrustBundle = "<your trust bundle cert if airgapped>"      
+
+
+openshift_version="4.6"
+// Name of the RHCOS VM template to clone to create VMs for the cluster
+rhcos_template = "rhcos OpenShift 4.6.8"
+
+// airgapped block
+airgapped = {
+      enabled = false
+      ocp_ver_rel = "<your version.release>"
+      mirror_ip = "<ip of mirror>" 
+      mirror_fqdn = "<fqdn of mirror>"
+      mirror_port = "<port of mirror>"
+      mirror_repository = "ocp4/openshift4"
+      }
+
+
+
+// *********************************************************
+// Static section that users typically do not need to update
+// *********************************************************
+
+// url for the vcd. (this is dal)
+vcd_url = "https://daldir01.vmware-solutions.cloud.ibm.com/api"
+
+// Name of the vcd Catalog
+vcd_catalog = "Public Catalog"
+
+// Set bootstrap_ip, control_plane_ip, and compute_ip if you want to use static
+// IPs reserved someone else, rather than the IPAM server.
+
+// The IP address to assign to the bootstrap VM.
+bootstrap_disk = 250000
+bootstrap_ip_address = "172.16.0.70"
+
+// The IP address to assign to the loadbalancer VM.
+lb_ip_address = "172.16.0.69"
+
+// including Bastion server for local DNS
+vm_dns_addresses = ["9.9.9.9","161.26.0.10","172.16.0.10"]

@@ -14,6 +14,10 @@ This toolkit performs an OpenShift UPI type install and will provision CoreOS no
 **NOTE**: Requires terraform 0.13 or later.  
 
 **Change History:**
+  - 6/02/2021:
+      - We divided the main readme into two documents, one for the setting up the OCP cluster with online path, and other one for setting up the OCP cluster with airgap path.
+      - Created the high level steps for [install OCP cluster for online path](#high-level-steps-for-setting-up-the-cluster-as-online-install)
+      - Created the high level steps for [install OCP cluster for airgap path](#high-level-steps-for-setting-up-the-cluster-as-airgap-install)
   - 5/07/2021:
       - Fixed issue with Edge Gateway Network selection in new Data centers. This fix requires 2 new variables to be added to your `terraform.tfvars` file. The 2 variables are `user_service_network_name` and `user_tenant_external_network_name`. See configuration info below for details.
       - Force a yum update of all packages on Bastion during build to resolve incompatibilities with newer packages
@@ -60,6 +64,57 @@ OpenShift 4.6 User-Provided Infrastructure
 
 ![topology](./media/vcd_arch.png)
 
+## High Level Steps for setting up the cluster as online install
+----------------------------------------------------------------
+**Note** : Please follow these steps in sequence using the steps below, and come back here to navigate after each section link you click and complete it.
+
+* [Step 1: Order a VCD](#order-a-vcd)
+* [Step 2: Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
+  * [Step 2.1: Setup Host Machine](#setup-host-machine)
+  * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
+  * [Step 2.3: Perform Bastion install and create the online ocp cluster](#perform-bastion-install)
+    * [Step 2.3.1: Login to Bastion](#login-to-bastion) 
+    * [Step 2.3.2: Create the online ocp cluster](#create-the-ocp-cluster)
+    * [Step 2.3.3: Client setup](#client-setup)
+    * [Step 2.3.4: Validate OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
+* [Step 3: Debugging the OCP installation](#debugging-the-ocp-installation)
+* [Step 4: Optional Steps](#optional-steps)
+  * [Step 4.1: Use SSH Key rather than password authentication for Bastion login](#use-ssh-key-rather-than-password-authentication-for-bastion-login-optional)
+  * [Step 4.2: Move SSH to higher port ](#move-ssh-to-higher-port-optional)
+  * [Step 4.3: Storage Configuration](#storage-configuration)
+    * [Step 4.3.1: Add an NFS Server to provide Persistent storage](#add-an-nfs-server-to-provide-persistent-storage)
+    * [Step 4.3.2: Create Openshift Container Storage Cluster for persistent storage](#create-openshift-container-storage-cluster-for-persistent-storage)
+    * [Step 4.3.3: Enable Registry](#enable-registry)
+* [Step 5: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
+
+## High Level Steps for setting up the cluster as airgap install
+----------------------------------------------------------------
+**Note** : Please follow these steps in sequence using the steps below, and come back here to navigate after each section link you click and complete it.
+
+* [Step 1: Order a VCD](#order-a-vcd)
+* [Step 2: Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
+  * [Step 2.1: Setup Host Machine](#setup-host-machine)
+  * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
+  * [Step 2.3: Perform Bastion install](#perform-bastion-install)
+    * [Step 2.3.1: Login to Bastion](#login-to-bastion) 
+* [Step 3: Setting up mirror registry on Bastion](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
+  * [Step 3.1: Setting up mirror registry](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
+  * [Step 3.2: Create a mirror for OpenShift 4.6 images](docs/airgap-cluster-setup.md#create-a-mirror-for-openshift-46-images)
+* [Step 4: Create the airgap cluster from Bastion](docs/airgap-cluster-setup.md#create-the-airgap-cluster-from-bastion)
+  * [Step 4.1: Copy registry cert in case of registry setup in different VCD](docs/airgap-cluster-setup.md#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
+  * [Step 4.2: Create the airgap cluster](docs/airgap-cluster-setup.md#create-the-airgap-cluster)
+  * [Step 4.3: Client setup](#client-setup)
+  * [Step 4.4: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
+* [Step 5: Post install cluster configuration](docs/airgap-cluster-setup.md#post-install-cluster-configuration)
+  * [Step 5.1: Mirror redhat operators catalog](docs/airgap-cluster-setup.md#mirror-redhat-operators-catalog)
+* [Step 6: Storage configuration](docs/airgap-cluster-setup.md#storage-configuration)
+* [Step 7: Debugging the OCP installation](#debugging-the-ocp-installation)
+* [Step 8: Optional Steps](#optional-steps)
+* [Step 9: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
+
+
+
+
 # Installation Process
 ## Order a VCD
 You will order a **VMware Solutions Shared** instance in IBM Cloud(below).  When you order a new instance, a **DataCenter** is created in vCloud Director.  It takes about an hour.
@@ -97,7 +152,73 @@ cp terraform.tfvars.example terraform.tfvars
 ```
 Edit terraform.tfvars per the terraform variables section
 ## Gather Information for terraform.tfvars
-#### Find vApp Template from the Image Catalog
+
+### terraform variables description
+
+| Variable                     | Description                                                  | Type | Default |
+| ---------------------------- | ------------------------------------------------------------ | ---- | ------- |
+| vcd_url               | for now either https://daldir01.vmware-solutions.cloud.ibm.com/api or https://fradir01.vmware-solutions.cloud.ibm.com/api api                    | string |  |
+| vcd_user                     | VCD username                                             | string | - |
+| vcd_password             | VCD password                                             | string | - |
+| vcd_vdc                      | VCD VDC name          | string | - |
+| cluster_id                   | VCD Cluster where OpenShift will be deployed             | string | - |
+| vcd_org   |  VCD Org from VCD Console screen |  string |   |
+| rhcos_template | Name of CoreOS OVA template from prereq #2 | string | - |
+| vcd_catalog   | Name of VCD Catalog containing your templates  | string  |  Public Catalog |
+| vm_dns_addresses           | List of DNS servers to use for your OpenShift Nodes (161.26.0.10 is the IBM Cloud Private Network Internal DNS Sever in case you go airgap)          | list   | 8.8.8.8, 161.26.0.10               |
+|mac_address_prefix   |  The prefix used to create mac addresses for dhcp reservations. The last 2 digits are derived from the last 2 digits of the ip address of a given machine. The final octet of the ip address for the vm's should not be over 99. |  string |  00:50:56:01:30 |
+| base_domain                | Base domain for your OpenShift Cluster. **Note: Don't pick a base domain that is currently registered in Public DNS**.                       | string | -                              |
+| bootstrap_ip_address|IP Address for bootstrap node|string|-|
+| control_plane_count          | Number of control plane VMs to create                        | string | 3                |
+| control_plane_memory         | Memory, in MB, to allocate to control plane VMs              | string | 16384            |
+| control_plane_num_cpus| Number of CPUs to allocate for control plane VMs             |string|4|
+| control_disk  | size in MB   | string  |  - |
+| compute_ip_addresses|List of IP addresses for your compute nodes|list|-|
+| compute_count|Number of compute VMs to create|string|3|
+| compute_memory|Memory, in MB, to allocate to compute VMs|string|16384|
+| compute_num_cpus|Number of CPUs to allocate for compute VMs|string|3|
+| compute_disk  | size in MB   | string  |  - |
+| storage_ip_addresses|List of IP addresses for your storage nodes|list|-|
+| storage_count|Number of storage VMs to create|string|0|
+| storage_memory               | Memory, in MB to allocate to storage VMs                     | string | 65536            |
+| storage_num_cpus             | Number of CPUs to allocate for storage VMs                   | string | 16               |
+| storage_disk  | See OCS doc for sizing info   | string  |  512000 |
+| lb_ip_address                | IP Address for LoadBalancer VM on same subnet as `machine_cidr` | string | -                |
+| openshift_pull_secret        | Path to your OpenShift [pull secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) | string |              |
+| openshift_cluster_cidr       | CIDR for pods in the OpenShift SDN                           | string | 10.128.0.0/14    |
+| openshift_service_cidr       | CIDR for services in the OpenShift SDN                       | string | 172.30.0.0/16    |
+| openshift_host_prefix        | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23               |
+| cluster_public_ip |Public IP address to be used for your OCP Cluster Console   |  string |   |
+|create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
+|bastion_disk   |disk size of bastion disk   | string  |  ~200GB |
+|openshift_version   |  The version of OpenShift you want to install | string  | 4.6  |
+|fips   |  Allows you to set fips compliant mode for install |  bool | false  |
+|user_service_network_name   | Service network name from Edge / Networks & Subnets  |  string |  - |
+|user_tenant_external_network_name   | Tenant network name from Edge / Networks & Subnets  |  string | -  |
+|additional_trust_bundle   |  name of file containing cert for mirror. Read OCP restricted network install doc. Cert name should match DNS name.  | string  |  - |
+|**initialization_info object** |   |   |   |
+|public_bastion_ip |  Choose 1 of the 5 Public ip's for ssh access to the Bastion.| String  |   |
+| machine_cidr | CIDR for your CoreOS VMs in `subnet/mask` format.            | string | -                              |
+|internal_bastion_ip   |  The internal ip for the Bastion. Must be assigned an ip address within your machine_addr range. (ex. 172.16.0.10) | string  |   |
+|bastion_password   |  Initial Password for Bastion |  string |   |
+|terraform_ocp_repo   |  The github repo to be deployed to the Bastion (usually https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd) | string  |   |
+| rhel_key  |  Red Hat Activation key used to register the Bastion.   |  string |   |
+|network_name   |  The network name that will be used for your Bastion and OCP cluster (ex. ocpnet) | string  |   |
+|static_start_address   |  The start of the reserved static ip range on your network. (ex. 172.16.0.150) | string  |   |
+|static_end_address   |  The end of the reserved static ip range on your network (ex. 172.16.0.200) |  string |   |
+|bastion_template   |  The vApp Template name to use for your Bastion (ex. RedHat-8-Template-Official ) |  string |   |
+|run_cluster_install   |  true or false, if true, the cluster install will be initiated without logging on to the Bastion. The output of the install will be placed in. If the install fails, you can log in to the Bastion and look in /root/cluster_install.log for errors.The install log should normally be transfered back to your Host machine even if the install fails| bool  |   |
+|start_vms   | False, not implemented yet)  |  bool |  false |
+|**airgapped object** | (only necessary for airgapped install)  |   |   |
+|  enabled | set to true for airgapped, false for regular install  |  bool |  false |
+|ocp_ver_rel   | Full version and release loaded into your mirror (ex. 4.6.15)  | string  | -  |
+|mirror_ip   |  ip address of the server hosting mirro | string  | -  |
+| mirror_fqdn  | fqdn of the mirror host. Must match the name in the mirrors registry's cert  |  string | -  |
+|  mirror_port | port of the mirror  |string   | -  |
+|  mirror_repository |  name of repo in mirror containing OCP install images (currently should be set to `ocp4/openshift4` see RH Doc for details) |  string |  - |
+
+
+### Find vApp Template from the Image Catalog
 We need a catalog of VM images to use for our OpenShift VMs and the Bastion.
 Fortunately IBM provides a set of images that are tailored to work for OpenShift deployments.
 To browse the available images:
@@ -109,7 +230,7 @@ To browse the available images:
   * RedHat-8-Template-Official
 * If you want to add your own Catalogs and more, see the [documentation about catalogs](#about-catalogs)
 
-#### Networking Info
+### Networking Info
 VCD Networking is covered in general in the [Operator Guide/Networking](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-networking). Below is the specific network configuration required.
 
 Go your VCD console Edge Gateway/External Networks/Networks & Subnets and gather Network the network names. You will need to set the following variables in your `terraform.tfvars` file:
@@ -157,7 +278,7 @@ storage_disk = 2097152
 
 ```
 
-#### Choosing an External IP  for your cluster and Bastion and retrieving the Red Hat Activation key
+### Choosing an External IP  for your cluster and Bastion and retrieving the Red Hat Activation key
 Configure the Edge Service Gateway (ESG) to provide inbound and outbound connectivity.  For a network overview diagram, followed by general Edge setup instruction, see: https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-create-network
 
 Each vCloud Datacenter comes with 5 IBM Cloud public IP addresses which we can use for SNAT and DNAT translations in and out of the datacenter instance.  VMWare vCloud calls these `sub-allocated` addresses.
@@ -189,7 +310,7 @@ Gather the following information that you will need when configuring the ESG:
     }
 ```
 
-#### Retrieve pull secret from Red Hat sites
+### Retrieve pull secret from Red Hat sites
 Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) and place in a file on the Bastion Server. Default location is `~/.pull-secret`
 
 ## Perform Bastion install
@@ -267,7 +388,29 @@ csr-approve.sh  ignition      main.tf  network  README.md  temp     terraform.tf
 [root@vm-rhel8 terraform]#
 
 ```
-If your terraform.tfvars file is complete, you can run the commands to create your cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too.
+
+**NOTE** : If you are following the path of creating the airgap cluster path, then skip moving ahead and please go back to the [high level steps for airgap cluster](#high-level-steps-for-setting-up-the-cluster-as-airgap-install) and follow next step in the list.
+
+#### Create the OCP cluster
+
+Update the initialization_info object to set `run_cluster_install` to true as shown in the example below before executing further instructions:    
+```
+ initialization_info     = {
+    public_bastion_ip = "161.xxx.xx.xxx"
+    bastion_password = "OCP4All"
+    internal_bastion_ip = "172.16.0.10"
+    terraform_ocp_repo = "https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd"
+    rhel_key = "xxxxxxxxxxxxxxxxxxxxxx"
+    machine_cidr = "172.16.0.1/24"
+    network_name      = "ocpnet"
+    static_start_address    = "172.16.0.150"
+    static_end_address      = "172.16.0.220"
+    run_cluster_install     = true
+    }
+```
+
+If your terraform.tfvars file is complete, you can run the commands to create your cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from `/opt/terraform` dir on your bastion server.
+
 ```
 terraform init
 terraform apply --auto-approve
@@ -297,73 +440,7 @@ $ ls -l /etc/hosts
 
 
 
-#### terraform variables
-
-| Variable                     | Description                                                  | Type | Default |
-| ---------------------------- | ------------------------------------------------------------ | ---- | ------- |
-| vcd_url               | for now either https://daldir01.vmware-solutions.cloud.ibm.com/api or https://fradir01.vmware-solutions.cloud.ibm.com/api api                    | string |  |
-| vcd_user                     | VCD username                                             | string | - |
-| vcd_password             | VCD password                                             | string | - |
-| vcd_vdc                      | VCD VDC name          | string | - |
-| cluster_id                   | VCD Cluster where OpenShift will be deployed             | string | - |
-| vcd_org   |  VCD Org from VCD Console screen |  string |   |
-| rhcos_template | Name of CoreOS OVA template from prereq #2 | string | - |
-| vcd_catalog   | Name of VCD Catalog containing your templates  | string  |  Public Catalog |
-| vm_dns_addresses           | List of DNS servers to use for your OpenShift Nodes (161.26.0.10 is the IBM Cloud Private Network Internal DNS Sever in case you go airgap)          | list   | 8.8.8.8, 161.26.0.10               |
-|mac_address_prefix   |  The prefix used to create mac addresses for dhcp reservations. The last 2 digits are derived from the last 2 digits of the ip address of a given machine. The final octet of the ip address for the vm's should not be over 99. |  string |  00:50:56:01:30 |
-| base_domain                | Base domain for your OpenShift Cluster. **Note: Don't pick a base domain that is currently registered in Public DNS**.                       | string | -                              |
-| bootstrap_ip_address|IP Address for bootstrap node|string|-|
-| control_plane_count          | Number of control plane VMs to create                        | string | 3                |
-| control_plane_memory         | Memory, in MB, to allocate to control plane VMs              | string | 16384            |
-| control_plane_num_cpus| Number of CPUs to allocate for control plane VMs             |string|4|
-| control_disk  | size in MB   | string  |  - |
-| compute_ip_addresses|List of IP addresses for your compute nodes|list|-|
-| compute_count|Number of compute VMs to create|string|3|
-| compute_memory|Memory, in MB, to allocate to compute VMs|string|16384|
-| compute_num_cpus|Number of CPUs to allocate for compute VMs|string|3|
-| compute_disk  | size in MB   | string  |  - |
-| storage_ip_addresses|List of IP addresses for your storage nodes|list|-|
-| storage_count|Number of storage VMs to create|string|0|
-| storage_memory               | Memory, in MB to allocate to storage VMs                     | string | 65536            |
-| storage_num_cpus             | Number of CPUs to allocate for storage VMs                   | string | 16               |
-| storage_disk  | See OCS doc for sizing info   | string  |  512000 |
-| lb_ip_address                | IP Address for LoadBalancer VM on same subnet as `machine_cidr` | string | -                |
-| openshift_pull_secret        | Path to your OpenShift [pull secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) | string |              |
-| openshift_cluster_cidr       | CIDR for pods in the OpenShift SDN                           | string | 10.128.0.0/14    |
-| openshift_service_cidr       | CIDR for services in the OpenShift SDN                       | string | 172.30.0.0/16    |
-| openshift_host_prefix        | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23               |
-| cluster_public_ip |Public IP address to be used for your OCP Cluster Console   |  string |   |
-|create_vms_only   |  **Experimental** If you set this to true, running `terraform apply` will fail after bootstrap machine. Just run `terraform apply` again and it should complete sucessfully | bool  | false |
-|bastion_disk   |disk size of bastion disk   | string  |  ~200GB |
-|openshift_version   |  The version of OpenShift you want to install | string  | 4.6  |
-|fips   |  Allows you to set fips compliant mode for install |  bool | false  |
-|user_service_network_name   | Service network name from Edge / Networks & Subnets  |  string |  - |
-|user_tenant_external_network_name   | Tenant network name from Edge / Networks & Subnets  |  string | -  |
-|additional_trust_bundle   |  name of file containing cert for mirror. Read OCP restricted network install doc. Cert name should match DNS name.  | string  |  - |
-|**initialization_info object** |   |   |   |
-|public_bastion_ip |  Choose 1 of the 5 Public ip's for ssh access to the Bastion.| String  |   |
-| machine_cidr | CIDR for your CoreOS VMs in `subnet/mask` format.            | string | -                              |
-|internal_bastion_ip   |  The internal ip for the Bastion. Must be assigned an ip address within your machine_addr range. (ex. 172.16.0.10) | string  |   |
-|bastion_password   |  Initial Password for Bastion |  string |   |
-|terraform_ocp_repo   |  The github repo to be deployed to the Bastion (usually https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd) | string  |   |
-| rhel_key  |  Red Hat Activation key used to register the Bastion.   |  string |   |
-|network_name   |  The network name that will be used for your Bastion and OCP cluster (ex. ocpnet) | string  |   |
-|static_start_address   |  The start of the reserved static ip range on your network. (ex. 172.16.0.150) | string  |   |
-|static_end_address   |  The end of the reserved static ip range on your network (ex. 172.16.0.200) |  string |   |
-|bastion_template   |  The vApp Template name to use for your Bastion (ex. RedHat-8-Template-Official ) |  string |   |
-|run_cluster_install   |  true or false, if true, the cluster install will be initiated without logging on to the Bastion. The output of the install will be placed in. If the install fails, you can log in to the Bastion and look in /root/cluster_install.log for errors.The install log should normally be transfered back to your Host machine even if the install fails| bool  |   |
-|start_vms   | False, not implemented yet)  |  bool |  false |
-|**airgapped object** | (only necessary for airgapped install)  |   |   |
-|  enabled | set to true for airgapped, false for regular install  |  bool |  false |
-|ocp_ver_rel   | Full version and release loaded into your mirror (ex. 4.6.15)  | string  | -  |
-|mirror_ip   |  ip address of the server hosting mirro | string  | -  |
-| mirror_fqdn  | fqdn of the mirror host. Must match the name in the mirrors registry's cert  |  string | -  |
-|  mirror_port | port of the mirror  |string   | -  |
-|  mirror_repository |  name of repo in mirror containing OCP install images (currently should be set to `ocp4/openshift4` see RH Doc for details) |  string |  - |
-
-
-
-#### Let OpenShift finish the installation:
+#### Validating OpenShift cluster install completion:
 Once terraform has completed sucessfully, you will see several pieces of information display. This data will also be written to `/root/<cluster_id>info.txt` on the Bastion and to` ~/<cluster_id>info.txt` on the Host computer. As sample is below:
 ```
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
@@ -490,14 +567,14 @@ oc get routes console -n openshift-console
 
 
 ## Optional Steps:
-#### Use SSH Key rather than password authentication for Bastion login (optional)
+### Use SSH Key rather than password authentication for Bastion login (optional)
 The Bastion install process will create an ssh key and place it in  `~/.ssh/bastion_id`  
 
 For login to Bastion, you can choose to use SSH Keys and disable password login:
   - edit /etc/ssh/sshd_config and set password authentication to no
   - add your bastion_id.pub ssh key to .ssh/authorised_keys on bastion
 
-#### Move SSH to higher port (optional)
+### Move SSH to higher port (optional)
 If you want to move your ssh port to a higher port to slow down hackers that are constantly looking to hack your server at port 22 then do the following:
 1. Edit /etc/ssh/sshd_config and uncomment the line that currently reads #Port 22 and change to your desired port and save file. `systemctl stop sshd` `systemctl start sshd`
 2. `semanage port -a -t ssh_port_t -p tcp <your new port number>`
@@ -505,64 +582,25 @@ If you want to move your ssh port to a higher port to slow down hackers that are
 `firewall-cmd --add-port=<your new port>/tcp --zone=public --permanent`  
 `firewall-cmd --reload`
 1. Update your edge FW rule for your Bastion with your new port. (replace port 22 with your new port)
-### Add an NFS Server to provide Persistent storage.
+
+### Storage Configuration
+
+#### Add an NFS Server to provide Persistent storage.
 -  [Here is an article on how to set this up](https://medium.com/faun/openshift-dynamic-nfs-persistent-volume-using-nfs-client-provisioner-fcbb8c9344e). Make the NFS Storage Class the default Storage Class   
 
   `oc patch storageclass managed-nfs-storage -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'`
 
 
-### Create Openshift Container Storage Cluster for persistent storage.
+#### Create Openshift Container Storage Cluster for persistent storage.
  If you added storage nodes and want to add OCS instead of NFS for storage provisioner, Instructions here -> [Openshift Container Storage - Bare Metal Path](https://access.redhat.com/documentation/en-us/red_hat_openshift_container_storage/4.6/html-single/deploying_openshift_container_storage_using_bare_metal_infrastructure/index#installing-openshift-container-storage-operator-using-the-operator-hub_rhocs)
 
  `oc patch storageclass ocs-storagecluster-cephfs -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'`
 
-### Enable Registry
+#### Enable Registry
  - [Enable the OCP Image registry using your NFS Storage](https://docs.openshift.com/container-platform/4.5/registry/configuring_registry_storage/configuring-registry-storage-baremetal.html)
  - [Exposing the Registry](https://docs.openshift.com/container-platform/4.5/registry/securing-exposing-registry.html)
 
-### Airgapped Installation
-You will need a registry to store your images. A simple registry can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).
 
-In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
-```
-cp <your mirror cert> /etc/pki/ca-trust/source/anchors/
-update-ca-trust
-trust list | grep -i "<hostname>"
-```
-The last command will check to see if the update was successful.
-
-You will need to create your own mirror or use an existing mirror to do an airgapped install. Instructions to create a mirror for OpenShift 4.6 can be found [here](https://docs.openshift.com/container-platform/4.6/installing/install_config/installing-restricted-networks-preparations.html#installing-restricted-networks-preparations).
-
-In order for the accept CSR code to work, you will have to:
-```  
-podman pull quay.io/openshift/origin-cli:latest
-podman tag quay.io/openshift/origin-cli:latest <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest  
-podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
-````
-
-**Disable Telemetry:** You should edit your pull secret and remove the section that refers to `cloud.openshift.com`. This removes Telemetry and Health Reporting. If you don't do this before installation, you will get an error in the insights operator. After installation, go [here](https://docs.openshift.com/container-platform/4.6/support/remote_health_monitoring/opting-out-of-remote-health-reporting.html) for instructions to disable Telemetry Reporting.
-
-Run this command to stop OpenShift from looking for Operators from the Online source.  
-
-`oc patch OperatorHub cluster --type json  -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'`
-
-You may receive an Alert stating `Cluster version operator has not retrieved updates in xh xxm 17s. Failure reason RemoteFailed . For more information refer to https://console-openshift-console.apps.<cluster_id>.<base_domain>.com/settings/cluster/` this is normal and can be ignored.
-
-You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
-
-You will need to follow the instructions carefully in order to setup imagesources for any operators that you want to install.
-
-An example of the airgapped object:
-```
-airgapped = {
-      enabled = true
-      ocp_ver_rel = "4.6.15"
-      mirror_ip = "172.16.0.10"
-      mirror_fqdn = "bastion.airgapfull.cdastu.com"
-      mirror_port = "5000"
-      mirror_repository = "ocp4/openshift4"
-      }
-```
 ### Deleting Cluster (and reinstalling)
 If you want to delete your cluster, you should use `terraform destroy` as this will delete you cluster and remove all resources on VCD, including FW rules. If you manually delete your cluster via the VCD Console, remember to delete the FW rules and DNAT rules associated with your cluster or the reinstall may fail. The FW and DNAT rules should be tagged with your cluster name in the name and/or description fields.
 
