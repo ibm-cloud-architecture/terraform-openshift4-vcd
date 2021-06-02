@@ -346,7 +346,7 @@ Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/
 Once you have finished editing your terraform.tfvars file you can execute the following commands. Terraform will now create the Bastion, install and configure all necessary software and perform all network customizations associated with the Bastion. The terraform.tfvars file will be copied to the Bastion server. The pull secret and additionalTrustBundle will be copied to the Bastion if they were specified in terraform.tfvars and are in the specified location on the Host machine. If you plan to create the pull secret and additionalTrustBundle on the Bastion directly and didn't put them on your Host, ignore the error messages about the copy failing.
 If you set `run_cluster_install     = true`, your OCP cluster will be created automatically once the Bastion is configured. The results of the install can be found either on the Bastion in `/root/cluster_install.log` or on your Host machine in `~/cluster_install.log`.
 
-**NOTE** Please confirm if you have configured the `initialization_info` correctly using details from section [Configuring  initialization_info in terraform.tfvars file]() for your case before executing further steps.
+**NOTE** Please confirm if you have configured the `initialization_info` correctly using details from section [Configuring  initialization_info in terraform.tfvars file](#configuring--initialization_info-in-terraformtfvars-file) for your case before executing further steps.
 
 ```
 terraform -chdir=bastion-vm init --var-file="../terraform.tfvars"
