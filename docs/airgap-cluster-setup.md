@@ -35,7 +35,9 @@ podman tag quay.io/openshift/origin-cli:latest <mirror_fqdn>:<mirror_port>/opens
 podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
 ````
 
-#### Copy registry cert in case of registry setup in different VCD
+#### Create the airgap cluster from Bastion
+
+##### Copy registry cert in case of registry setup in different VCD
 
 This is special step and you have to perform it only if you have your mirror registry setup in other VCD than your current VCD where you are trying to create the OCP cluster.
 
@@ -47,7 +49,7 @@ We have to further mention it in the `terraform.tfvars` as below :
 additionalTrustBundle = "/opt/registry/certs/domain.crt"
 ```
 
-#### Create the airgap cluster from bastion server
+##### Create the airgap cluster from bastion server
 
 Next update your terraform.tfvars file to create the cluster and enable airgap install. The `terraform.tfvars` file that needs to be updated for this step is located in the `/opt/terraform` directory of the bastion server. We will have to make changes in three sections.
 
