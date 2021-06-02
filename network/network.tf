@@ -175,7 +175,7 @@ resource "vcd_nsxv_dnat" "dnat" {
          marker_end: "${var.cluster_id}"  
          
  %{if var.airgapped["enabled"]}
-    - name: Copy Mirro Cert for trust
+    - name: Copy Mirror Cert for trust
       shell: "cp ${var.additionalTrustBundle} /etc/pki/ca-trust/source/anchors/."
       args:
         warn: no  
