@@ -15,9 +15,9 @@ This toolkit performs an OpenShift UPI type install and will provision CoreOS no
 
 **Change History:**
   - 6/02/2021:
-      - We divided the main readme into two documents, one for the install of the OCP cluster with online path, and other one for install of the OCP cluster with airgap path.
+      - We divided the main readme into two documents, one for the setting up the OCP cluster with online path, and other one for setting up the OCP cluster with airgap path.
       - Created the high level steps for [install OCP cluster for online path](#high-level-steps-for-setting-up-the-cluster-as-online-install)
-      - Created the high level steps for [install OCP cluster for airgap path]()
+      - Created the high level steps for [install OCP cluster for airgap path](#high-level-steps-for-setting-up-the-cluster-as-airgap-install)
   - 5/07/2021:
       - Fixed issue with Edge Gateway Network selection in new Data centers. This fix requires 2 new variables to be added to your `terraform.tfvars` file. The 2 variables are `user_service_network_name` and `user_tenant_external_network_name`. See configuration info below for details.
       - Force a yum update of all packages on Bastion during build to resolve incompatibilities with newer packages
