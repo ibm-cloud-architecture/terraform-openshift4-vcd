@@ -34,7 +34,7 @@ podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
 
 #### Copy registry cert in case of registry setup in different VCD
 
-This is special step if you have your mirror registry setup in other VCD than your current VCD where you are trying to create the OCP cluster.
+This is special step and you have to perform it only if you have your mirror registry setup in other VCD than your current VCD where you are trying to create the OCP cluster.
 
 User have to manually copy  the registry cert file `/opt/registry/certs/domain.crt` ( cert file for the registry that was generated in the remote VCD bastion server while  the registry was setup) from the registry VCD bastion server, to your current VCD bastion server at some location (standard location : `/opt/registry/certs/domain.crt`). 
 
