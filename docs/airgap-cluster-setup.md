@@ -37,6 +37,8 @@ podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
 
 #### Create the airgap cluster from Bastion
 
+Once you have the bastion server ready, you can move ahead to create the arigap cluster by following below steps:
+
 ##### Copy registry cert in case of registry setup in different VCD
 
 This is special step and you have to perform it only if you have your mirror registry setup in other VCD than your current VCD where you are trying to create the OCP cluster.
