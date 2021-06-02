@@ -49,7 +49,7 @@ We have to further mention it in the `terraform.tfvars` as below :
 additionalTrustBundle = "/opt/registry/certs/domain.crt"
 ```
 
-##### Create the airgap cluster from bastion server
+##### Create the airgap cluster
 
 Next update your terraform.tfvars file to create the cluster and enable airgap install. The `terraform.tfvars` file that needs to be updated for this step is located in the `/opt/terraform` directory of the bastion server. We will have to make changes in three sections.
 
