@@ -95,7 +95,7 @@ OpenShift 4.6 User-Provided Infrastructure
   * [Step 3.1: Setting up mirror registry](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
   * [Step 3.2: Create a mirror for OpenShift 4.6 images](docs/airgap-cluster-setup.md#create-a-mirror-for-openshift-46-images)
 * [Step 4: Create the airgap cluster from Bastion](docs/airgap-cluster-setup.md#create-the-airgap-cluster-from-bastion-server)
-  * [Step 4.1: Copy registry cert in case of registry setup in different VCD]()
+  * [Step 4.1: Copy registry cert in case of registry setup in different VCD](#docs/airgap-cluster-setup.md#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
   * [Step 4.2: Create the airgap cluster](docs/airgap-cluster-setup.md#create-the-airgap-cluster-from-bastion-server)
   * [Step 4.3: Client setup](#client-setup)
   * [Step 4.4: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
