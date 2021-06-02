@@ -10,6 +10,9 @@ Please follow the steps from main document [high level steps to setup the airgap
 
 
 #### Setting up mirror registry
+
+If you have a mirror registry already setup in some other VCD by your team, then you can skip setting up the mirror registry and directly create the OCP cluster by following the instructions [here]()
+
 You will need a registry to store your images. A simple registry can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).
 
 In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
