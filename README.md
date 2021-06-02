@@ -62,6 +62,7 @@ OpenShift 4.6 User-Provided Infrastructure
 
 ## High Level Steps for setting up the cluster as online install
 ----------------------------------------------------------------
+**Note** : Please follow these steps in sequence using the steps below, and come back here to navigate after each section link you click and complete it.
 
 * [Step 1: Order a VCD](#order-a-vcd)
 * [Step 2: Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
@@ -84,6 +85,7 @@ OpenShift 4.6 User-Provided Infrastructure
 
 ## High Level Steps for setting up the cluster as airgap install
 ----------------------------------------------------------------
+**Note** : Please follow these steps in sequence using the steps below, and come back here to navigate after each section link you click and complete it.
 
 * [Step 1: Order a VCD](#order-a-vcd)
 * [Step 2: Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
