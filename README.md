@@ -383,7 +383,7 @@ csr-approve.sh  ignition      main.tf  network  README.md  temp     terraform.tf
 
 ```
 
-**NOTE** : If you are following the path of creating the airgap cluster path, then please go back to the [high level steps for airgap cluster](#high-level-steps-for-setting-up-the-cluster-as-airgap-install)
+**NOTE** : If you are following the path of creating the airgap cluster path, then skip moving ahead and please go back to the [high level steps for airgap cluster](#high-level-steps-for-setting-up-the-cluster-as-airgap-install) and follow next step in the list.
 
 #### Create the OCP cluster
 
