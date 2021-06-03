@@ -304,10 +304,11 @@ resource "null_resource" "setup_bastion" {
 resource "null_resource" "setup_ssh" {
  
   provisioner "local-exec" {
-      command = templatefile("${path.module}/scripts/fix_ssh.sh.tmpl", {
+      command = templatefile("${path.module}/scripts/fix_ssh.sh.tmpl" , {
          bastion_password            = var.initialization_info["bastion_password"]
          public_bastion_ip           = var.initialization_info["public_bastion_ip"] 
     })
+      interpreter = ["/usr/bin/bash", "-c"]
   }
     depends_on = [
         vcd_vapp_vm.bastion 
