@@ -37,7 +37,7 @@ podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
 
 #### Create the airgap cluster from Bastion
 
-Once you have the bastion server ready, **NOTE** you have follow the section [Adding the registry to your pull secret](https://docs.openshift.com/container-platform/4.2/installing/install_config/installing-restricted-networks-preparations.html#installation-adding-registry-pull-secret_installing-restricted-networks-preparations)
+Once you have the bastion server ready, **NOTE** you have to follow the section [Adding the registry to your pull secret](https://docs.openshift.com/container-platform/4.2/installing/install_config/installing-restricted-networks-preparations.html#installation-adding-registry-pull-secret_installing-restricted-networks-preparations)
 
 
 Then you can move ahead to create the arigap cluster by following below steps:
