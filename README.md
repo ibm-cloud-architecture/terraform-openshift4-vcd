@@ -14,8 +14,12 @@ This toolkit performs an OpenShift UPI type install and will provision CoreOS no
 **NOTE**: Requires terraform 0.13 or later.  
 
 **Change History:**
+
+  - 6/04/2021:  
+      - updates to add additonal network related entries necessary for airgapped install to handle access to mirror. Also trust cert for airgap install.
+      - Fix to force bash shell when host machine default shell is not bash (ie Ubuntu). Tested on Ubuntu 20
   - 6/02/2021:
-      - We divided the main readme into two documents, one for the setting up the OCP cluster with online path, and other one for setting up the OCP cluster with airgap path.
+      - We divided the main readme into two documents, one for the setting up the OCP cluster with online path, and other one for setting  up the OCP cluster with airgap path.
       - Created the high level steps for [install OCP cluster for online path](#high-level-steps-for-setting-up-the-cluster-as-online-install)
       - Created the high level steps for [install OCP cluster for airgap path](#high-level-steps-for-setting-up-the-cluster-as-airgap-install)
   - 5/07/2021:
@@ -73,7 +77,7 @@ OpenShift 4.6 User-Provided Infrastructure
   * [Step 2.1: Setup Host Machine](#setup-host-machine)
   * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
   * [Step 2.3: Perform Bastion install and create the online ocp cluster](#perform-bastion-install)
-    * [Step 2.3.1: Login to Bastion](#login-to-bastion) 
+    * [Step 2.3.1: Login to Bastion](#login-to-bastion)
     * [Step 2.3.2: Create the online ocp cluster](#create-the-ocp-cluster)
     * [Step 2.3.3: Client setup](#client-setup)
     * [Step 2.3.4: Validate OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
@@ -96,7 +100,7 @@ OpenShift 4.6 User-Provided Infrastructure
   * [Step 2.1: Setup Host Machine](#setup-host-machine)
   * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
   * [Step 2.3: Perform Bastion install](#perform-bastion-install)
-    * [Step 2.3.1: Login to Bastion](#login-to-bastion) 
+    * [Step 2.3.1: Login to Bastion](#login-to-bastion)
 * [Step 3: Setting up mirror registry on Bastion](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
   * [Step 3.1: Setting up mirror registry](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
   * [Step 3.2: Create a mirror for OpenShift 4.6 images](docs/airgap-cluster-setup.md#create-a-mirror-for-openshift-46-images)
@@ -294,9 +298,9 @@ Gather the following information that you will need when configuring the ESG:
 - The Red Hat Activation key can be retrieved from this screen to populate `rhel_key`
 
 - Bastion server install with online path
-  
+
   **NOTE** If you are trying to install the OCP cluster using online path you should follow this part.
-    
+
   - Set `run_cluster_install` to true.
   - Your terraform.tfvars entries should look something like this:    
 ```
@@ -317,9 +321,9 @@ Gather the following information that you will need when configuring the ESG:
 ```
 
 - Bastion server install with airgap path
-  
+
   **NOTE** If you are trying to install the OCP cluster using the airgap path you should follow this part.
-  
+
   - Set run_cluster_install to false. We need to configure the mirror registry first before we setup the cluster.
   - Your terraform.tfvars entries should look something like this:    
 ```
