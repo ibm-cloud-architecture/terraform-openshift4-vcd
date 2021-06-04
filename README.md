@@ -141,7 +141,7 @@ You will order a **VMware Solutions Shared** instance in IBM Cloud(below).  When
 
 # Installing the Bastion and initial network configuration
 ## Setup Host Machine
-You will need a "Host" machine to perform the initial Bastion install and configuration. This process has only been tested on a RHEL8 Linux machine and a Mac but may work on other linux based systems that support the required software. You should have the following installed on your Host:
+You will need a "Host" machine to perform the initial Bastion install and configuration. This process has only been tested on a RHEL8 Linux machine, Ubuntu 20 and a Mac but may work on other linux based systems that support the required software. You should have the following installed on your Host:
  - ansible [instructions here](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
  - git
  - terraform [instructons here](https://www.terraform.io/downloads.html)
