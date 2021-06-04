@@ -97,7 +97,7 @@ OpenShift 4.6 User-Provided Infrastructure
   * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
   * [Step 2.3: Perform Bastion install](#perform-bastion-install)
     * [Step 2.3.1: Login to Bastion](#login-to-bastion) 
-* [Step 3: Setting up mirror registry on Bastion](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
+* [Step 3: Setting up mirror registry on Bastion (Skip this if you if you have a mirror registry already setup with the OCP images mirrored)](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
   * [Step 3.1: Setting up mirror registry](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
   * [Step 3.2: Create a mirror for OpenShift 4.6 images](docs/airgap-cluster-setup.md#create-a-mirror-for-openshift-46-images)
 * [Step 4: Create the airgap cluster from Bastion](docs/airgap-cluster-setup.md#create-the-airgap-cluster-from-bastion)
