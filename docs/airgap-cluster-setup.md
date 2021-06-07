@@ -63,13 +63,13 @@ Next update your terraform.tfvars file to create the cluster and enable airgap i
 Update the trust bundle for your mirror registry following steps [Copy registry cert in case of registry setup in different VCD](#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
 
 
-Update the redhat_pull_secret:
+* Update the redhat_pull_secret:
 
 ```
 openshift_pull_secret = "<path to pull secret JSON file created in the previous section>"
 ```
 
-Update the airgapped object based on the example below:
+* Update the `airgapped` object based on the example below:
 
 ```
 airgapped = {
@@ -82,7 +82,7 @@ airgapped = {
       }
 ```
 
-Update the initialization_info object to set `run_cluster_install` to true as shown in the example below:    
+* Update the `initialization_info` object to set `run_cluster_install` to true as shown in the example below:    
 ```
  initialization_info     = {
     public_bastion_ip = "161.xxx.xx.xxx"
