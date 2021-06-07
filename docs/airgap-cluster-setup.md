@@ -130,9 +130,12 @@ You may receive an Alert stating `Cluster version operator has not retrieved upd
 
 Assuming that you have a mirror registry where the redhat catalogs are mirrored, now you will configure the catalog access by following below steps
 
+**Pre-requisite**:
+
 * You need to have the shared files `imageContentSourcePolicy.yaml` and `catalogSource.yaml` that was generated as a process of mirroring the catalogs in shared registry.
+
+**Steps**:
 * Once you have the access to these files run below commands:
-  
 
 Setting the mirror policy for the catalog images
 
