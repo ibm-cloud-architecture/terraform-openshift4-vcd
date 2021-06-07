@@ -123,10 +123,21 @@ You may receive an Alert stating `Cluster version operator has not retrieved upd
 
 ##### Configure mirrored redhat operators catalog
 
-You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
+Assuming that you have a mirror registry where the redhat catalogs are mirrored, now you will configure the catalog access by following below steps
 
-You will need to follow the instructions carefully in order to setup imagesources for any operators that you want to install.
+* You need to have the shared files `imageContentSourcePolicy.yaml` and `catalogSource.yaml` that was generated as a process of mirroring the catalogs in shared registry.
+* Once you have the access to these files run below commands:
+  * Setting the mirror policy for the catalog images
 
+```
+oc apply -f imageContentSourcePolicy.yaml
+```
+
+  * Creating the catalogsource for the mirrored catalogs
+
+```
+oc apply -f catalogSource.yaml
+```
 
 #### Storage Configuration
 
