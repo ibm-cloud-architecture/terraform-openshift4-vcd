@@ -96,7 +96,7 @@ OpenShift 4.6 User-Provided Infrastructure
 * [Step 2: Setup Host Machine Pre-requisites](#setup-host-machine)
   * [Step 2.1: Setup Host Machine](#setup-host-machine)
   * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
-* [Step 3: Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
+* [Step 3: Perform Bastion install](#perform-bastion-install)
   * [Step 3.1: Perform Bastion install](#perform-bastion-install)
     * [Step 3.1.1: Login to Bastion](#login-to-bastion)
 * [Step 3: Setting up mirror registry on Bastion](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
