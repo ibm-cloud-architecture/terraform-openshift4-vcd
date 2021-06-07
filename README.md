@@ -88,7 +88,7 @@ OpenShift 4.6 User-Provided Infrastructure
 * [Step 5: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
 
 
-## High Level Steps for setting up shared mirror registry for airgap install
+## High Level Steps for setting up shared mirror registry for airgap install (Skip this if you if you have a mirror registry already setup with the OCP images mirrored)
 ----------------------------------------------------------------
 **Note** : Please follow these steps in sequence using the steps below, and come back here to navigate after each section link you click and complete it.
 
@@ -98,7 +98,7 @@ OpenShift 4.6 User-Provided Infrastructure
   * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
   * [Step 2.3: Perform Bastion install](#perform-bastion-install)
     * [Step 2.3.1: Login to Bastion](#login-to-bastion)
-* [Step 3: Setting up mirror registry on Bastion (Skip this if you if you have a mirror registry already setup with the OCP images mirrored)](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
+* [Step 3: Setting up mirror registry on Bastion](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
   * [Step 3.1: Setting up mirror registry](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
   * [Step 3.2: Create a mirror for OpenShift 4.6 images](docs/airgap-cluster-setup.md#create-a-mirror-for-openshift-46-images)
   * [Step 3.3: Create a mirror for redhat operators catalog](docs/airgap-cluster-setup.md#create-a-mirror-for-redhat-openshift-catalogs)
