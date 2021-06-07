@@ -76,6 +76,8 @@ openshift_pull_secret = "<path to pull secret JSON file created in the previous 
 ```
 
 * Update the `airgapped` object based on the example below:
+  *  Update `enabled = true`
+  *  Provide the mirror registry details for the shared mirror registry where all your OCP images are mirrored , this will help to install the OCP cluster further.
 
 ```
 airgapped = {
@@ -88,7 +90,12 @@ airgapped = {
       }
 ```
 
-* Update the `initialization_info` object to set `run_cluster_install` to true as shown in the example below:    
+* Update the `initialization_info` object to set `run_cluster_install` to true as shown in the example below:
+  * Updated `run_cluster_install = true` , which will create the OCP cluster
+  * Update the `public_bastion_ip` and `cluster_public_ip` with the public ips that are available for your VCD
+
+cluster_public_ip       = "161.xxx.x.xxx"
+
 ```
  initialization_info     = {
     public_bastion_ip = "161.xxx.xx.xxx"
