@@ -39,7 +39,7 @@ podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
 
 You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
 
-**NOTE** Only follow the instructions for mirroring the catalog images.
+**NOTE** Only follow the instructions for mirroring the catalog images and save the `imageContentSourcePolicy.yaml` and `catalogSource.yaml` that gets generated  in the directory `manifests-<index_image_name>-<random_number>` after the `oc adm catalog mirror` command is completed. These two files needs to be shared with the team who would use this shared registry to get the redhat catalogs setup in their airgap cluster once it will be created by them.
 
 
 #### Create the airgap cluster from Bastion
