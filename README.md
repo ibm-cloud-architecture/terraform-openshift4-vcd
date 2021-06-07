@@ -158,6 +158,7 @@ You will need a "Host" machine to perform the initial Bastion install and config
  - ansible [instructions here](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
  - git
  - terraform [instructons here](https://www.terraform.io/downloads.html)
+ - jq [install instructions](https://stedolan.github.io/jq/download/)
 
 
 On your Host, clone the git repository. After cloning the repo, You will need to edit `terraform.tfvars` as appropriate, setting up all the information necessary to create your cluster. You will need to set the vcd information as well as public ip's, etc. Instructions on gathering key pieces of informaton are below.
