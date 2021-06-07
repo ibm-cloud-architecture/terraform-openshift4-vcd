@@ -58,7 +58,7 @@ additionalTrustBundle = "/opt/registry/certs/domain.crt"
 
 ##### Update the terraform.tfvars airgap parameters
 
-Next update your terraform.tfvars file to create the cluster and enable airgap install. The `terraform.tfvars` file that needs to be updated for this step is located in the `/opt/terraform` directory of the bastion server. We will have to make changes in three sections.
+Next update your terraform.tfvars file to create the cluster and enable airgap install. We will have to make changes in below sections.
 
 Update the trust bundle for your mirror registry following steps [Copy registry cert in case of registry setup in different VCD](#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
 
