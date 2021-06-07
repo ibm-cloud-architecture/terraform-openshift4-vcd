@@ -414,9 +414,6 @@ csr-approve.sh  ignition      main.tf  network  README.md  temp     terraform.tf
 
 ```
 
-**NOTE** : If you are following the path of creating the airgap cluster path, then skip moving ahead and please go back to the [high level steps for airgap cluster](#high-level-steps-for-setting-up-the-cluster-as-airgap-install) and follow next step in the list.
-
-
 #### Client setup
 
 On the **Client** that you will access the OCP Console, (your Mac, PC, etc.) add name resolution to direct console to the **Public IP** of the LoadBalancer in /etc/hosts on the client that will login to the Console UI.
