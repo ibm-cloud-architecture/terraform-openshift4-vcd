@@ -119,7 +119,6 @@ OpenShift 4.6 User-Provided Infrastructure
     * [Step 2.3.1: Login to Bastion](#login-to-bastion) 
     * [Step 2.3.2: Client setup](#client-setup)
     * [Step 2.3.3: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
-    * [Step 2.3.4: Create the airgap cluster](docs/airgap-cluster-setup.md#create-the-airgap-cluster)
 * [Step 5: Post install cluster configuration](docs/airgap-cluster-setup.md#post-install-cluster-configuration)
   * [Step 5.1: Mirror redhat operators catalog](docs/airgap-cluster-setup.md#mirror-redhat-operators-catalog)
 * [Step 6: Storage configuration](docs/airgap-cluster-setup.md#storage-configuration)
