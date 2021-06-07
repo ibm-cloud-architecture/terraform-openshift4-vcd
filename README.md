@@ -307,9 +307,7 @@ Gather the following information that you will need when configuring the ESG:
 - Take an unused IP and set `cluster_public_ip` and for `public_bastion_ip`
 - The Red Hat Activation key can be retrieved from this screen to populate `rhel_key`
 
-- Bastion server install with online path
-  
-  **NOTE** If you are trying to install the OCP cluster using online path you should follow this part.
+- Bastion server install with both online or airgap path
     
   - Set `run_cluster_install` to true.
   - Your terraform.tfvars entries should look something like this:    
@@ -327,29 +325,6 @@ Gather the following information that you will need when configuring the ESG:
     static_start_address    = "172.16.0.150"
     static_end_address      = "172.16.0.220"
     run_cluster_install     = true
-    }
-```
-
-- Bastion server install with airgap path
-  
-  **NOTE** If you are trying to install the OCP cluster using the airgap path you should follow this part.
-  
-  - Set run_cluster_install to false. We need to configure the mirror registry first before we setup the cluster.
-  - Your terraform.tfvars entries should look something like this:    
-```
- cluster_public_ip  = "161.yyy.yy.yyy"
-
- initialization_info     = {
-    public_bastion_ip = "161.xxx.xx.xxx"
-    bastion_password = "OCP4All"
-    internal_bastion_ip = "172.16.0.10"
-    terraform_ocp_repo = "https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd"
-    rhel_key = "xxxxxxxxxxxxxxxxxxxxxx"
-    machine_cidr = "172.16.0.1/24"
-    network_name      = "ocpnet"
-    static_start_address    = "172.16.0.150"
-    static_end_address      = "172.16.0.220"
-    run_cluster_install     = false
     }
 ```
 
