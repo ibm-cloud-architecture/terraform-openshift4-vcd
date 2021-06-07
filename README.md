@@ -108,6 +108,10 @@ OpenShift 4.6 User-Provided Infrastructure
 **Note** : Please follow these steps in sequence using the steps below, and come back here to navigate after each section link you click and complete it.
 
 * [Step 1: Order a VCD](#order-a-vcd)
+* [Step 2: Setup Host Machine Pre-requisites](#setup-host-machine)
+  * [Step 2.1: Setup Host Machine](#setup-host-machine)
+  * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
+  * [Step 2.3: Adding the registry creds to redhat pull-secret.json](#)
 * [Step 2: Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
   * [Step 2.1: Setup Host Machine](#setup-host-machine)
   * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
