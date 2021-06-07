@@ -58,9 +58,11 @@ additionalTrustBundle = "/opt/registry/certs/domain.crt"
 
 ##### Update the terraform.tfvars airgap parameters
 
+
+
 Next update your terraform.tfvars file to create the cluster and enable airgap install. We will have to make changes in below sections.
 
-Update the trust bundle for your mirror registry following steps [Copy registry cert in case of registry setup in different VCD](#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
+* Update the trust bundle for your mirror registry following steps [Copy registry cert in case of registry setup in different VCD](#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
 
 
 * Update the redhat_pull_secret:
