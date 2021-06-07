@@ -42,13 +42,7 @@ You will also need to mirror any operators that you will need and place them in 
 **NOTE** Only follow the instructions for mirroring the catalog images and save the `imageContentSourcePolicy.yaml` and `catalogSource.yaml` that gets generated  in the directory `manifests-<index_image_name>-<random_number>` after the `oc adm catalog mirror` command is completed. These two files needs to be shared with the team who would use this shared registry to get the redhat catalogs setup in their airgap cluster once it will be created by them.
 
 
-#### Create the airgap cluster from Bastion
-
-Once you have the bastion server ready, **NOTE** you have to follow the section [Adding the registry creds to your pull secret](https://docs.openshift.com/container-platform/4.4/installing/install_config/installing-restricted-networks-preparations.html#installation-adding-registry-pull-secret_installing-restricted-networks-preparations)
-
-
-Then you can move ahead to create the arigap cluster by following below steps:
-
+#### Setup airgap pre-requisites
 
 ##### Copy registry cert in case of registry setup in different VCD
 
