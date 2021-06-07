@@ -44,6 +44,8 @@ You will also need to mirror any operators that you will need and place them in 
 
 #### Setup airgap pre-requisites
 
+##### Add the mirror creds in the pull-secret.json by following the steps in [Adding shared mirror registry creds in redhat pull-secret.json](https://docs.openshift.com/container-platform/4.4/installing/install_config/installing-restricted-networks-preparations.html#installation-adding-registry-pull-secret_installing-restricted-networks-preparations)
+
 ##### Copy registry cert in case of registry setup in different VCD
 
 This is special step and you have to perform it only if you have your mirror registry setup in other VCD than your current VCD where you are trying to create the OCP cluster.
