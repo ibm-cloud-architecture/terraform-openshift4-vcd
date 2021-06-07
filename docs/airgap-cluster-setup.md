@@ -53,7 +53,8 @@ Follow thes steps to add your shared registry credentials in the pull-secret.jso
 This is special step and you have to perform it only if you have your mirror registry setup in other VCD than your current VCD where you are trying to create the OCP cluster.
 
 **Pre-requisite**
-1. Access to the shared registry `domain.crt` file.
+
+* Access to the shared registry `domain.crt` file.
 
 **Steps**
 
