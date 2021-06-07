@@ -165,8 +165,19 @@ On your Host, clone the git repository. After cloning the repo, You will need to
 ```
 git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd
 cd terraform-openshift4-vcd
+```
+
+If you are planning to install the OCP cluster with airgap path then 
+```
+cp terraform.tfvars.airgap.example terraform.tfvars
+```
+
+If you are planning to install the OCP cluster with online path then 
+```
 cp terraform.tfvars.example terraform.tfvars
 ```
+
+
 Edit terraform.tfvars per the terraform variables section
 ## Gather Information for terraform.tfvars
 
