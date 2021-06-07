@@ -362,6 +362,9 @@ If you set `run_cluster_install     = true`, your OCP cluster will be created au
 
 **NOTE** Please confirm if you have configured the `initialization_info` correctly using details from section [Configuring  initialization_info in terraform.tfvars file](#configuring--initialization_info-in-terraformtfvars-file) for your case before executing further steps.
 
+If your terraform.tfvars file is complete, you can run the commands to create your bastion vm and cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from `/opt/terraform` dir on your bastion server.
+
+
 ```
 terraform -chdir=bastion-vm init --var-file="../terraform.tfvars"
 terraform -chdir=bastion-vm plan --var-file="../terraform.tfvars"
@@ -436,30 +439,6 @@ csr-approve.sh  ignition      main.tf  network  README.md  temp     terraform.tf
 
 **NOTE** : If you are following the path of creating the airgap cluster path, then skip moving ahead and please go back to the [high level steps for airgap cluster](#high-level-steps-for-setting-up-the-cluster-as-airgap-install) and follow next step in the list.
 
-#### Create the OCP cluster
-
-Update the initialization_info object to set `run_cluster_install` to true as shown in the example below before executing further instructions:    
-```
- initialization_info     = {
-    public_bastion_ip = "161.xxx.xx.xxx"
-    bastion_password = "OCP4All"
-    internal_bastion_ip = "172.16.0.10"
-    terraform_ocp_repo = "https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd"
-    rhel_key = "xxxxxxxxxxxxxxxxxxxxxx"
-    machine_cidr = "172.16.0.1/24"
-    network_name      = "ocpnet"
-    static_start_address    = "172.16.0.150"
-    static_end_address      = "172.16.0.220"
-    run_cluster_install     = true
-    }
-```
-
-If your terraform.tfvars file is complete, you can run the commands to create your cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from `/opt/terraform` dir on your bastion server.
-
-```
-terraform init
-terraform apply --auto-approve
-```
 
 #### Client setup
 
