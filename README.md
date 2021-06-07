@@ -114,6 +114,7 @@ OpenShift 4.6 User-Provided Infrastructure
   * [Step 2.3: Adding the registry creds to redhat pull-secret.json](#)
   * [Step 2.4: Setup airgap pre-requisites](docs/airgap-cluster-setup.md#setup-airgap-pre-requisites)
     * [Step 2.4.1: Copy registry cert in case of shared registry from different VCD](docs/airgap-cluster-setup.md#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
+    * [Step 2.4.2: Update the terraform.tfvars airgap parameters]()
 * [Step 2: Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
   * [Step 2.3: Perform Bastion install](#perform-bastion-install)
     * [Step 2.3.1: Login to Bastion](#login-to-bastion) 
