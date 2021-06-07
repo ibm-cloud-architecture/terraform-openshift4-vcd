@@ -55,6 +55,8 @@ This is special step and you have to perform it only if you have your mirror reg
 *Pre-requisite*
 1. Access to the shared registry `domain.crt` file.
 
+*Steps*
+
 * User have to manually copy  the registry cert file `domain.crt` (cert file for the registry ) from the shared location by your team, to your current hostmachine where you will be creating the cluster (standard location to keep this file: `/opt/registry/certs/domain.crt`). 
 
 * Further mention it in the `terraform.tfvars` as below : 
