@@ -127,13 +127,15 @@ Assuming that you have a mirror registry where the redhat catalogs are mirrored,
 
 * You need to have the shared files `imageContentSourcePolicy.yaml` and `catalogSource.yaml` that was generated as a process of mirroring the catalogs in shared registry.
 * Once you have the access to these files run below commands:
-  * Setting the mirror policy for the catalog images
+  
+
+Setting the mirror policy for the catalog images
 
 ```
 oc apply -f imageContentSourcePolicy.yaml
 ```
-  * Setting the mirror policy for the catalog images
-  * Creating the catalogsource for the mirrored catalogs
+
+Creating the catalogsource for the mirrored catalogs
 
 ```
 oc apply -f catalogSource.yaml
