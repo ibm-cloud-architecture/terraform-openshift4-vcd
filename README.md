@@ -69,48 +69,65 @@ OpenShift 4.6 User-Provided Infrastructure
 **Note** : Please follow these steps in sequence using the steps below, and come back here to navigate after each section link you click and complete it.
 
 * [Step 1: Order a VCD](#order-a-vcd)
-* [Step 2: Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
+* [Step 2: Setup Host Machine Pre-requisites](#setup-host-machine)
   * [Step 2.1: Setup Host Machine](#setup-host-machine)
   * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
-  * [Step 2.3: Perform Bastion install and create the online ocp cluster](#perform-bastion-install)
+* [Step 3: Perform Bastion install and Create the airgap cluster](#perform-bastion-install)
     * [Step 2.3.1: Login to Bastion](#login-to-bastion) 
-    * [Step 2.3.2: Create the online ocp cluster](#create-the-ocp-cluster)
-    * [Step 2.3.3: Client setup](#client-setup)
-    * [Step 2.3.4: Validate OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
-* [Step 3: Debugging the OCP installation](#debugging-the-ocp-installation)
-* [Step 4: Optional Steps](#optional-steps)
-  * [Step 4.1: Use SSH Key rather than password authentication for Bastion login](#use-ssh-key-rather-than-password-authentication-for-bastion-login-optional)
-  * [Step 4.2: Move SSH to higher port ](#move-ssh-to-higher-port-optional)
-  * [Step 4.3: Storage Configuration](#storage-configuration)
-    * [Step 4.3.1: Add an NFS Server to provide Persistent storage](#add-an-nfs-server-to-provide-persistent-storage)
-    * [Step 4.3.2: Create Openshift Container Storage Cluster for persistent storage](#create-openshift-container-storage-cluster-for-persistent-storage)
-    * [Step 4.3.3: Enable Registry](#enable-registry)
-* [Step 5: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
+    * [Step 2.3.2: Client setup](#client-setup)
+    * [Step 2.3.3: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
+* [Step 4: Debugging the OCP installation](#debugging-the-ocp-installation)
+* [Step 5: Optional Steps](#optional-steps)
+  * [Step 5.1: Use SSH Key rather than password authentication for Bastion login](#use-ssh-key-rather-than-password-authentication-for-bastion-login-optional)
+  * [Step 5.2: Move SSH to higher port ](#move-ssh-to-higher-port-optional)
+  * [Step 5.3: Storage Configuration](#storage-configuration)
+    * [Step 5.3.1: Add an NFS Server to provide Persistent storage](#add-an-nfs-server-to-provide-persistent-storage)
+    * [Step 5.3.2: Create Openshift Container Storage Cluster for persistent storage](#create-openshift-container-storage-cluster-for-persistent-storage)
+    * [Step 5.3.3: Enable Registry](#enable-registry)
+* [Step 6: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
 
-## High Level Steps for setting up the cluster as airgap install
+
+## High Level Steps for setting up shared mirror registry for airgap install (Skip this if you if you have a mirror registry already setup with the OCP images mirrored)
 ----------------------------------------------------------------
 **Note** : Please follow these steps in sequence using the steps below, and come back here to navigate after each section link you click and complete it.
 
 * [Step 1: Order a VCD](#order-a-vcd)
-* [Step 2: Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
+* [Step 2: Setup Host Machine Pre-requisites](#setup-host-machine)
   * [Step 2.1: Setup Host Machine](#setup-host-machine)
   * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
-  * [Step 2.3: Perform Bastion install](#perform-bastion-install)
-    * [Step 2.3.1: Login to Bastion](#login-to-bastion) 
-* [Step 3: Setting up mirror registry on Bastion (Skip this if you if you have a mirror registry already setup with the OCP images mirrored)](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
+* [Step 3: Perform Bastion install](#perform-bastion-install)
+  * [Step 3.1: Perform Bastion install](#perform-bastion-install)
+    * [Step 3.1.1: Login to Bastion](#login-to-bastion)
+* [Step 3: Setting up mirror registry on Bastion](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
   * [Step 3.1: Setting up mirror registry](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
   * [Step 3.2: Create a mirror for OpenShift 4.6 images](docs/airgap-cluster-setup.md#create-a-mirror-for-openshift-46-images)
-* [Step 4: Create the airgap cluster from Bastion](docs/airgap-cluster-setup.md#create-the-airgap-cluster-from-bastion)
-  * [Step 4.1: Copy registry cert in case of registry setup in different VCD](docs/airgap-cluster-setup.md#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
-  * [Step 4.2: Create the airgap cluster](docs/airgap-cluster-setup.md#create-the-airgap-cluster)
-  * [Step 4.3: Client setup](#client-setup)
-  * [Step 4.4: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
-* [Step 5: Post install cluster configuration](docs/airgap-cluster-setup.md#post-install-cluster-configuration)
-  * [Step 5.1: Mirror redhat operators catalog](docs/airgap-cluster-setup.md#mirror-redhat-operators-catalog)
-* [Step 6: Storage configuration](docs/airgap-cluster-setup.md#storage-configuration)
-* [Step 7: Debugging the OCP installation](#debugging-the-ocp-installation)
-* [Step 8: Optional Steps](#optional-steps)
-* [Step 9: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
+  * [Step 3.3: Create a mirror for redhat operators catalog](docs/airgap-cluster-setup.md#create-a-mirror-for-redhat-openshift-catalogs)
+
+## High Level Steps for setting up the cluster as airgap install
+----------------------------------------------------------------
+**Note** : Please confirm if you have a shared mirrored registry, else follow the steps [here](#high-level-steps-for-setting-up-shared-mirror-registry-for-airgap-install-skip-this-if-you-if-you-have-a-mirror-registry-already-setup-with-the-ocp-images-mirrored) and then continue.
+
+Please follow these steps in sequence using the steps below, and come back here to navigate after each section link you click and complete it.
+
+* [Step 1: Order a VCD](#order-a-vcd)
+* [Step 2: Setup Host Machine Pre-requisites](#setup-host-machine)
+  * [Step 2.1: Setup Host Machine](#setup-host-machine)
+  * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
+  * [Step 2.4: Setup airgap pre-requisites](docs/airgap-cluster-setup.md#setup-airgap-pre-requisites)
+    * [Step 2.4.1: Adding the registry creds to redhat pull-secret.json](docs/airgap-cluster-setup.md#add-the-mirror-creds-in-the-pull-secretjson)
+    * [Step 2.4.2: Copy registry cert in case of shared registry from different VCD](docs/airgap-cluster-setup.md#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
+    * [Step 2.4.3: Update the terraform.tfvars airgap parameters](docs/airgap-cluster-setup.md#update-the-terraformtfvars-airgap-parameters)
+* [Step 3: Perform Bastion install and Create the airgap cluster](#perform-bastion-install)
+    * [Step 2.3.1: Login to Bastion](#login-to-bastion) 
+    * [Step 2.3.2: Client setup](#client-setup)
+    * [Step 2.3.3: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
+* [Step 4: Debugging the OCP installation](#debugging-the-ocp-installation)
+* [Step 4: Post install cluster configuration](docs/airgap-cluster-setup.md#post-install-cluster-configuration)
+  * [Step 4.1: Configure mirrored redhat operators catalog](docs/airgap-cluster-setup.md#configure-mirrored-redhat-operators-catalog)
+* [Step 5: Storage configuration](docs/airgap-cluster-setup.md#storage-configuration)
+* [Step 6: Debugging the OCP installation](#debugging-the-ocp-installation)
+* [Step 7: Optional Steps](#optional-steps)
+* [Step 8: Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
 
 
 
@@ -141,6 +158,7 @@ You will need a "Host" machine to perform the initial Bastion install and config
  - ansible [instructions here](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
  - git
  - terraform [instructons here](https://www.terraform.io/downloads.html)
+ - jq [install instructions](https://stedolan.github.io/jq/download/)
 
 
 On your Host, clone the git repository. After cloning the repo, You will need to edit `terraform.tfvars` as appropriate, setting up all the information necessary to create your cluster. You will need to set the vcd information as well as public ip's, etc. Instructions on gathering key pieces of informaton are below.
@@ -148,8 +166,19 @@ On your Host, clone the git repository. After cloning the repo, You will need to
 ```
 git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd
 cd terraform-openshift4-vcd
+```
+
+If you are planning to install the OCP cluster with airgap path then 
+```
+cp terraform.tfvars.airgap.example terraform.tfvars
+```
+
+If you are planning to install the OCP cluster with online path then 
+```
 cp terraform.tfvars.example terraform.tfvars
 ```
+
+
 Edit terraform.tfvars per the terraform variables section
 ## Gather Information for terraform.tfvars
 
@@ -293,9 +322,7 @@ Gather the following information that you will need when configuring the ESG:
 - Take an unused IP and set `cluster_public_ip` and for `public_bastion_ip`
 - The Red Hat Activation key can be retrieved from this screen to populate `rhel_key`
 
-- Bastion server install with online path
-  
-  **NOTE** If you are trying to install the OCP cluster using online path you should follow this part.
+- Bastion server install with both online or airgap path
     
   - Set `run_cluster_install` to true.
   - Your terraform.tfvars entries should look something like this:    
@@ -316,29 +343,6 @@ Gather the following information that you will need when configuring the ESG:
     }
 ```
 
-- Bastion server install with airgap path
-  
-  **NOTE** If you are trying to install the OCP cluster using the airgap path you should follow this part.
-  
-  - Set run_cluster_install to false. We need to configure the mirror registry first before we setup the cluster.
-  - Your terraform.tfvars entries should look something like this:    
-```
- cluster_public_ip  = "161.yyy.yy.yyy"
-
- initialization_info     = {
-    public_bastion_ip = "161.xxx.xx.xxx"
-    bastion_password = "OCP4All"
-    internal_bastion_ip = "172.16.0.10"
-    terraform_ocp_repo = "https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd"
-    rhel_key = "xxxxxxxxxxxxxxxxxxxxxx"
-    machine_cidr = "172.16.0.1/24"
-    network_name      = "ocpnet"
-    static_start_address    = "172.16.0.150"
-    static_end_address      = "172.16.0.220"
-    run_cluster_install     = false
-    }
-```
-
 #### Retrieve pull secret from Red Hat sites
 Retrieve the [OpenShift Pull Secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) and place in a file on the Bastion Server. Default location is `~/.pull-secret`
 
@@ -347,6 +351,11 @@ Once you have finished editing your terraform.tfvars file you can execute the fo
 If you set `run_cluster_install     = true`, your OCP cluster will be created automatically once the Bastion is configured. The results of the install can be found either on the Bastion in `/root/cluster_install.log` or on your Host machine in `~/cluster_install.log`.
 
 **NOTE** Please confirm if you have configured the `initialization_info` correctly using details from section [Configuring  initialization_info in terraform.tfvars file](#configuring--initialization_info-in-terraformtfvars-file) for your case before executing further steps.
+
+**NOTE** Please confirm if you have configured all the pre-requisites if you are following the airgap cluster install path from [Setup airgap pre-requisites](docs/airgap-cluster-setup.md#setup-airgap-pre-requisites)
+
+If your terraform.tfvars file is complete, you can run the commands to create your bastion vm and cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from `/opt/terraform` dir on your bastion server.
+
 
 ```
 terraform -chdir=bastion-vm init --var-file="../terraform.tfvars"
@@ -418,33 +427,6 @@ bastion-vm      haproxy.conf  lb       media    output.tf  storage  terraform.tf
 csr-approve.sh  ignition      main.tf  network  README.md  temp     terraform.tfvars.example  versions.tf
 [root@vm-rhel8 terraform]#
 
-```
-
-**NOTE** : If you are following the path of creating the airgap cluster path, then skip moving ahead and please go back to the [high level steps for airgap cluster](#high-level-steps-for-setting-up-the-cluster-as-airgap-install) and follow next step in the list.
-
-#### Create the OCP cluster
-
-Update the initialization_info object to set `run_cluster_install` to true as shown in the example below before executing further instructions:    
-```
- initialization_info     = {
-    public_bastion_ip = "161.xxx.xx.xxx"
-    bastion_password = "OCP4All"
-    internal_bastion_ip = "172.16.0.10"
-    terraform_ocp_repo = "https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd"
-    rhel_key = "xxxxxxxxxxxxxxxxxxxxxx"
-    machine_cidr = "172.16.0.1/24"
-    network_name      = "ocpnet"
-    static_start_address    = "172.16.0.150"
-    static_end_address      = "172.16.0.220"
-    run_cluster_install     = true
-    }
-```
-
-If your terraform.tfvars file is complete, you can run the commands to create your cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from `/opt/terraform` dir on your bastion server.
-
-```
-terraform init
-terraform apply --auto-approve
 ```
 
 #### Client setup
