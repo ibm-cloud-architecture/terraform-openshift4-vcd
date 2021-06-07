@@ -337,6 +337,8 @@ If you set `run_cluster_install     = true`, your OCP cluster will be created au
 
 **NOTE** Please confirm if you have configured the `initialization_info` correctly using details from section [Configuring  initialization_info in terraform.tfvars file](#configuring--initialization_info-in-terraformtfvars-file) for your case before executing further steps.
 
+**NOTE** Please confirm if you have configured all the pre-requisites if you are following the airgap cluster install path from [Setup airgap pre-requisites](docs/airgap-cluster-setup.md#setup-airgap-pre-requisites)
+
 If your terraform.tfvars file is complete, you can run the commands to create your bastion vm and cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from `/opt/terraform` dir on your bastion server.
 
 
