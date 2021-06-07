@@ -48,9 +48,9 @@ You will also need to mirror any operators that you will need and place them in 
 
 This is special step and you have to perform it only if you have your mirror registry setup in other VCD than your current VCD where you are trying to create the OCP cluster.
 
-User have to manually copy  the registry cert file `/opt/registry/certs/domain.crt` ( cert file for the registry that was generated in the remote VCD bastion server while  the registry was setup) from the registry VCD bastion server, to your current VCD bastion server at some location (standard location : `/opt/registry/certs/domain.crt`). 
+* User have to manually copy  the registry cert file `domain.crt` (cert file for the registry that was generated in the remote VCD bastion server while the registry was setup) from the shared location by your team, to your current hostmachine where you will be creating the cluster (standard location to keep this file: `/opt/registry/certs/domain.crt`). 
 
-We have to further mention it in the `terraform.tfvars` as below : 
+* Further mention it in the `terraform.tfvars` as below : 
 
 ```
 additionalTrustBundle = "/opt/registry/certs/domain.crt"
