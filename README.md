@@ -105,7 +105,9 @@ OpenShift 4.6 User-Provided Infrastructure
 
 ## High Level Steps for setting up the cluster as airgap install
 ----------------------------------------------------------------
-**Note** : Please follow these steps in sequence using the steps below, and come back here to navigate after each section link you click and complete it.
+**Note** : Please confirm if you have a shared mirrored registry, else follow the steps [here](#high-level-steps-for-setting-up-shared-mirror-registry-for-airgap-install-skip-this-if-you-if-you-have-a-mirror-registry-already-setup-with-the-ocp-images-mirrored) and then continue.
+
+Please follow these steps in sequence using the steps below, and come back here to navigate after each section link you click and complete it.
 
 * [Step 1: Order a VCD](#order-a-vcd)
 * [Step 2: Setup Host Machine Pre-requisites](#setup-host-machine)
