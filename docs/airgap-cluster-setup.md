@@ -60,11 +60,8 @@ additionalTrustBundle = "/opt/registry/certs/domain.crt"
 
 Next update your terraform.tfvars file to create the cluster and enable airgap install. The `terraform.tfvars` file that needs to be updated for this step is located in the `/opt/terraform` directory of the bastion server. We will have to make changes in three sections.
 
-Update the trust bundle for your mirror registry:
+Update the trust bundle for your mirror registry following steps [Copy registry cert in case of registry setup in different VCD]()
 
-```
-additionalTrustBundle = "/opt/registry/certs/domain.crt"
-```
 
 Update the redhat_pull_secret:
 
