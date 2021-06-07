@@ -35,6 +35,13 @@ podman tag quay.io/openshift/origin-cli:latest <mirror_fqdn>:<mirror_port>/opens
 podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
 ````
 
+#### Create a mirror for Redhat Openshift catalogs
+
+You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
+
+**NOTE** Only follow the instructions for mirroring the catalog images.
+
+
 #### Create the airgap cluster from Bastion
 
 Once you have the bastion server ready, **NOTE** you have to follow the section [Adding the registry creds to your pull secret](https://docs.openshift.com/container-platform/4.4/installing/install_config/installing-restricted-networks-preparations.html#installation-adding-registry-pull-secret_installing-restricted-networks-preparations)
