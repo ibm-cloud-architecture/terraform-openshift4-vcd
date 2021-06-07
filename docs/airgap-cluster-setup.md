@@ -132,6 +132,7 @@ Assuming that you have a mirror registry where the redhat catalogs are mirrored,
 ```
 oc apply -f imageContentSourcePolicy.yaml
 ```
+  * Setting the mirror policy for the catalog images
   * Creating the catalogsource for the mirrored catalogs
 
 ```
