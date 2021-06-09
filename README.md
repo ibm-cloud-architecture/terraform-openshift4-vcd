@@ -419,6 +419,8 @@ airgap.crt  pull-secret
 [root@vm-rhel8 ~]#
 
 ```
+**NOTE IF you are just setting up the bastion server and want to create mirror registry then skip further steps and return back to [High Level Steps for setting up the cluster](#architecture)**
+
 **NOTE If you have already created the cluster with below parameter to true, you can skip going ahead and return back to [High Level Steps for setting up the cluster](#architecture)**
 
 ```
@@ -427,10 +429,9 @@ initialization_info     = {
     }
 ```
 
-##### Steps to create cluster only if you just created bastion server earlier and not the OCP cluster
-
 **NOTE If you have setup the bastion server as earlier step with `run_cluster_install = false` in `terrraform.tfvars` as shown below and now trying to setup OCP cluster go ahead and run the steps to install the OCP cluster from the bastion else skip further part of this step.**
 
+##### Steps to create cluster only if you just created bastion server earlier and not the OCP cluster
 
 * You can now go to the vcd directory. It is now placed in /opt/terraform. You will find your terraform.tfvars in the directory. You can inspect it to ensure that it is complete.
 ```
