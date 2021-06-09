@@ -419,7 +419,7 @@ airgap.crt  pull-secret
 [root@vm-rhel8 ~]#
 
 ```
-**NOTE** If you have already created the cluster with below parameter to true, you can skip going ahead and return back to [High Level Steps for setting up the cluster as airgap install]()
+**NOTE** If you have already created the cluster with below parameter to true, you can skip going ahead and return back to [High Level Steps for setting up the cluster](#architecture)
 
 ```
 initialization_info     = {
