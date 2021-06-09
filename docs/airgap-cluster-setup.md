@@ -11,7 +11,7 @@ Please follow the steps from main document [high level steps to setup the airgap
 
 #### Setting up mirror registry
 
-**NOTE**: If you have a mirror registry already setup  with the OCP images mirrored , in some other VCD by your team, then you can skip setting up the mirror registry and directly create the OCP cluster by following the instructions [Create the airgap cluster from bastion server](#create-the-airgap-cluster-from-bastion-server)
+**NOTE**: If you have a mirror registry already setup  with the OCP images mirrored , in some other VCD by your team, then you can skip setting up the mirror registry and directly create the OCP cluster by following the instructions [High Level Steps for setup cluster](../README.md#architecture)
 
 You need a mirror registry to mirror the OCP release images so it can be used to create the OCP cluster further. A simple registry setup instructions can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).
 
