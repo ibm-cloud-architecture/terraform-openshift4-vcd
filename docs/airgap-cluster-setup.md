@@ -13,6 +13,28 @@ Please follow the steps from main document [high level steps to setup the airgap
 
 **NOTE**: If you have a mirror registry already setup  with the OCP images mirrored , in some other VCD by your team, then you can skip setting up the mirror registry and directly create the OCP cluster by following the instructions [High Level Steps for setup cluster](../README.md#architecture)
 
+
+##### Setting up of registry via automated script
+
+You can run this script [setup_simple_private_registry.sh](scripts/setup_simple_private_registry.sh) to setup simple private registry on your bastion server
+
+* You need to edit the below parameters in the script [setup_simple_private_registry.sh](scripts/setup_simple_private_registry.sh)
+
+```sh
+
+registry_username_to_be_created="<username you want>"
+registry_password_to_be_set="<password you want>"
+
+```
+
+* Now you can execute the script to install the Strimzi operator
+
+```
+ ./scripts/setup_simple_private_registry.sh
+```
+
+##### Setting up of registry manually via redhat documented steps
+
 You need a mirror registry to mirror the OCP release images so it can be used to create the OCP cluster further. A simple registry setup instructions can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).
 
 In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
