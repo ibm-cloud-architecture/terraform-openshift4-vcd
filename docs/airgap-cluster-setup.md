@@ -33,7 +33,7 @@ registry_password_to_be_set="<password you want>"
  ./scripts/setup_simple_private_registry.sh
 ```
 
-In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
+* In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
 ```
 cp <your mirror cert> /etc/pki/ca-trust/source/anchors/
 update-ca-trust
