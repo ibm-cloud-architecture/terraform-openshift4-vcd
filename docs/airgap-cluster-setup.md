@@ -48,6 +48,8 @@ You will also need to mirror any operators that you will need and place them in 
 
 Follow thes steps to add your shared registry credentials in the pull-secret.json [Adding shared mirror registry creds in redhat pull-secret.json](https://docs.openshift.com/container-platform/4.4/installing/install_config/installing-restricted-networks-preparations.html#installation-adding-registry-pull-secret_installing-restricted-networks-preparations)
 
+**NOTE** **Disable Telemetry:** You should edit your pull secret and remove the section that refers to `cloud.openshift.com`. This removes Telemetry and Health Reporting. If you don't do this before installation of OCP cluster, you will get an error in the insights operator.
+
 ##### Copy registry cert in case of registry setup in different VCD
 
 This is special step and you have to perform it only if you have your mirror registry setup in other VCD than your current VCD where you are trying to create the OCP cluster.
@@ -119,7 +121,7 @@ cluster_public_ip       = "161.xxx.x.xxx"
 
 #### Post install cluster configuration
 
-**Disable Telemetry:** You should edit your pull secret and remove the section that refers to `cloud.openshift.com`. This removes Telemetry and Health Reporting. If you don't do this before installation, you will get an error in the insights operator. After installation, go [here](https://docs.openshift.com/container-platform/4.6/support/remote_health_monitoring/opting-out-of-remote-health-reporting.html) for instructions to disable Telemetry Reporting.
+**Disable Telemetry:** After installation, go [here](https://docs.openshift.com/container-platform/4.6/support/remote_health_monitoring/opting-out-of-remote-health-reporting.html) for instructions to disable Telemetry Reporting.
 
 Run this command to stop OpenShift from looking for Operators from the Online source.  
 
