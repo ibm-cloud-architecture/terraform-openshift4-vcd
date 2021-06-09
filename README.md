@@ -354,7 +354,7 @@ If you set `run_cluster_install     = true`, your OCP cluster will be created au
 
 **NOTE** Please confirm if you have configured all the pre-requisites if you are following the airgap cluster install path from [Setup airgap pre-requisites](docs/airgap-cluster-setup.md#setup-airgap-pre-requisites)
 
-If your terraform.tfvars file is complete, you can run the commands to create your bastion vm and cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from `/opt/terraform` dir on your bastion server.
+If your terraform.tfvars file is complete, you can run the commands to create your bastion vm and cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from your host machine under dir `terraform-openshift4-vcd`
 
 
 ```
@@ -419,6 +419,22 @@ airgap.crt  pull-secret
 [root@vm-rhel8 ~]#
 
 ```
+**NOTE** If you have already created the cluster with below parameter to true, you can skip going ahead and return back to [High Level Steps for setting up the cluster as airgap install]()
+
+```
+initialization_info     = {
+    run_cluster_install     = true
+    }
+```
+
+**NOTE** If you have setup the bastion server as earlier step with then you would need to go ahead and run the steps to setup the OCP cluster from the bastion else skip further part of this step.
+
+```
+initialization_info     = {
+    run_cluster_install     = false
+    }
+```
+
 You can now go to the vcd directory. It is now placed in /opt/terraform. You will find your terraform.tfvars in the directory. You can inspect it to ensure that it is complete.
 ```
 [root@vm-rhel8 ~]# cd /opt/terraform/
