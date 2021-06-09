@@ -429,7 +429,7 @@ initialization_info     = {
     }
 ```
 
-**NOTE If you have setup the bastion server as earlier step with `run_cluster_install = false` in `terrraform.tfvars` as shown below and now trying to setup OCP cluster go ahead and run the steps to install the OCP cluster from the bastion else skip further part of this step.**
+**NOTE If you have setup the bastion server as earlier step with `run_cluster_install = false` in `terrraform.tfvars` as shown above and now trying to setup OCP cluster go ahead and run the steps to install the OCP cluster from the bastion else skip further part of this step.**
 
 ##### Steps to create cluster only if you just created bastion server earlier and not the OCP cluster
 
