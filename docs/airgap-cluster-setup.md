@@ -44,7 +44,7 @@ trust list | grep -i "<hostname>"
 
 You need a mirror registry to mirror the OCP release images so it can be used to create the OCP cluster further. A simple registry setup instructions can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).
 
-In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
+* In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
 ```
 cp <your mirror cert> /etc/pki/ca-trust/source/anchors/
 update-ca-trust
