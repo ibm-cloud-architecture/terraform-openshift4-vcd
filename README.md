@@ -421,7 +421,7 @@ airgap.crt  pull-secret
 ```
 **NOTE IF you are just setting up the bastion server and want to create mirror registry then skip further steps and return back to [High Level Steps for setting up the cluster](#architecture)**
 
-**NOTE If you have already created the cluster with below parameter to true, you can skip going ahead and return back to [High Level Steps for setting up the cluster](#architecture)**
+**NOTE If you have already created the cluster with below parameter to true and your cluster is already created, then you can skip going ahead and skip to [client-setup](#client-setup)**
 
 ```
 initialization_info     = {
