@@ -97,7 +97,7 @@ This is special step and you have to perform it only if you have your mirror reg
 additionalTrustBundle = "/opt/registry/certs/domain.crt"
 ```
 
-In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
+* In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
 ```
 cp <your mirror cert> /etc/pki/ca-trust/source/anchors/
 update-ca-trust
