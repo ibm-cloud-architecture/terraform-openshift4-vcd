@@ -24,7 +24,7 @@ trust list | grep -i "<hostname>"
 The last command will check to see if the update was successful.
 
 #### Create a mirror for OpenShift 4.6 images
-You will need to create your own mirror or use an existing mirror to do an airgapped install. Instructions to create a mirror for OpenShift 4.6 can be found [here](https://docs.openshift.com/container-platform/4.6/installing/install_config/installing-restricted-networks-preparations.html#installing-restricted-networks-preparations).
+You will need to create your own mirror or use an existing mirror to do an airgapped install. Instructions to create a mirror for OpenShift 4.6 can be found [here](https://docs.openshift.com/container-platform/4.6/installing/installing-mirroring-installation-images.html).
 
 After following the instructions above, you should have a pull secret file on your server.  You will need to know this path as it will be used to update the tfvars file in the next section.
 
@@ -35,43 +35,57 @@ podman tag quay.io/openshift/origin-cli:latest <mirror_fqdn>:<mirror_port>/opens
 podman push <mirror_fqdn>:<mirror_port>/openshift/origin-cli:latest
 ````
 
-#### Create the airgap cluster from Bastion
+#### Create a mirror for Redhat Openshift catalogs
 
-Once you have the bastion server ready, **NOTE** you have to follow the section [Adding the registry creds to your pull secret](https://docs.openshift.com/container-platform/4.4/installing/install_config/installing-restricted-networks-preparations.html#installation-adding-registry-pull-secret_installing-restricted-networks-preparations)
+You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
+
+**NOTE** Only follow the instructions for mirroring the catalog images and save the `imageContentSourcePolicy.yaml` and `catalogSource.yaml` that gets generated  in the directory `manifests-<index_image_name>-<random_number>` after the `oc adm catalog mirror` command is completed. These two files needs to be shared with the team who would use this shared registry to get the redhat catalogs setup in their airgap cluster once it will be created by them.
 
 
-Then you can move ahead to create the arigap cluster by following below steps:
+#### Setup airgap pre-requisites
 
+##### Add the mirror creds in the pull-secret.json 
+
+Follow thes steps to add your shared registry credentials in the pull-secret.json [Adding shared mirror registry creds in redhat pull-secret.json](https://docs.openshift.com/container-platform/4.4/installing/install_config/installing-restricted-networks-preparations.html#installation-adding-registry-pull-secret_installing-restricted-networks-preparations)
+
+**NOTE** **Disable Telemetry:** You should edit your pull secret and remove the section that refers to `cloud.openshift.com`. This removes Telemetry and Health Reporting. If you don't do this before installation of OCP cluster, you will get an error in the insights operator.
 
 ##### Copy registry cert in case of registry setup in different VCD
 
 This is special step and you have to perform it only if you have your mirror registry setup in other VCD than your current VCD where you are trying to create the OCP cluster.
 
-User have to manually copy  the registry cert file `/opt/registry/certs/domain.crt` ( cert file for the registry that was generated in the remote VCD bastion server while  the registry was setup) from the registry VCD bastion server, to your current VCD bastion server at some location (standard location : `/opt/registry/certs/domain.crt`). 
+**Pre-requisite**
 
-We have to further mention it in the `terraform.tfvars` as below : 
+* Access to the shared registry `domain.crt` file.
 
-```
-additionalTrustBundle = "/opt/registry/certs/domain.crt"
-```
+**Steps**
 
-##### Create the airgap cluster
+* User have to manually copy  the registry cert file `domain.crt` (cert file for the registry ) from the shared location by your team, to your current hostmachine where you will be creating the cluster (standard location to keep this file: `/opt/registry/certs/domain.crt`). 
 
-Next update your terraform.tfvars file to create the cluster and enable airgap install. The `terraform.tfvars` file that needs to be updated for this step is located in the `/opt/terraform` directory of the bastion server. We will have to make changes in three sections.
-
-Update the trust bundle for your mirror registry:
+* Further mention it in the `terraform.tfvars` as below : 
 
 ```
 additionalTrustBundle = "/opt/registry/certs/domain.crt"
 ```
 
-Update the redhat_pull_secret:
+##### Update the terraform.tfvars airgap parameters
+
+
+
+Next update your terraform.tfvars file to create the cluster and enable airgap install. We will have to make changes in below sections.
+
+* Update the trust bundle for your mirror registry following steps [Copy registry cert in case of registry setup in different VCD](#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
+
+
+* Update the redhat_pull_secret with the file path that was updated from [Add the mirror creds in the pull-secret.json](#add-the-mirror-creds-in-the-pull-secretjson):
 
 ```
 openshift_pull_secret = "<path to pull secret JSON file created in the previous section>"
 ```
 
-Update the airgapped object based on the example below:
+* Update the `airgapped` object based on the example below:
+  *  Update `enabled = true`
+  *  Provide the mirror registry details for the shared mirror registry where all your OCP images are mirrored , this will help to install the OCP cluster further.
 
 ```
 airgapped = {
@@ -84,7 +98,12 @@ airgapped = {
       }
 ```
 
-Update the initialization_info object to set `run_cluster_install` to true as shown in the example below:    
+* Update the `initialization_info` object to set `run_cluster_install` to true as shown in the example below:
+  * Updated `run_cluster_install = true` , which will create the OCP cluster
+  * Update the `public_bastion_ip` and `cluster_public_ip` with the public ips that are available for your VCD
+
+cluster_public_ip       = "161.xxx.x.xxx"
+
 ```
  initialization_info     = {
     public_bastion_ip = "161.xxx.xx.xxx"
@@ -100,20 +119,9 @@ Update the initialization_info object to set `run_cluster_install` to true as sh
     }
 ```
 
-
-
-If your terraform.tfvars file is complete, you can run the commands to create your cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from `/opt/terraform` dir on your bastion server.
-
-```
-terraform init
-terraform apply --auto-approve
-```
-
-
-
 #### Post install cluster configuration
 
-**Disable Telemetry:** You should edit your pull secret and remove the section that refers to `cloud.openshift.com`. This removes Telemetry and Health Reporting. If you don't do this before installation, you will get an error in the insights operator. After installation, go [here](https://docs.openshift.com/container-platform/4.6/support/remote_health_monitoring/opting-out-of-remote-health-reporting.html) for instructions to disable Telemetry Reporting.
+**Disable Telemetry:** After installation, go [here](https://docs.openshift.com/container-platform/4.6/support/remote_health_monitoring/opting-out-of-remote-health-reporting.html) for instructions to disable Telemetry Reporting.
 
 Run this command to stop OpenShift from looking for Operators from the Online source.  
 
@@ -121,12 +129,28 @@ Run this command to stop OpenShift from looking for Operators from the Online so
 
 You may receive an Alert stating `Cluster version operator has not retrieved updates in xh xxm 17s. Failure reason RemoteFailed . For more information refer to https://console-openshift-console.apps.<cluster_id>.<base_domain>.com/settings/cluster/` this is normal and can be ignored.
 
-##### Mirror redhat operators catalog
+##### Configure mirrored redhat operators catalog
 
-You will also need to mirror any operators that you will need and place them in the mirror. Instructions can be found [here](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-restricted-networks.html)
+Assuming that you have a mirror registry where the redhat catalogs are mirrored, now you will configure the catalog access by following below steps
 
-You will need to follow the instructions carefully in order to setup imagesources for any operators that you want to install.
+**Pre-requisite**:
 
+* You need to have the shared files `imageContentSourcePolicy.yaml` and `catalogSource.yaml` that was generated as a process of mirroring the catalogs in shared registry.
+
+**Steps**:
+* Once you have the access to these files run below commands:
+
+Setting the mirror policy for the catalog images
+
+```
+oc apply -f imageContentSourcePolicy.yaml
+```
+
+Creating the catalogsource for the mirrored catalogs
+
+```
+oc apply -f catalogSource.yaml
+```
 
 #### Storage Configuration
 
