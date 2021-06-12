@@ -354,7 +354,7 @@ If you set `run_cluster_install     = true`, your OCP cluster will be created au
 
 **NOTE** Please confirm if you have configured all the pre-requisites if you are following the airgap cluster install path from [Setup airgap pre-requisites](docs/airgap-cluster-setup.md#setup-airgap-pre-requisites)
 
-If your terraform.tfvars file is complete, you can run the commands to create your bastion vm and cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from `/opt/terraform` dir on your bastion server.
+If your terraform.tfvars file is complete, you can run the commands to create your bastion vm and cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from your host machine under dir `terraform-openshift4-vcd`
 
 
 ```
@@ -419,13 +419,35 @@ airgap.crt  pull-secret
 [root@vm-rhel8 ~]#
 
 ```
-You can now go to the vcd directory. It is now placed in /opt/terraform. You will find your terraform.tfvars in the directory. You can inspect it to ensure that it is complete.
+**NOTE IF you are just setting up the bastion server and want to create mirror registry then skip further steps and return back to [High Level Steps for setting up the cluster](#architecture)**
+
+**NOTE If you have already created the cluster with below parameter to true and your cluster is already created, then you can skip going ahead and skip to [client-setup](#client-setup)**
+
+```
+initialization_info     = {
+    run_cluster_install     = true
+    }
+```
+
+**NOTE If you have setup the bastion server as earlier step with `run_cluster_install = false` in `terrraform.tfvars` as shown above and now trying to setup OCP cluster go ahead and run the steps to install the OCP cluster from the bastion else skip further part of this step.**
+
+##### Steps to create cluster only if you just created bastion server earlier and not the OCP cluster
+
+* You can now go to the vcd directory. It is now placed in /opt/terraform. You will find your terraform.tfvars in the directory. You can inspect it to ensure that it is complete.
 ```
 [root@vm-rhel8 ~]# cd /opt/terraform/
 [root@vm-rhel8 terraform]# ls
 bastion-vm      haproxy.conf  lb       media    output.tf  storage  terraform.tfvars          variables.tf  vm
 csr-approve.sh  ignition      main.tf  network  README.md  temp     terraform.tfvars.example  versions.tf
 [root@vm-rhel8 terraform]#
+
+```
+
+* If your `terraform.tfvars` file is complete from `/opt/terraform/` location on your bastion , you can run the commands to create your cluster. The FW, DNAT and /etc/hosts entries on the Bastion will now be created too. The following terraform commands needs to be executed from `/opt/terraform` dir on your bastion server.
+
+```
+terraform init
+terraform apply --auto-approve
 
 ```
 
