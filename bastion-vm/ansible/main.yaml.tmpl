@@ -143,7 +143,7 @@
       shell: "firewall-cmd --add-port=53/udp --zone=public --permanent"
 
     - name: configure firewall
-      shell: "firewall-cmd --add-port=5000/tcp --zone=public --permanent"
+      shell: "firewall-cmd --add-port=5000-5010/tcp --zone=public --permanent"
 
     - name: configure firewall
       shell: "firewall-cmd --reload"

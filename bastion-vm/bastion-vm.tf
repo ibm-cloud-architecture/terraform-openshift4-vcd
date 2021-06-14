@@ -124,6 +124,54 @@ resource "vcd_nsxv_firewall_rule" "bastion_inbound_allow" {
     protocol = "tcp"
     port     = "5000"
   }
+  service {
+    protocol = "tcp"
+    port     = "5001"
+  }  
+  
+  service {
+    protocol = "tcp"
+    port     = "5002"
+  }
+  service {
+    protocol = "tcp"
+    port     = "5003"
+  }  
+  
+  service {
+    protocol = "tcp"
+    port     = "5004"
+  }  
+  service {
+    protocol = "tcp"
+    port     = "5005"
+  }  
+  
+  service {
+    protocol = "tcp"
+    port     = "5006"
+  }  
+  
+  service {
+    protocol = "tcp"
+    port     = "5007"
+  }  
+
+  service {
+    protocol = "tcp"
+    port     = "5008"
+  }  
+
+  service {
+    protocol = "tcp"
+    port     = "5009"
+  }  
+
+  service {
+    protocol = "tcp"
+    port     = "5010"
+  }  
+
 
     depends_on = [
       vcd_vapp_org_network.vappOrgNet,
