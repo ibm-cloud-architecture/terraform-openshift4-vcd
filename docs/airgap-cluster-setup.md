@@ -167,10 +167,10 @@ You may receive an Alert stating `Cluster version operator has not retrieved upd
 
 ##### Configure mirrored redhat operators catalog
 
-Assuming that you have a mirror registry where the redhat catalogs are mirrored by following the earlier instructions [create a mirror for redhat openshift catalogs](#create-a-mirror-for-redhat-openshift-catalogs), now you will configure the catalog access by following below steps
+Assuming that you have a mirror registry and you have redhat catalog mirror created, now you will configure the catalog access by following below steps
 
 **Pre-requisite**:
-
+* Redhat catalogs are mirrored by following the earlier instructions [create a mirror for redhat openshift catalogs](#create-a-mirror-for-redhat-openshift-catalogs)
 * You need to have the shared files `imageContentSourcePolicy.yaml` and `catalogSource.yaml` that was generated as a process of mirroring the catalogs in shared registry.
 
 **Steps**:
