@@ -3,7 +3,7 @@
 
 
 # This parameter is to be set in case of the registry to be setup with existing TLS CERT file like `domain.crt`
-export REGISTRY_SETUP_WITH_EXISTING_TLS_CERTIFICATE="false"
+export REGISTRY_SETUP_WITH_EXISTING_TLS_CERTIFICATE="true"
 
 #These parameters needs to be set for setting up the registry
 export registry_dir="/opt/test2_registry"
@@ -22,6 +22,39 @@ export REGISTRY_PORT_NUMBER="5004"
 
 #This is the auth file tht gets created for your registry credentials
 auth_filename="htpasswd_$REGISTRY_PORT_NUMBER"
+
+
+setup_firewall_for_exposed_port(){
+
+     firewall-cmd --add-port=$REGISTRY_PORT_NUMBER/tcp --zone=internal --permanent
+     firewall-cmd --add-port=$REGISTRY_PORT_NUMBER/tcp --zone=public --permanent
+     firewall-cmd --reload
+
+}
+
+start_the_registry(){
+
+      echo "[INFO] Starting  the registry"
+      podman run --name registry_$REGISTRY_PORT_NUMBER \
+      -p $REGISTRY_PORT_NUMBER:5000 \
+      -v $DATA_DIR:/var/lib/registry:z \
+      -v $AUTH_DIR:/auth:z \
+      -e "REGISTRY_AUTH=htpasswd" \
+      -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+      -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd_$REGISTRY_PORT_NUMBER \
+      -v $CERTS_DIR:/certs:z \
+      -e "REGISTRY_HTTP_TLS_CERTIFICATE=/certs/$REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME" \
+      -e "REGISTRY_HTTP_TLS_KEY=/certs/$REGISTRY_HTTP_TLS_KEY_FILENAME" \
+      -e REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true \
+      -d \
+      docker.io/library/registry:latest
+
+      if [ $? -gt 0 ]; then
+         echo "[ERROR] Some error while running the registry setup command, please check container logs and try again"
+         exit 1
+      fi
+}
+
 
 echo "[INFO] Checking Pre-requisites:"
 if podman -v > /dev/null ;then
@@ -60,30 +93,10 @@ if [[ "$REGISTRY_SETUP_WITH_EXISTING_TLS_CERTIFICATE" == "true" ]]; then
       echo "[INFO] Printing the trust list with hostname=$HOSTNAME"
       echo "Trust List : $(trust list | grep -i $HOSTNAME)"
 
-      echo "[INFO] Starting  the registry"
-      podman run --name registry_$REGISTRY_PORT_NUMBER \
-      -p $REGISTRY_PORT_NUMBER:5000 \
-      -v $DATA_DIR:/var/lib/registry:z \
-      -v $AUTH_DIR:/auth:z \
-      -e "REGISTRY_AUTH=htpasswd" \
-      -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
-      -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd_$REGISTRY_PORT_NUMBER \
-      -v $CERTS_DIR:/certs:z \
-      -e "REGISTRY_HTTP_TLS_CERTIFICATE=/certs/$REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME" \
-      -e "REGISTRY_HTTP_TLS_KEY=/certs/$REGISTRY_HTTP_TLS_KEY_FILENAME" \
-      -e REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true \
-      -d \
-      docker.io/library/registry:latest
-
-      if [ $? -gt 0 ]; then
-         echo "[ERROR] Some error while runnng the registry setup command, please check container logs and try again"
-         exit 1
-      fi
+      start_the_registry
 
 
-     firewall-cmd --add-port=$REGISTRY_PORT_NUMBER/tcp --zone=internal --permanent
-     firewall-cmd --add-port=$REGISTRY_PORT_NUMBER/tcp --zone=public --permanent
-     firewall-cmd --reload
+     setup_firewall_for_exposed_port
 
      echo "[INFO] Registry container started :"
      echo "[INFO] ================================================================================================================"
@@ -166,24 +179,9 @@ else
   echo "[INFO] Printing the trust list with hostname=$HOSTNAME"
   echo "Trust List : $(trust list | grep -i $HOSTNAME)"
   
-  echo "[INFO] Starting  the registry"
-  podman run --name registry_$REGISTRY_PORT_NUMBER \
-  -p $REGISTRY_PORT_NUMBER:5000 \
-  -v $DATA_DIR:/var/lib/registry:z \
-  -v $AUTH_DIR:/auth:z \
-  -e "REGISTRY_AUTH=htpasswd" \
-  -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
-  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd_$REGISTRY_PORT_NUMBER \
-  -v $CERTS_DIR:/certs:z \
-  -e "REGISTRY_HTTP_TLS_CERTIFICATE=/certs/$REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME" \
-  -e "REGISTRY_HTTP_TLS_KEY=/certs/$REGISTRY_HTTP_TLS_KEY_FILENAME" \
-  -e REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true \
-  -d \
-  docker.io/library/registry:latest
+  start_the_registry
 
-  firewall-cmd --add-port=$REGISTRY_PORT_NUMBER/tcp --zone=internal --permanent
-  firewall-cmd --add-port=$REGISTRY_PORT_NUMBER/tcp --zone=public --permanent
-  firewall-cmd --reload
+  setup_firewall_for_exposed_port
 
   echo "[INFO] Registry container started :"
   echo "[INFO] ================================================================================================================"
