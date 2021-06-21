@@ -21,9 +21,37 @@ You can run this script [setup_simple_private_registry.sh](scripts/setup_simple_
 * You need to edit the below parameters in the script [setup_simple_private_registry.sh](scripts/setup_simple_private_registry.sh)
 
 ```sh
+#Parameters for TLS Certificate usage.
+ #This parameter is to be set in case of the registry to be setup with existing TLS CERT file.
+export REGISTRY_SETUP_WITH_EXISTING_TLS_CERTIFICATE="false"
+ #Cert filenames, in case if you dont have one use the name ex: '$HOSTNAME-$REGISTRY_PORT_NUMBER.crt'
+export REGISTRY_HTTP_TLS_KEY_FILENAME="bastion-cp4waiops-registry-cp4waiops-shared-registry-cluster-5004.key"
+ #ex : '$HOSTNAME-$REGISTRY_PORT_NUMBER.key'
+export REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME="bastion-cp4waiops-registry-cp4waiops-shared-registry-cluster-5004.crt"
 
-registry_username_to_be_created="<username you want>"
-registry_password_to_be_set="<password you want>"
+#Parameters for registry directory paths
+ #Provide the registry directory ex : '/opt/test2_registry'.
+export registry_dir="/opt/test2_registry"
+ #Provide the Auth directory where registry access crendentials file will be created by the script. ex : '$registry_dir/auth'
+export AUTH_DIR="$registry_dir/auth"
+ #Provide the Certs directory which will be used to either generate self signed certificate, or where you have existing TLS certificate file. ex : '$registry_dir/certs'
+export CERTS_DIR="$registry_dir/certs"
+ #Provide the Data directory which will be used by the registry to store the data. ex: '$registry_dir/data'
+export DATA_DIR="$registry_dir/data"
+
+
+#Parameters for registry credentials to access it.
+ #Username for your registry to access it once it is created.
+export registry_username_to_be_created="test_user"
+ #Password for your registry to access it once it is created.
+export registry_password_to_be_set="simplepassword"
+
+#Parameters for registry name and port number
+ #Registry name that you want to setup
+export REGISTRY_NAME="registry123"
+ #Port number for the the registry to be accessed later once it is created.
+export REGISTRY_PORT_NUMBER="5004"
+
 
 ```
 
