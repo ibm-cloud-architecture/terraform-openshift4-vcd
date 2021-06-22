@@ -5,12 +5,16 @@
                  #Parameters that needs to be set before running the script#
 #############################################################################################
 #Parameters for TLS Certificate usage.
- #This parameter is to be set in case of the registry to be setup with existing TLS CERT file.
+ #This parameter is to be set in case you need to setup your registry with existing TLS CERT file.
 export REGISTRY_SETUP_WITH_EXISTING_TLS_CERTIFICATE="false"
- #Cert filenames, in case if you dont have one use the name ex: '$HOSTNAME-$REGISTRY_PORT_NUMBER.crt'
-export REGISTRY_HTTP_TLS_KEY_FILENAME="bastion-cp4waiops-registry-cp4waiops-shared-registry-cluster-5004.key"
- #ex : '$HOSTNAME-$REGISTRY_PORT_NUMBER.key'
-export REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME="bastion-cp4waiops-registry-cp4waiops-shared-registry-cluster-5004.crt"
+ #Certificate key filename, if you have existing file you can provide the name here, else in case if you dont have one then the script creates one with self signed certificate key file
+ #use this name if you dont have file of yours ex: '$HOSTNAME-$REGISTRY_PORT_NUMBER.key'
+ #NOTE: If you provide your existing filename then you need to make sure it is present in the directory path as per the parameter 'CERTS_DIR' below
+export REGISTRY_HTTP_TLS_KEY_FILENAME="$HOSTNAME-$REGISTRY_PORT_NUMBER.key"
+ #Certificate crt filename, if you have existing file you can provide the name here , else in case if you don't have one then the script creates one with self signed certificate crt file
+ #use this name if you don't have file of yours ex : '$HOSTNAME-$REGISTRY_PORT_NUMBER.crt'
+ #NOTE: If you provide your existing filename then you need to make sure it is present in the directory path as per the parameter 'CERTS_DIR' below
+export REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME="$HOSTNAME-$REGISTRY_PORT_NUMBER.crt"
 
 #Parameters for registry directory paths
  #Provide the registry directory ex : '/opt/test2_registry'.
