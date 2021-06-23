@@ -1,15 +1,107 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Setup persistent storage for Airgap cluster](#setup-persistent-storage-for-airgap-cluster)
+  - [Create rook-cephfs Storage for persistent storage.](#create-rook-cephfs-storage-for-persistent-storage)
+    - [Pre-requisite](#pre-requisite)
+    - [Steps to setup rook-cephfs through automated script:](#steps-to-setup-rook-cephfs-through-automated-script)
+    - [Steps to setup rook-cephfs manually](#steps-to-setup-rook-cephfs-manually)
+    - [Steps to delete rook-cephfs Storage from the cluster.](#steps-to-delete-rook-cephfs-storage-from-the-cluster)
+  - [Add an NFS Server to provide Persistent storage.](#add-an-nfs-server-to-provide-persistent-storage)
+    - [Steps to setup](#steps-to-setup)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Setup persistent storage for Airgap cluster
-
-
 ## Create rook-cephfs Storage for persistent storage.
-
-
 ### Pre-requisite
 
- - You need to have separate hard disk storage present for all the master nodes and compute nodes for `rook-cephfs` to work.
- - The separate hard disk storage capacity depends on your requirements, we setup 200GB hard disk storage for each master and comput node of the cluster.
+ - You need to have either some `storage-nodes` along with master and compute nodes , or have a separate hard disk storage present for all the master nodes and compute nodes for the `rook-cephfs` to work.
  
-### Steps to setup rook-cephfs
+ example of `storage-nodes`
+ ```
+storage-00.aadeshpa-green-cluster.cp4waiops602.com         Ready    worker   4d    v1.19.0+a5a0987
+storage-01.aadeshpa-green-cluster.cp4waiops602.com         Ready    worker   4d    v1.19.0+a5a0987
+storage-02.aadeshpa-green-cluster.cp4waiops602.com         Ready    worker   4d    v1.19.0+a5a0987
+ ```
+ 
+ example of `extra hard disk to master and compute node`
+ 
+ <img width="1410" alt="Screen Shot 2021-05-24 at 11 11 48 AM" src="https://media.github.ibm.com/user/186069/files/65397700-bc81-11eb-83e8-4022f48ae8f8">
+ 
+ 
+ - The separate hard disk storage capacity depends on your requirements, for Cp4waiops we setup 200GB hard disk storage for each master and comput node of the cluster.
+
+### Steps to setup rook-cephfs through automated script:
+
+Since we are installing rook-cephfs in airgap cluster, we need to have a mirror registry setup beforehand and you need to provide its credentials to the script
+
+* You need to edit the below parameters in the script [install_rook-cephfs_airgap.sh](scripts/install_rook-cephfs_airgap.sh)
+
+```sh
+
+# This is your mirror registry where you want to mirror the strimzi images
+mirror_registry="<your-mirror-registry>:<port>"
+
+#Provide the creds for your mirror registry
+mirror_registry_username="<mirrror-registry-username>"
+mirror_registry_password="<mirror-registry-password>"
+```
+
+* Now you can execute the script to install the Strimzi operator
+
+```
+ ./scripts/install_rook-cephfs_airgap.sh
+```
+
+* Verify the pods are running correctly
+
+```console
+oc get pods -n rook-ceph
+
+NAME                                                              READY   STATUS      RESTARTS   AGE
+csi-cephfsplugin-69m6d                                            3/3     Running     0          8m13s
+csi-cephfsplugin-6fhkf                                            3/3     Running     0          8m13s
+csi-cephfsplugin-c5ft8                                            3/3     Running     0          8m13s
+csi-cephfsplugin-fctwt                                            3/3     Running     0          8m13s
+csi-cephfsplugin-j7jk2                                            3/3     Running     0          8m13s
+csi-cephfsplugin-provisioner-678685c55-79v9k                      6/6     Running     0          8m12s
+csi-cephfsplugin-provisioner-678685c55-vcxp9                      6/6     Running     0          8m12s
+csi-cephfsplugin-q4hh7                                            3/3     Running     0          8m13s
+csi-cephfsplugin-qgvz4                                            3/3     Running     0          8m13s
+csi-cephfsplugin-wmkbs                                            3/3     Running     0          8m13s
+csi-rbdplugin-2r89v                                               3/3     Running     0          8m14s
+csi-rbdplugin-fsrm5                                               3/3     Running     0          8m14s
+csi-rbdplugin-g5fgf                                               3/3     Running     0          8m14s
+csi-rbdplugin-hzcz6                                               3/3     Running     0          8m14s
+csi-rbdplugin-n9hlt                                               3/3     Running     0          8m14s
+csi-rbdplugin-p2rh6                                               3/3     Running     0          8m14s
+csi-rbdplugin-provisioner-6b86f8b7d6-5pnfc                        6/6     Running     0          8m14s
+csi-rbdplugin-provisioner-6b86f8b7d6-whnqm                        6/6     Running     0          8m14s
+csi-rbdplugin-qf95x                                               3/3     Running     0          8m14s
+csi-rbdplugin-wb56l                                               3/3     Running     0          8m14s
+rook-ceph-crashcollector-0335f10fed6b4e0529f7d7c1e8373091-m4zjx   1/1     Running     0          7m55s
+rook-ceph-crashcollector-25f7f9755cf10757ce94b46df5fa3d70-4dhsg   1/1     Running     0          6m58s
+rook-ceph-crashcollector-2dedc790ad9f798c4a5f0958bd5a2adf-hdbqs   1/1     Running     0          7m29s
+rook-ceph-mds-myfs-a-5d76b6c67c-klcnv                             1/1     Running     0          6m59s
+rook-ceph-mds-myfs-b-777cb64b8f-d2wkq                             1/1     Running     0          6m58s
+rook-ceph-mgr-a-b8fc65fbd-cft8v                                   1/1     Running     0          7m29s
+rook-ceph-mon-a-6c948dd6d-lv6zw                                   1/1     Running     0          8m7s
+rook-ceph-mon-b-55fd45f884-md46s                                  1/1     Running     0          7m55s
+rook-ceph-mon-c-f6dfb9975-pbjgw                                   1/1     Running     0          7m41s
+rook-ceph-operator-78cf5f6f59-x84xs                               1/1     Running     0          8m29s
+rook-ceph-osd-prepare-0335f10fed6b4e0529f7d7c1e8373091-89csw      0/1     Completed   0          7m25s
+rook-ceph-osd-prepare-111964f401dbbf717da42d83975016f9-md9db      0/1     Completed   0          7m26s
+rook-ceph-osd-prepare-25f7f9755cf10757ce94b46df5fa3d70-gcpcg      0/1     Completed   0          7m25s
+rook-ceph-osd-prepare-2dedc790ad9f798c4a5f0958bd5a2adf-q522t      0/1     Completed   0          7m26s
+rook-ceph-osd-prepare-de2339ea0101ca914ea77756cf95b292-zx4z7      0/1     Completed   0          7m28s
+rook-ceph-osd-prepare-e460b4ae84ca1e50e7ce2533c838495a-d4fwj      0/1     Completed   0          7m27s
+rook-ceph-osd-prepare-f93fa49ad4c8f6ee82358a6329fd5d84-flc5j      0/1     Completed   0          7m26s
+rook-ceph-osd-prepare-fd503266f7403c9e04873772d6dfdd28-grhs5      0/1     Completed   0          7m27s
+```
+
+### Steps to setup rook-cephfs manually
 
 You can setup `rook-cephfs` storage in your airgap cluster by following below steps:
 
@@ -23,7 +115,7 @@ git clone https://github.com/rook/rook --branch v1.5.8
 
 Example:
 
-```
+```shell
 podman pull <original_image>
 podman tag <original_image> <registry_hostname>:<registry_port>/<namspace>/<image:tag>
 podman push <registry_hostname>:<registry_port>/<namspace>/<image:tag>
@@ -44,7 +136,7 @@ File : `rook/cluster/examples/kubernetes/ceph/operator-openshift.yaml `
 
 Images:
 
-```
+```yaml
 spec:
   serviceAccountName: rook-ceph-system
   containers:
@@ -67,7 +159,7 @@ File : `rook/cluster/examples/kubernetes/ceph/cluster.yaml`
   
 Images: 
 
-```
+```yaml
 spec:
   cephVersion:
     image: docker.io/ceph/ceph:v15.2.9
@@ -80,7 +172,7 @@ spec:
 
 Example: For File `rook/cluster/examples/kubernetes/ceph/operator-openshift.yaml`
 
-```
+```yaml
 spec:
   serviceAccountName: rook-ceph-system
   containers:
@@ -93,7 +185,7 @@ NOTE: Make sure all the above mentioned images in above point has been updated i
 
 4. Finally apply all the yaml files as shown below to setup the `rook-cephfs` storage
 
-```
+```shell
 oc create -f ./rook/cluster/examples/kubernetes/ceph/crds.yaml
 oc create -f ./rook/cluster/examples/kubernetes/ceph/common.yaml
 oc create -f ./rook/cluster/examples/kubernetes/ceph/operator-openshift.yaml
@@ -112,7 +204,7 @@ oc patch storageclass rook-cephfs -p '{"metadata": {"annotations":{"storageclass
 
 6. Verify if the `rook-cephfs` is setup correctly
 
-```
+```console
 # oc get pods -n rook-ceph
 NAME                                                              READY   STATUS      RESTARTS   AGE
 csi-cephfsplugin-gbprl                                            3/3     Running     0          18h
@@ -141,9 +233,8 @@ rook-ceph-osd-2-7fdb4bbd84-62bmf                                  1/1     Runnin
 rook-ceph-osd-prepare-compute-00.aadeshpa.cp4waiops502.comqnvq7   0/1     Completed   0          18h
 rook-ceph-osd-prepare-compute-01.aadeshpa.cp4waiops502.com825zw   0/1     Completed   0          18h
 rook-ceph-osd-prepare-compute-02.aadeshpa.cp4waiops502.comxvd94   0/1     Completed   0          18h
-
-
-
+```
+```console
 # oc get storageclass
 NAME                    PROVISIONER                     RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
 rook-ceph-block         rook-ceph.rbd.csi.ceph.com      Delete          Immediate           true                   18h
@@ -157,7 +248,7 @@ NOTE : You should make sure that none of the PVC are bound to `rook-cephfs` stor
 
 Apply the above yamls in the given sequence :
 
-```
+```shell
 oc patch storageclass rook-cephfs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 oc delete -f ./rook/cluster/examples/kubernetes/ceph/csi/rbd/storageclass-test.yaml
 oc delete -f ./rook/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
@@ -169,6 +260,7 @@ oc delete -f ./rook/cluster/examples/kubernetes/ceph/crds.yaml
 
 ```
 
+Once above resources are deleted follow this step to [Delete the data on hosts](https://rook.github.io/docs/rook/v1.5/ceph-teardown.html#delete-the-data-on-hosts) from `/var/lib/rook`
 
 ## Add an NFS Server to provide Persistent storage.
 
@@ -176,18 +268,19 @@ oc delete -f ./rook/cluster/examples/kubernetes/ceph/crds.yaml
 
 1. Download kubernetes-incubator
 
-```
+```console
 $ curl -L -o kubernetes-incubator.zip https://github.com/kubernetes-incubator/external-storage/archive/master.zip
 unzip kubernetes-incubator.zip
+```
+```shell
 $ cd external-storage-master/nfs-client/
-
 ```
 
 2. Mirror the image for setting up NFS server in your internal container registry
 
 Example:
 
-```
+```shell
 podman pull <original_image>
 podman tag <original_image> <registry_hostname>:<registry_port>/<namspace>/<image:tag>
 podman push <registry_hostname>:<registry_port>/<namspace>/<image:tag>
@@ -205,7 +298,7 @@ File : `deploy/deployment.yaml`
 
 Image
 
-```
+```yaml
 spec:
   serviceAccountName: nfs-client-provisioner
   containers:
@@ -218,7 +311,7 @@ spec:
 
 Example: For File `deploy/deployment.yaml`
 
-```
+```yaml
 spec:
   serviceAccountName: nfs-client-provisioner
   containers:
@@ -228,8 +321,6 @@ spec:
 ```
 
 4. Follow the steps in [this article to setup the NFS storage](https://medium.com/faun/openshift-dynamic-nfs-persistent-volume-using-nfs-client-provisioner-fcbb8c9344e)
-
-
 
 5. [OPTIONAL] Make the NFS Storage Class the default Storage Class if you want it to be the default storageclass 
 
