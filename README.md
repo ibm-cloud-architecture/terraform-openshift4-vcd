@@ -655,6 +655,7 @@ You don't need to recreate your Bastion everytime you want to create a cluster b
  
  * My nodes are stuck in restarting.  How do I troubleshoot it?
  
+ 
  Ans: Goto your vcloud director console, and in the `Virtual Machine` section in the left panel , select all the `control plane` and `compute` nodes and also the `storage` nodes if present and reboot them at once. It takes some time to reboot and you can verify if all the nodes are ready by below command
  ```
  oc get machineconfigpool
