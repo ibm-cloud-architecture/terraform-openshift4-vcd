@@ -14,8 +14,12 @@ This toolkit performs an OpenShift UPI type install and will provision CoreOS no
 **NOTE**: Requires terraform 0.13 or later.  
 
 **Change History:**
+
+  - 6/04/2021:  
+      - updates to add additonal network related entries necessary for airgapped install to handle access to mirror. Also trust cert for airgap install.
+      - Fix to force bash shell when host machine default shell is not bash (ie Ubuntu). Tested on Ubuntu 20
   - 6/02/2021:
-      - We divided the main readme into two documents, one for the setting up the OCP cluster with online path, and other one for setting up the OCP cluster with airgap path.
+      - We divided the main readme into two documents, one for the setting up the OCP cluster with online path, and other one for setting  up the OCP cluster with airgap path.
       - Created the high level steps for [install OCP cluster for online path](#high-level-steps-for-setting-up-the-cluster-as-online-install)
       - Created the high level steps for [install OCP cluster for airgap path](#high-level-steps-for-setting-up-the-cluster-as-airgap-install)
   - 5/07/2021:
@@ -73,7 +77,7 @@ OpenShift 4.6 User-Provided Infrastructure
   * [Step 2.1: Setup Host Machine](#setup-host-machine)
   * [Step 2.2: Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
 * [Step 3: Perform Bastion install and Create the airgap cluster](#perform-bastion-install)
-  * [Step 3.1: Login to Bastion](#login-to-bastion) 
+  * [Step 3.1: Login to Bastion](#login-to-bastion)
   * [Step 3.2: Client setup](#client-setup)
   * [Step 3.3: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
 * [Step 4: Debugging the OCP installation](#debugging-the-ocp-installation)
@@ -118,7 +122,7 @@ Please follow these steps in sequence using the steps below, and come back here 
     * [Step 2.3.2: Copy registry cert in case of shared registry from different VCD](docs/airgap-cluster-setup.md#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
     * [Step 2.3.3: Update the terraform.tfvars airgap parameters](docs/airgap-cluster-setup.md#update-the-terraformtfvars-airgap-parameters)
 * [Step 3: Perform Bastion install and Create the airgap cluster](#perform-bastion-install)
-  * [Step 3.1: Login to Bastion](#login-to-bastion) 
+  * [Step 3.1: Login to Bastion](#login-to-bastion)
   * [Step 3.2: Client setup](#client-setup)
   * [Step 3.3: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
 * [Step 4: Debugging the OCP installation](#debugging-the-ocp-installation)
@@ -154,7 +158,9 @@ You will order a **VMware Solutions Shared** instance in IBM Cloud(below).  When
 
 # Installing the Bastion and initial network configuration
 ## Setup Host Machine
-You will need a "Host" machine to perform the initial Bastion install and configuration. This process has only been tested on a RHEL8 Linux machine and a Mac but may work on other linux based systems that support the required software. You should have the following installed on your Host:
+You will need a "Host" machine to perform the initial Bastion install and configuration. This process has only been tested on a RHEL8 Linux machine, Ubuntu 20 and a Mac but may work on other linux based systems that support the required software. You should have the following installed on your Host:
+ - sshpass
+ - ssh-keygen
  - ansible [instructions here](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
  - git
  - terraform [instructons here](https://www.terraform.io/downloads.html)
@@ -168,12 +174,12 @@ git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vcd
 cd terraform-openshift4-vcd
 ```
 
-If you are planning to install the OCP cluster with airgap path then 
+If you are planning to install the OCP cluster with airgap path then
 ```
 cp terraform.tfvars.airgap.example terraform.tfvars
 ```
 
-If you are planning to install the OCP cluster with online path then 
+If you are planning to install the OCP cluster with online path then
 ```
 cp terraform.tfvars.example terraform.tfvars
 ```
@@ -323,7 +329,7 @@ Gather the following information that you will need when configuring the ESG:
 - The Red Hat Activation key can be retrieved from this screen to populate `rhel_key`
 
 - Bastion server install with both online or airgap path
-    
+
   - Set `run_cluster_install` to true.
   - Your terraform.tfvars entries should look something like this:    
 ```

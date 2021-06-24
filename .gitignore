@@ -1,6 +1,6 @@
 #  Local .terraform directories
 **/.terraform/*
-
+**/.terraform.lock.hcl
 # .tfstate files
 *.tfstate
 *.tfstate.*
@@ -20,6 +20,8 @@ makefile
 **/terraform.tfstate.d/*
 **/installer/*
 **/go-vcloud-director.log
+**/temp/*
 tmp.txt
 crash.log
 .docker*
+media/temp.yaml

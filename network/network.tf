@@ -59,8 +59,32 @@ resource "vcd_nsxv_firewall_rule" "lb_allow" {
   }
 }
 
+resource "vcd_nsxv_firewall_rule" "mirror_allow" {
+// if airgapped, you need to allow access to mirrors public ip
+  count = var.airgapped["enabled"] ? 1 : 0 
+
+  org          = var.vcd_org
+  vdc          = var.vcd_vdc
+  edge_gateway = element(data.vcd_resource_list.edge_gateway_name.list,1)
+  action       = "accept"
+  name         = "${var.cluster_id}_mirror_allow_rule"  
+  
+  source {
+    ip_addresses = ["any"]
+  }
+
+  destination {
+    ip_addresses = [var.airgapped["mirror_ip"]]
+  }
+
+  service {
+    protocol = "tcp"
+    port     = var.airgapped["mirror_port"]
+  }
+}
+
 resource "vcd_nsxv_firewall_rule" "cluster_allow" {
-// if airgapped, you need the lb to have access so it can get dhcpd, coredns and haproxy images
+// if not airgapped, you need the cluster to have access because the default is deny
   count = var.airgapped["enabled"] ? 0 : 1 
 
   org          = var.vcd_org
@@ -127,12 +151,16 @@ resource "vcd_nsxv_dnat" "dnat" {
   connection: local
   gather_facts: False
   tasks:
-    - name: update hosts
+    - name: update /etc/hosts
       blockinfile:
          path: /etc/hosts
          block: |
             ${var.network_lb_ip_address}  api.${var.cluster_id}.${var.base_domain}
             ${var.network_lb_ip_address}  api-int.${var.cluster_id}.${var.base_domain}
+         %{if var.airgapped["enabled"]}
+            ${var.airgapped["mirror_ip"]}  ${var.airgapped["mirror_fqdn"]} 
+         %{endif}
+            
          state: present
          marker_begin: "${var.cluster_id}"
          marker_end: "${var.cluster_id}"
@@ -144,7 +172,18 @@ resource "vcd_nsxv_dnat" "dnat" {
             address=/.apps.${var.cluster_id}.${var.base_domain}/${var.network_lb_ip_address}
          state: present
          marker_begin: "${var.cluster_id}"
-         marker_end: "${var.cluster_id}"         
+         marker_end: "${var.cluster_id}"  
+         
+ %{if var.airgapped["enabled"]}
+    - name: Copy Mirror Cert for trust
+      shell: "cp ${var.additionalTrustBundle} /etc/pki/ca-trust/source/anchors/."
+      args:
+        warn: no  
+    - name: Update trust cert store for mirror ca
+      shell: "update-ca-trust"
+      args:
+        warn: no          
+ %{endif}       
 EOF
 }
 

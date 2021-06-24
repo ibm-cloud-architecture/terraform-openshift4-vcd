@@ -23,6 +23,7 @@ data "vcd_edgegateway" "mygateway" {
   name          = element(data.vcd_resource_list.edge_gateway_name.list,1)
 
 }
+
  locals {
     ansible_directory = "/tmp"
     additional_trust_bundle_dest = dirname(var.additionalTrustBundle)
@@ -119,6 +120,59 @@ resource "vcd_nsxv_firewall_rule" "bastion_inbound_allow" {
     protocol = "tcp"
     port     = "22"
   }
+  service {
+    protocol = "tcp"
+    port     = "5000"
+  }
+  service {
+    protocol = "tcp"
+    port     = "5001"
+  }  
+  
+  service {
+    protocol = "tcp"
+    port     = "5002"
+  }
+  service {
+    protocol = "tcp"
+    port     = "5003"
+  }  
+  
+  service {
+    protocol = "tcp"
+    port     = "5004"
+  }  
+  service {
+    protocol = "tcp"
+    port     = "5005"
+  }  
+  
+  service {
+    protocol = "tcp"
+    port     = "5006"
+  }  
+  
+  service {
+    protocol = "tcp"
+    port     = "5007"
+  }  
+
+  service {
+    protocol = "tcp"
+    port     = "5008"
+  }  
+
+  service {
+    protocol = "tcp"
+    port     = "5009"
+  }  
+
+  service {
+    protocol = "tcp"
+    port     = "5010"
+  }  
+
+
     depends_on = [
       vcd_vapp_org_network.vappOrgNet,
   ]
@@ -298,7 +352,7 @@ resource "null_resource" "setup_bastion" {
 resource "null_resource" "setup_ssh" {
  
   provisioner "local-exec" {
-      command = templatefile("${path.module}/scripts/fix_ssh.sh.tmpl", {
+      command = templatefile("${path.module}/scripts/fix_ssh.sh.tmpl" , {
          bastion_password            = var.initialization_info["bastion_password"]
          public_bastion_ip           = var.initialization_info["public_bastion_ip"] 
     })

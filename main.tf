@@ -78,6 +78,7 @@ module "network" {
       var.storage_ip_addresses
       ])
   airgapped     = var.airgapped
+  additionalTrustBundle = var.additionalTrustBundle
   network_lb_ip_address = var.lb_ip_address
   vcd_password  = var.vcd_password
   vcd_org       = var.vcd_org
@@ -477,7 +478,7 @@ Kubeadmin                      : User: kubeadmin password: ${data.local_file.kub
 Bastion Public IP              : ${var.initialization_info["public_bastion_ip"]}   ssh -i ~/.ssh/id_bastion root@${var.initialization_info["public_bastion_ip"]}  
 Bastion Privat IP              : ${var.initialization_info["internal_bastion_ip"]}
 Login to Bootstrap from Bastion: ssh -i ${path.cwd}/installer/${var.cluster_id}/openshift_rsa core@${var.bootstrap_ip_address}
-Public IP                      : ${var.cluster_public_ip}
+Cluster Public IP              : ${var.cluster_public_ip}
 OpenShift Console              : ${local.openshift_console_url}
 Export KUBECONFIG              : ${local.export_kubeconfig}
 

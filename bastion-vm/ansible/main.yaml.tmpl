@@ -58,14 +58,13 @@
         name: dnsmasq
         state: restarted
         enabled: yes
-
-    # install additional tools
-    - name: epel tools
+  # install install epel
+    - name: install epel
       shell: "yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
       args:
-        warn: no 
+        warn: no         
 
-    # install additioanl tools
+ # install additional tools
     - name: install tools
       yum:
         name:
@@ -77,6 +76,13 @@
           - podman
           - docker
         state: latest
+
+ # install install vcd-cli
+    - name: install vcd-cli
+      shell: "pip3 install vcd-cli"
+      args:
+        warn: no         
+
 
     # nginx as http server
     - name: Copy file with owner and permissions
@@ -141,6 +147,9 @@
 
     - name: configure firewall
       shell: "firewall-cmd --add-port=53/udp --zone=public --permanent"
+
+    - name: configure firewall
+      shell: "firewall-cmd --add-port=5000-5010/tcp --zone=public --permanent"
 
     - name: configure firewall
       shell: "firewall-cmd --reload"
