@@ -21,6 +21,7 @@ locals {
   repo_ip = var.airgapped["enabled"] ? local.mirror_repo_ip : []
   openshift_console_url = "https://console-openshift-console.apps.${var.cluster_id}.${var.base_domain}"
   export_kubeconfig     = "export KUBECONFIG=${path.cwd}/installer/${var.cluster_id}/auth/kubeconfig"
+  vcd_host            = replace(replace(var.vcd_url,"https://", ""),"/api","")
 
   }
 
@@ -468,6 +469,7 @@ module "storage_vm_vms_only" {
   ]
 }
 
+
 data "template_file" "write_final_args" {
   template = <<EOF
 **********************************************************************************************************************  
@@ -496,3 +498,37 @@ resource "local_file" "write_final_args" {
     module.ignition,
   ]
 }
+data "template_file" "startup_vms_script" {
+  template = <<EOF
+# **********************************************************************************************************************  
+# This script starts the vms in the cluster after all machines have been provisioned.   
+# **********************************************************************************************************************
+ 
+vcd login ${local.vcd_host} ${var.vcd_org} ${var.vcd_user} -p ${var.vcd_password} 
+vcd vapp power-on ${local.app_name}
+vcd logout
+EOF
+}
+resource "local_file" "startup_vms_script" {
+  content  = data.template_file.startup_vms_script.rendered
+  filename = "/root/${var.cluster_id}-start-vms.sh"
+  depends_on = [
+    module.ignition,
+  ]
+}
+
+
+resource "null_resource" "start_vapp" {
+    triggers = {
+      always_run = "$timestamp()"
+  }
+       depends_on = [
+         module.compute_vm,
+         module.control_plane_vm,
+         module.storage_vm,
+     ]
+
+  provisioner "local-exec"{
+     command  = "/root/${var.cluster_id}-start-vms.sh"
+  }
+}  
