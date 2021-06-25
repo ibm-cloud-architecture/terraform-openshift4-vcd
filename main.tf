@@ -507,6 +507,7 @@ data "template_file" "startup_vms_script" {
 vcd login ${local.vcd_host} ${var.vcd_org} ${var.vcd_user} -p ${var.vcd_password} 
 vcd vapp power-on ${local.app_name}
 vcd logout
+${path.cwd}/installer/${var.cluster_id}/openshift-install --dir=${path.cwd}/installer/${var.cluster_id} wait-for bootstrap-complete --log-level=info
 EOF
 }
 resource "local_file" "startup_vms_script" {
