@@ -11,13 +11,74 @@ Please follow the steps from main document [high level steps to setup the airgap
 
 #### Setting up mirror registry
 
-**NOTE**: If you have a mirror registry already setup  with the OCP images mirrored , in some other VCD by your team, then you can skip setting up the mirror registry and directly create the OCP cluster by following the instructions [Create the airgap cluster from bastion server](#create-the-airgap-cluster-from-bastion-server)
+**NOTE**: If you have a mirror registry already setup  with the OCP images mirrored , in some other VCD by your team, then you can skip setting up the mirror registry and directly create the OCP cluster by following the instructions [High Level Steps for setup cluster](../README.md#architecture)
+
+
+##### Setting up of registry via automated script
+
+You can run this script [setup_simple_private_registry.sh](scripts/setup_simple_private_registry.sh) to setup simple private registry on your bastion server
+
+* You need to edit the below parameters in the script [setup_simple_private_registry.sh](scripts/setup_simple_private_registry.sh)
+
+```sh
+#Parameters for TLS Certificate usage.
+ #This parameter is to be set in case you need to setup your registry with existing TLS CERT file.
+export REGISTRY_SETUP_WITH_EXISTING_TLS_CERTIFICATE="false"
+ #Certificate key filename, if you have existing file you can provide the name here, else in case if you dont have one then the script creates one with self signed certificate key file
+ #use this name if you dont have file of yours ex: '$HOSTNAME-$REGISTRY_PORT_NUMBER.key'
+ #NOTE: If you provide your existing filename then you need to make sure it is present in the directory path as per the parameter 'CERTS_DIR' below
+export REGISTRY_HTTP_TLS_KEY_FILENAME="$HOSTNAME-$REGISTRY_PORT_NUMBER.key"
+ #Certificate crt filename, if you have existing file you can provide the name here , else in case if you don't have one then the script creates one with self signed certificate crt file
+ #use this name if you don't have file of yours ex : '$HOSTNAME-$REGISTRY_PORT_NUMBER.crt'
+ #NOTE: If you provide your existing filename then you need to make sure it is present in the directory path as per the parameter 'CERTS_DIR' below
+export REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME="$HOSTNAME-$REGISTRY_PORT_NUMBER.crt"
+
+#Parameters for registry directory paths
+ #Provide the registry directory ex : '/opt/test2_registry'.
+export registry_dir="/opt/test2_registry"
+ #Provide the Auth directory where registry access crendentials file will be created by the script. ex : '$registry_dir/auth'
+export AUTH_DIR="$registry_dir/auth"
+ #Provide the Certs directory which will be used to either generate self signed certificate, or where you have existing TLS certificate file. ex : '$registry_dir/certs'
+export CERTS_DIR="$registry_dir/certs"
+ #Provide the Data directory which will be used by the registry to store the data. ex: '$registry_dir/data'
+export DATA_DIR="$registry_dir/data"
+
+
+#Parameters for registry credentials to access it.
+ #Username for your registry to access it once it is created.
+export registry_username_to_be_created="test_user"
+ #Password for your registry to access it once it is created.
+export registry_password_to_be_set="simplepassword"
+
+#Parameters for registry name and port number
+ #Registry name that you want to setup
+export REGISTRY_NAME="registry123"
+ #Port number for the the registry to be accessed later once it is created.
+export REGISTRY_PORT_NUMBER="5004"
+
+
+```
+
+* Now you can execute the script to install the Strimzi operator
+
+```
+ ./scripts/setup_simple_private_registry.sh
+```
+
+* In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
+```
+cp <your mirror cert> /etc/pki/ca-trust/source/anchors/
+update-ca-trust
+trust list | grep -i "<hostname>"
+```
+
+##### Setting up of registry manually via redhat documented steps
 
 You need a mirror registry to mirror the OCP release images so it can be used to create the OCP cluster further. A simple registry setup instructions can be found [here](https://www.redhat.com/sysadmin/simple-container-registry).
 
-In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
+* In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
 ```
-cp <your mirror cert>/etc/pki/ca-trust/source/anchors/
+cp <your mirror cert> /etc/pki/ca-trust/source/anchors/
 update-ca-trust
 trust list | grep -i "<hostname>"
 ```
@@ -66,6 +127,13 @@ This is special step and you have to perform it only if you have your mirror reg
 
 ```
 additionalTrustBundle = "/opt/registry/certs/domain.crt"
+```
+
+* In order to prevent an x509 untrusted CA error during the terraform apply step, you must currently copy your mirror certificate to this directory and trust it. I should be able to fix this in the future.  
+```
+cp <your mirror cert> /etc/pki/ca-trust/source/anchors/
+update-ca-trust
+trust list | grep -i "<hostname>"
 ```
 
 ##### Update the terraform.tfvars airgap parameters
@@ -131,10 +199,10 @@ You may receive an Alert stating `Cluster version operator has not retrieved upd
 
 ##### Configure mirrored redhat operators catalog
 
-Assuming that you have a mirror registry where the redhat catalogs are mirrored, now you will configure the catalog access by following below steps
+Assuming that you have a mirror registry and you have redhat catalog mirror created, now you will configure the catalog access by following below steps
 
 **Pre-requisite**:
-
+* Redhat catalogs are mirrored by following the earlier instructions [create a mirror for redhat openshift catalogs](#create-a-mirror-for-redhat-openshift-catalogs)
 * You need to have the shared files `imageContentSourcePolicy.yaml` and `catalogSource.yaml` that was generated as a process of mirroring the catalogs in shared registry.
 
 **Steps**:
