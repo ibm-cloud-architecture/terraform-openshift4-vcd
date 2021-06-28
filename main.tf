@@ -504,7 +504,7 @@ data "template_file" "startup_vms_script" {
 # This script starts the vms in the cluster after all machines have been provisioned.   
 # **********************************************************************************************************************
  
-vcd login ${local.vcd_host} ${var.vcd_org} ${var.vcd_user} -p ${var.vcd_password} 
+vcd login ${local.vcd_host} ${var.vcd_org} ${var.vcd_user} -p ${var.vcd_password} -v ${var.vcd_vdc}
 vcd vapp power-on ${local.app_name}
 vcd logout
 ${path.cwd}/installer/${var.cluster_id}/openshift-install --dir=${path.cwd}/installer/${var.cluster_id} wait-for bootstrap-complete --log-level=info
