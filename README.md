@@ -658,3 +658,13 @@ You don't need to recreate your Bastion everytime you want to create a cluster b
  `terraform -chdir=bastion-vm apply --var-file="../terraform.tfvars" --auto-approve` on your Host machine.
 
  If you delete the Bastion via some other method, remember to delete the FW, DNAT and SNAT rule associated with the Bastion. They will be tagged with references to the Bastion
+ 
+ ### FAQ
+ 
+ * My nodes are stuck in restarting.  How do I troubleshoot it?
+ 
+ 
+ Ans: Goto your vcloud director console, and in the `Virtual Machine` section in the left panel , select all the `control plane` and `compute` nodes and also the `storage` nodes if present and reboot them at once. It takes some time to reboot and you can verify if all the nodes are ready by below command
+ ```
+ oc get machineconfigpool
+ ```
