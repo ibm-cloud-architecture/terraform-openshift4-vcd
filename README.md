@@ -15,6 +15,8 @@ This toolkit performs an OpenShift UPI type install and will provision CoreOS no
 
 **Change History:**
 
+  - 6/25/2021:
+      - added code to use vcd-cli to start cluster after its provisioned so now the terraform will start the cluster for you and will end when the bootstrap is complete.
   - 6/04/2021:  
       - updates to add additonal network related entries necessary for airgapped install to handle access to mirror. Also trust cert for airgap install.
       - Fix to force bash shell when host machine default shell is not bash (ie Ubuntu). Tested on Ubuntu 20
