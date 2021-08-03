@@ -221,19 +221,12 @@ else
       if [[ ( $userinput == "Y" ) || ( $userinput == "y" ) ]];then
          echo "[INFO] Using the existing certificate files '$CERTS_DIR/$REGISTRY_HTTP_TLS_KEY_FILENAME' and '$CERTS_DIR/$REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME'"
       elif [[ ( $userinput == "N" ) || ( $userinput == "n" ) ]];then
-         #echo "[INFO] Common Name to be used for registry tls key and cert :--------->>>>>> Hostname='$HOSTNAME' <<<<<<<---------"
-
-         #echo "[INFO] The registry is secured with TLS by using a key and certificate signed by a simple self-signed certificate. "
-         #echo "[INFO] Creating self-signed certificate in directory $CERTS_DIR"
-         #openssl req -newkey rsa:4096 -nodes -sha256 -keyout $CERTS_DIR/$REGISTRY_HTTP_TLS_KEY_FILENAME -x509 -days 365 -out $CERTS_DIR/$REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME
-
          generate_cert_files      
       else
          echo "[ERROR] Invalid option '$userinput', please run again and select ('Y/N' or 'y/n')"
          exit 1
       fi
   else
-      echo "Both cert and its key is not found, and you are stuck and it is not creating cert file now"
       generate_cert_files
   fi
   
