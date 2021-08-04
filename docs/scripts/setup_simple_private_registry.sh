@@ -132,8 +132,9 @@ generate_cert_files(){
 
      echo "[INFO] The registry is secured with TLS by using a key and certificate signed by a simple self-signed certificate. "
      echo "[INFO] Creating self-signed certificate in directory $CERTS_DIR"
-     openssl req -newkey rsa:4096 -nodes -sha256 -keyout $CERTS_DIR/$REGISTRY_HTTP_TLS_KEY_FILENAME -x509 -days 365 -out $CERTS_DIR/$REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME
-
+     
+     #creating the self signed certificate with SAN(Subject alternate name)
+     openssl req -newkey rsa:4096 -nodes -sha256 -keyout $CERTS_DIR/$REGISTRY_HTTP_TLS_KEY_FILENAME -x509 -days 365 -out $CERTS_DIR/$REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME -addext "subjectAltName = DNS:$HOSTNAME"
 }
 
 display_registry_access_details(){
