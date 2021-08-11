@@ -6,7 +6,14 @@
 #############################################################################################
 #Parameters for TLS Certificate usage.
  #This parameter is to be set in case you need to setup your registry with existing TLS CERT file.
-export REGISTRY_SETUP_WITH_EXISTING_TLS_CERTIFICATE="false"
+export REGISTRY_SETUP_WITH_EXISTING_TLS_CERTIFICATE="true"
+
+#Parameters for registry name and port number
+ #Registry name that you want to setup
+export REGISTRY_NAME="registry123"
+ #Port number for the the registry to be accessed later once it is created.
+export REGISTRY_PORT_NUMBER="5004"
+
  #Certificate key filename, if you have existing file you can provide the name here, else in case if you dont have one then the script creates one with self signed certificate key file
  #use this name if you dont have file of yours ex: '$HOSTNAME-$REGISTRY_PORT_NUMBER.key'
  #NOTE: If you provide your existing filename then you need to make sure it is present in the directory path as per the parameter 'CERTS_DIR' below
@@ -17,8 +24,8 @@ export REGISTRY_HTTP_TLS_KEY_FILENAME="$HOSTNAME-$REGISTRY_PORT_NUMBER.key"
 export REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME="$HOSTNAME-$REGISTRY_PORT_NUMBER.crt"
 
 #Parameters for registry directory paths
- #Provide the registry directory ex : '/opt/test2_registry'.
-export registry_dir="/opt/test2_registry"
+ #Provide the registry directory ex : '/opt/$REGISTRY_PORT_NUMBER_registry'.
+export registry_dir="/opt/${REGISTRY_PORT_NUMBER}_registry"
  #Provide the Auth directory where registry access crendentials file will be created by the script. ex : '$registry_dir/auth'
 export AUTH_DIR="$registry_dir/auth"
  #Provide the Certs directory which will be used to either generate self signed certificate, or where you have existing TLS certificate file. ex : '$registry_dir/certs'
@@ -35,9 +42,9 @@ export registry_password_to_be_set="simplepassword"
 
 #Parameters for registry name and port number
  #Registry name that you want to setup
-export REGISTRY_NAME="registry123"
+#export REGISTRY_NAME="registry123"
  #Port number for the the registry to be accessed later once it is created.
-export REGISTRY_PORT_NUMBER="5004"
+#export REGISTRY_PORT_NUMBER="5004"
 #############################################################################################
 
 #This is the auth file that gets created for your registry credentials. This is static and no need to change.
@@ -119,6 +126,17 @@ restart_container_registry(){
      fi
 }
 
+generate_cert_files(){
+
+     echo "[INFO] Common Name to be used for registry tls key and cert :--------->>>>>> Hostname='$HOSTNAME' <<<<<<<---------"
+
+     echo "[INFO] The registry is secured with TLS by using a key and certificate signed by a simple self-signed certificate. "
+     echo "[INFO] Creating self-signed certificate in directory $CERTS_DIR"
+     
+     #creating the self signed certificate with SAN(Subject alternate name)
+     openssl req -newkey rsa:4096 -nodes -sha256 -keyout $CERTS_DIR/$REGISTRY_HTTP_TLS_KEY_FILENAME -x509 -days 365 -out $CERTS_DIR/$REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME -addext "subjectAltName = DNS:$HOSTNAME"
+}
+
 display_registry_access_details(){
 
 
@@ -141,20 +159,6 @@ display_registry_access_details(){
 
 
 
-#echo "[INFO] Checking Pre-requisites:"
-#if podman -v > /dev/null ;then
-#   echo "[INFO] Pre-requisite 'Podman' exists"
-#else
-#   echo "[ERROR] Pre-requisite 'Podman' does not exists, please install and try again"
-#   exit 1
-#fi
-
-#if httpd-tools -v > /dev/null ;then
-#   echo "[INFO] Pre-requisite 'httpd-tools' exists"
-#else
-#   echo "[ERROR] Pre-requisite 'httpd-tools' does not exists, installing it."
-#   yum install -y podman httpd-tools
-#fi
 
 #installing httpd-tools
 #echo "[INFO] Installing httpd-tools"
@@ -218,16 +222,13 @@ else
       if [[ ( $userinput == "Y" ) || ( $userinput == "y" ) ]];then
          echo "[INFO] Using the existing certificate files '$CERTS_DIR/$REGISTRY_HTTP_TLS_KEY_FILENAME' and '$CERTS_DIR/$REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME'"
       elif [[ ( $userinput == "N" ) || ( $userinput == "n" ) ]];then
-         echo "[INFO] Common Name to be used for registry tls key and cert :--------->>>>>> Hostname='$HOSTNAME' <<<<<<<---------"
-
-         echo "[INFO] The registry is secured with TLS by using a key and certificate signed by a simple self-signed certificate. "
-         echo "[INFO] Creating self-signed certificate in directory $CERTS_DIR"
-         openssl req -newkey rsa:4096 -nodes -sha256 -keyout $CERTS_DIR/$REGISTRY_HTTP_TLS_KEY_FILENAME -x509 -days 365 -out $CERTS_DIR/$REGISTRY_HTTP_TLS_CERTIFICATE_FILENAME      
+         generate_cert_files      
       else
          echo "[ERROR] Invalid option '$userinput', please run again and select ('Y/N' or 'y/n')"
          exit 1
       fi
-
+  else
+      generate_cert_files
   fi
   
   echo "[INFO] The certificate will also have to be trusted by your hosts and clients"
