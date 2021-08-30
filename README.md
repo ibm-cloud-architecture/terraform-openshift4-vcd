@@ -1,3 +1,45 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [OpenShift Installation on IBM Cloud VMWare Solutions Shared based on VMWare Cloud Director](#openshift-installation-on-ibm-cloud-vmware-solutions-shared-based-on-vmware-cloud-director)
+  - [Overview](#overview)
+  - [Architecture](#architecture)
+  - [High Level Steps for setting up the cluster as online install](#high-level-steps-for-setting-up-the-cluster-as-online-install)
+  - [High Level Steps for setting up shared mirror registry for airgap install (Skip this if you if you have a mirror registry already setup with the OCP images mirrored)](#high-level-steps-for-setting-up-shared-mirror-registry-for-airgap-install-skip-this-if-you-if-you-have-a-mirror-registry-already-setup-with-the-ocp-images-mirrored)
+  - [High Level Steps for setting up the cluster as airgap install](#high-level-steps-for-setting-up-the-cluster-as-airgap-install)
+- [Installation Process](#installation-process)
+  - [Order a VCD](#order-a-vcd)
+      - [Procedure:](#procedure)
+      - [Initial VCD setup](#initial-vcd-setup)
+- [Installing the Bastion and initial network configuration](#installing-the-bastion-and-initial-network-configuration)
+  - [Setup Host Machine](#setup-host-machine)
+  - [Gather Information for terraform.tfvars](#gather-information-for-terraformtfvars)
+    - [terraform variables description](#terraform-variables-description)
+    - [Find vApp Template from the Image Catalog](#find-vapp-template-from-the-image-catalog)
+    - [Networking Info](#networking-info)
+    - [Choosing an External IP  for your cluster and Bastion and retrieving the Red Hat Activation key](#choosing-an-external-ip--for-your-cluster-and-bastion-and-retrieving-the-red-hat-activation-key)
+      - [Configuring  `initialization_info` in `terraform.tfvars` file](#configuring--initialization_info-in-terraformtfvars-file)
+      - [Retrieve pull secret from Red Hat sites](#retrieve-pull-secret-from-red-hat-sites)
+  - [Perform Bastion install](#perform-bastion-install)
+      - [Login to Bastion](#login-to-bastion)
+        - [Steps to create cluster only if you just created bastion server earlier and not the OCP cluster](#steps-to-create-cluster-only-if-you-just-created-bastion-server-earlier-and-not-the-ocp-cluster)
+      - [Client setup](#client-setup)
+      - [Validating OpenShift cluster install completion:](#validating-openshift-cluster-install-completion)
+      - [Debugging the OCP installation](#debugging-the-ocp-installation)
+  - [Configuration to enable OCP console login](#configuration-to-enable-ocp-console-login)
+  - [Optional Steps:](#optional-steps)
+    - [Use SSH Key rather than password authentication for Bastion login (optional)](#use-ssh-key-rather-than-password-authentication-for-bastion-login-optional)
+    - [Move SSH to higher port (optional)](#move-ssh-to-higher-port-optional)
+    - [Storage Configuration](#storage-configuration)
+      - [Add an NFS Server to provide Persistent storage.](#add-an-nfs-server-to-provide-persistent-storage)
+      - [Create Openshift Container Storage Cluster for persistent storage.](#create-openshift-container-storage-cluster-for-persistent-storage)
+      - [Enable Registry](#enable-registry)
+    - [Deleting Cluster (and reinstalling)](#deleting-cluster-and-reinstalling)
+    - [FAQ](#faq)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 # OpenShift Installation on IBM Cloud VMWare Solutions Shared based on VMWare Cloud Director
 ## Overview
