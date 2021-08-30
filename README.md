@@ -150,7 +150,7 @@ OpenShift 4.6 User-Provided Infrastructure
   * [Step 4.1: Setting up mirror registry](docs/airgap-cluster-setup.md#setting-up-mirror-registry)
   * [Step 4.2: Create a mirror for OpenShift 4.6 images](docs/airgap-cluster-setup.md#create-a-mirror-for-openshift-46-images)
   * [Step 4.3: Create a mirror for redhat operators catalog](docs/airgap-cluster-setup.md#create-a-mirror-for-redhat-openshift-catalogs)
-* [Step 5 (Optional): [How to increase existing bastion server disk capacity for mirroring of the images](docs/airgap-cluster-setup.md#how-to-increase-existing-bastion-server-disk-capacity-for-mirroring-of-the-images)] 
+* [Step 5 (Optional): [How to increase existing bastion server disk capacity for mirroring of the images](docs/airgap-cluster-setup.md#how-to-increase-existing-bastion-server-disk-capacity-for-mirroring-of-the-images)
 
 ## High Level Steps for setting up the cluster as airgap install
 ----------------------------------------------------------------
