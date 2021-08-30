@@ -1,3 +1,25 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Airgap OpenShift Installation on IBM Cloud VMWare Solutions Shared based on VMWare Cloud Director](#airgap-openshift-installation-on-ibm-cloud-vmware-solutions-shared-based-on-vmware-cloud-director)
+  - [Overview](#overview)
+      - [Setting up mirror registry](#setting-up-mirror-registry)
+        - [Setting up of registry via automated script](#setting-up-of-registry-via-automated-script)
+        - [Setting up of registry manually via redhat documented steps](#setting-up-of-registry-manually-via-redhat-documented-steps)
+      - [Create a mirror for OpenShift 4.6 images](#create-a-mirror-for-openshift-46-images)
+      - [Create a mirror for Redhat Openshift catalogs](#create-a-mirror-for-redhat-openshift-catalogs)
+      - [Setup airgap pre-requisites](#setup-airgap-pre-requisites)
+        - [Add the mirror creds in the pull-secret.json](#add-the-mirror-creds-in-the-pull-secretjson)
+        - [Copy registry cert in case of registry setup in different VCD](#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
+        - [Update the terraform.tfvars airgap parameters](#update-the-terraformtfvars-airgap-parameters)
+      - [Post install cluster configuration](#post-install-cluster-configuration)
+        - [Configure mirrored redhat operators catalog](#configure-mirrored-redhat-operators-catalog)
+      - [Storage Configuration](#storage-configuration)
+  - [How to increase existing bastion server disk capacity for mirroring of the images](#how-to-increase-existing-bastion-server-disk-capacity-for-mirroring-of-the-images)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Airgap OpenShift Installation on IBM Cloud VMWare Solutions Shared based on VMWare Cloud Director
 ## Overview
 Deploy OpenShift on IBM Cloud VMWare Solutions based on VMWare Cloud Director.  This toolkit uses Terraform to automate the OpenShift installation process including the Edge Network configuration, Bastion host creation, OpenShift CoreOS bootstrap, loadbalancer, control and worker node creation. Once provisioned, the VMWare Cloud Director environment gives you complete control of all aspects of you OpenShift environment.
