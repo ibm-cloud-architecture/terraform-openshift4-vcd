@@ -1,3 +1,25 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Airgap OpenShift Installation on IBM Cloud VMWare Solutions Shared based on VMWare Cloud Director](#airgap-openshift-installation-on-ibm-cloud-vmware-solutions-shared-based-on-vmware-cloud-director)
+  - [Overview](#overview)
+      - [Setting up mirror registry](#setting-up-mirror-registry)
+        - [Setting up of registry via automated script](#setting-up-of-registry-via-automated-script)
+        - [Setting up of registry manually via redhat documented steps](#setting-up-of-registry-manually-via-redhat-documented-steps)
+      - [Create a mirror for OpenShift 4.6 images](#create-a-mirror-for-openshift-46-images)
+      - [Create a mirror for Redhat Openshift catalogs](#create-a-mirror-for-redhat-openshift-catalogs)
+      - [Setup airgap pre-requisites](#setup-airgap-pre-requisites)
+        - [Add the mirror creds in the pull-secret.json](#add-the-mirror-creds-in-the-pull-secretjson)
+        - [Copy registry cert in case of registry setup in different VCD](#copy-registry-cert-in-case-of-registry-setup-in-different-vcd)
+        - [Update the terraform.tfvars airgap parameters](#update-the-terraformtfvars-airgap-parameters)
+      - [Post install cluster configuration](#post-install-cluster-configuration)
+        - [Configure mirrored redhat operators catalog](#configure-mirrored-redhat-operators-catalog)
+      - [Storage Configuration](#storage-configuration)
+  - [How to increase existing bastion server disk capacity for mirroring of the images](#how-to-increase-existing-bastion-server-disk-capacity-for-mirroring-of-the-images)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Airgap OpenShift Installation on IBM Cloud VMWare Solutions Shared based on VMWare Cloud Director
 ## Overview
 Deploy OpenShift on IBM Cloud VMWare Solutions based on VMWare Cloud Director.  This toolkit uses Terraform to automate the OpenShift installation process including the Edge Network configuration, Bastion host creation, OpenShift CoreOS bootstrap, loadbalancer, control and worker node creation. Once provisioned, the VMWare Cloud Director environment gives you complete control of all aspects of you OpenShift environment.
@@ -224,3 +246,71 @@ oc apply -f catalogSource.yaml
 
 If you need to configure a storageclass, there are a few options.  You can follow these instructions for setting up NFS or rookcephfs [here](airgap-storage.md).
 
+
+# How to increase existing bastion server disk capacity for mirroring of the images
+
+In case when you want to increase the capacity of the disk on the bastion server which has shared mirror registry, you can use these steps.
+**Steps**:
+
+* Expanding the disk capacity for the Bastion server from the  VCloud director console.
+
+1. Goto to cloud.ibm.com and under your account and in the hamburger menu select your your `VMwhare->resources`.
+2. In the `VMware Solutions Shared ` click your resource name and inside that click the `vCloud director console` for your resource and sign in.
+3. In the Virtual Data Center select your VDC under which you have your Bastion server setup with the mirror registry.
+4. Click on vApps and select the bastion server.
+5. Click `Hardware-> Hard Disks`
+6. Click edit and increase the size of the disk from 1000 GB to 3000 GB(Depending on your capacity requirement).
+
+<img width="1440" alt="Screen Shot 2021-08-18 at 5 15 47 PM" src="https://media.github.ibm.com/user/186069/files/f5504800-0047-11ec-816f-e265bcd868c4">
+
+* Now steps to configure linux on the bastion server to enable the extended disk capacity usage.
+
+1. SSH to the bastion server for your VDC(Virtual Data Center)
+2. Run below command to find out the pvc names
+
+```
+# lsblk
+```
+
+3. Run below commands to enable the hard disk whose capacity is extended to register it with the linux os on that bastion server.
+
+Commands:
+```console
+(echo n;echo p;echo 3;echo ;echo ;echo t;echo 3;echo 8e;echo w) | fdisk /dev/sda > /dev/null 2>&1; fdisk -l /dev/sda
+partprobe
+pvcreate /dev/sda4
+vgextend rhel /dev/sda4
+vgdisplay -v
+lvextend -l +100%FREE /dev/rhel/root
+xfs_growfs  /dev/rhel/root
+```
+NOTE: Here `sda4` depends on your volume mount name as per above command
+
+4. Finally after execution of above commands run the commands to verify if your disk capacity is extended and configured.
+
+```console
+]# lsblk
+NAME          MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda             8:0    0    3T  0 disk 
+├─sda1          8:1    0    1G  0 part /boot
+├─sda2          8:2    0   31G  0 part 
+│ ├─rhel-root 253:0    0    2T  0 lvm  /
+│ └─rhel-swap 253:1    0  3.2G  0 lvm  [SWAP]
+├─sda3          8:3    0  968G  0 part 
+│ └─rhel-root 253:0    0    2T  0 lvm  /
+└─sda4          8:4    0    1T  0 part 
+  └─rhel-root 253:0    0    2T  0 lvm  /
+sr0            11:0    1 1024M  0 rom  
+
+[root@bastion-cp4waiops-registry-cp4waiops-shared-registry-cluster ~]# df -H
+Filesystem             Size  Used Avail Use% Mounted on
+devtmpfs               4.1G     0  4.1G   0% /dev
+tmpfs                  4.1G   87k  4.1G   1% /dev/shm
+tmpfs                  4.1G  9.4M  4.1G   1% /run
+tmpfs                  4.1G     0  4.1G   0% /sys/fs/cgroup
+/dev/mapper/rhel-root  2.2T  828G  1.4T  38% /
+/dev/sda1              1.1G  269M  795M  26% /boot
+tmpfs                  815M     0  815M   0% /run/user/0
+```
+
+NOTE: If you observer the `sda4` is added with the size.
