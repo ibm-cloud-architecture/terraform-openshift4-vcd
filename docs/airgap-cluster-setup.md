@@ -225,7 +225,7 @@ oc apply -f catalogSource.yaml
 If you need to configure a storageclass, there are a few options.  You can follow these instructions for setting up NFS or rookcephfs [here](airgap-storage.md).
 
 
-#### How to increase existing bastion server disk capacity for mirroring of the images
+## How to increase existing bastion server disk capacity for mirroring of the images
 
 In case when you want to increase the capacity of the disk on the bastion server which has shared mirror registry, you can use these steps.
 **Steps**:
