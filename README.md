@@ -714,7 +714,7 @@ You don't need to recreate your Bastion everytime you want to create a cluster b
  
  * My installation aborts.  How do I troubleshoot it? 
 
-Ans: Per, ssh to your bootstrap host. `/root` contains the cluster info. 
+Ans: ssh to your bootstrap host. `/root` contains the cluster info. 
 
 Check the logs on the the boostrap host per [Red Hat OpenShift Troubleshooting](https://docs.openshift.com/container-platform/4.7/support/troubleshooting/troubleshooting-installations.html)
 
