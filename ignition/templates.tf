@@ -21,7 +21,7 @@ networking:
   - ${var.cluster_servicecidr}
 platform:
   none: {}
-fips: ${var.fips}  
+fips: ${var.fips}
 pullSecret: '${chomp(file(var.pull_secret))}'
 sshKey: '${var.ssh_public_key}'
 %{if var.additionalTrustBundle != ""}
@@ -245,7 +245,11 @@ metadata:
   creationTimestamp: null
   name: cluster
 spec:
+  %{if var.compute_count == 0}
+  mastersSchedulable: true
+  %{else}
   mastersSchedulable: false
+    %{endif}  
   policy:
     name: ""
 status: {}

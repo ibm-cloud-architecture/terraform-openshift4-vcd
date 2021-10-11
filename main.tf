@@ -22,6 +22,10 @@ locals {
   openshift_console_url = "https://console-openshift-console.apps.${var.cluster_id}.${var.base_domain}"
   export_kubeconfig     = "export KUBECONFIG=${path.cwd}/installer/${var.cluster_id}/auth/kubeconfig"
   vcd_host            = replace(replace(var.vcd_url,"https://", ""),"/api","")
+  l_api_backend_addresses = flatten([
+      var.bootstrap_ip_address,
+      var.control_plane_ip_addresses
+    ])
 
   }
 
@@ -101,12 +105,13 @@ module "lb" {
   lb_ip_address = var.lb_ip_address
   initialization_info = var.initialization_info
 
-  api_backend_addresses = flatten([
-    var.bootstrap_ip_address,
-    var.control_plane_ip_addresses
-  ])
+//  api_backend_addresses = flatten([
+//    var.bootstrap_ip_address,
+//    var.control_plane_ip_addresses
+//  ])
 
-  ingress_backend_addresses = concat(var.compute_ip_addresses, var.storage_ip_addresses)
+api_backend_addresses = local.l_api_backend_addresses
+ingress_backend_addresses = var.compute_count == "0" ? local.l_api_backend_addresses : concat(var.compute_ip_addresses, var.storage_ip_addresses)
   ssh_public_key            = chomp(tls_private_key.installkey.public_key_openssh)
 
   cluster_domain = local.cluster_domain
@@ -210,6 +215,7 @@ module "ignition" {
   initialization_info = var.initialization_info
   additionalTrustBundle = var.additionalTrustBundle
   fips                = var.fips
+  compute_count       = var.compute_count
   depends_on = [
      local_file.write_public_key,
      module.network
@@ -424,7 +430,7 @@ module "storage_vm" {
   memory        = var.storage_memory
   disk_size     = var.compute_disk
   initialization_info = var.initialization_info
-  
+
   extra_disk_size    = var.storage_disk
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
   depends_on = [
@@ -455,7 +461,7 @@ module "storage_vm_vms_only" {
   memory        = var.storage_memory
   disk_size     = var.compute_disk
   initialization_info = var.initialization_info
-  
+
   extra_disk_size    = var.storage_disk
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
   depends_on = [
@@ -472,12 +478,12 @@ module "storage_vm_vms_only" {
 
 data "template_file" "write_final_args" {
   template = <<EOF
-**********************************************************************************************************************  
-This information stored in: /root/${var.cluster_id}info.txt on the Bastion and the Home Directory of the Host Machine.   
+**********************************************************************************************************************
+This information stored in: /root/${var.cluster_id}info.txt on the Bastion and the Home Directory of the Host Machine.
 **********************************************************************************************************************
 
 Kubeadmin                      : User: kubeadmin password: ${data.local_file.kubeadmin_password.content}
-Bastion Public IP              : ${var.initialization_info["public_bastion_ip"]}   ssh -i ~/.ssh/id_bastion root@${var.initialization_info["public_bastion_ip"]}  
+Bastion Public IP              : ${var.initialization_info["public_bastion_ip"]}   ssh -i ~/.ssh/id_bastion root@${var.initialization_info["public_bastion_ip"]}
 Bastion Privat IP              : ${var.initialization_info["internal_bastion_ip"]}
 Login to Bootstrap from Bastion: ssh -i ${path.cwd}/installer/${var.cluster_id}/openshift_rsa core@${var.bootstrap_ip_address}
 Cluster Public IP              : ${var.cluster_public_ip}
@@ -500,10 +506,10 @@ resource "local_file" "write_final_args" {
 }
 data "template_file" "startup_vms_script" {
   template = <<EOF
-# **********************************************************************************************************************  
-# This script starts the vms in the cluster after all machines have been provisioned.   
 # **********************************************************************************************************************
- 
+# This script starts the vms in the cluster after all machines have been provisioned.
+# **********************************************************************************************************************
+
 vcd login ${local.vcd_host} ${var.vcd_org} ${var.vcd_user} -p ${var.vcd_password} -v ${var.vcd_vdc}
 vcd vapp power-on ${local.app_name}
 vcd logout
@@ -532,4 +538,4 @@ resource "null_resource" "start_vapp" {
   provisioner "local-exec"{
      command  = "/root/${var.cluster_id}-start-vms.sh"
   }
-}  
+}
