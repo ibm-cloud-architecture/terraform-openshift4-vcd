@@ -711,3 +711,21 @@ You don't need to recreate your Bastion everytime you want to create a cluster b
  ```
  oc get machineconfigpool
  ```
+ 
+ * My installation aborts.  How do I troubleshoot it? 
+
+Ans: ssh to your bootstrap host. `/root` contains the cluster info. 
+
+Check the logs on the the boostrap host per [Red Hat OpenShift Troubleshooting](https://docs.openshift.com/container-platform/4.7/support/troubleshooting/troubleshooting-installations.html)
+
+```
+ssh core@<bootstrap_fqdn> journalctl -b -f -u bootkube.service
+ssh core@<bootstrap_fqdn> journalctl -b -f -u kubelet.service
+ssh core@<bootstrap_fqdn> journalctl -b -f -u crio.service
+```
+
+* My installation reports a truncated hostname. What should I do?
+
+In one instance, the `cluster_id` such as `5ba09b2e-960a-4724-81a4-3a30c4c9af37` lead to a generated hostname which exceeded the Kubernetes object exceeding the 63 character limit. Make sure you have a small length such that the kubelet.service generates a small object name.
+
+`Sep 23 16:48:49 bootstrap-00.5ba09b2e-960a-4724-81a4-3a30c4c9af37.abcdefghijk.com hyperkube[2280]: E0923 16:48:49.774509    2280 kubelet_pods.go:403] hostname for pod:"bootstrap-kube-apiserver-bootstrap-00.5ba09b2e-960a-4724-81a4-3a30c4c9af37.abcdefghijk.com" was longer than 63. Truncated hostname to :"bootstrap-kube-apiserver-bootstrap-00.5ba09b2e-960a-4724-81a4-3"`
