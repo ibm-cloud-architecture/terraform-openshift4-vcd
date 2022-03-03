@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Airgap OpenShift Installation on IBM Cloud VMWare Solutions Shared based on VMWare Cloud Director](#airgap-openshift-installation-on-ibm-cloud-vmware-solutions-shared-based-on-vmware-cloud-director)
+- [Airgap OpenShift Installation on IBM Cloud VMware Solutions Shared based on VMware Cloud Director](#airgap-openshift-installation-on-ibm-cloud-vmware-solutions-shared-based-on-vmware-cloud-director)
   - [Overview](#overview)
       - [Setting up mirror registry](#setting-up-mirror-registry)
         - [Setting up of registry via automated script](#setting-up-of-registry-via-automated-script)
@@ -20,9 +20,9 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# Airgap OpenShift Installation on IBM Cloud VMWare Solutions Shared based on VMWare Cloud Director
+# Airgap OpenShift Installation on IBM Cloud VMware Solutions Shared based on VMware Cloud Director
 ## Overview
-Deploy OpenShift on IBM Cloud VMWare Solutions based on VMWare Cloud Director.  This toolkit uses Terraform to automate the OpenShift installation process including the Edge Network configuration, Bastion host creation, OpenShift CoreOS bootstrap, loadbalancer, control and worker node creation. Once provisioned, the VMWare Cloud Director environment gives you complete control of all aspects of you OpenShift environment.
+Deploy OpenShift on IBM Cloud VMware Solutions based on VMware Cloud Director.  This toolkit uses Terraform to automate the OpenShift installation process including the Edge Network configuration, Bastion host creation, OpenShift CoreOS bootstrap, loadbalancer, control and worker node creation. Once provisioned, the VMware Cloud Director environment gives you complete control of all aspects of you OpenShift environment.
 
 This document helps you to configure "airgapped" clusters without Internet access.
 

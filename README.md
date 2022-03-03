@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [OpenShift Installation on IBM Cloud VMWare Solutions Shared based on VMWare Cloud Director](#openshift-installation-on-ibm-cloud-vmware-solutions-shared-based-on-vmware-cloud-director)
+- [OpenShift Installation on IBM Cloud VMware Solutions Shared based on VMware Cloud Director](#openshift-installation-on-ibm-cloud-vmware-solutions-shared-based-on-vmware-cloud-director)
   - [Overview](#overview)
   - [Architecture](#architecture)
   - [High Level Steps for setting up the cluster as online install](#high-level-steps-for-setting-up-the-cluster-as-online-install)
@@ -41,13 +41,13 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
-# OpenShift Installation on IBM Cloud VMWare Solutions Shared based on VMWare Cloud Director
+# OpenShift Installation on IBM Cloud VMware Solutions Shared based on VMware Cloud Director
 ## Overview
-Deploy OpenShift on IBM Cloud VMWare Solutions based on VMWare Cloud Director.  This toolkit uses Terraform to automate the OpenShift installation process including the Edge Network configuration, Bastion host creation, OpenShift CoreOS bootstrap, loadbalancer, control and worker node creation. Once provisioned, the VMWare Cloud Director environment gives you complete control of all aspects of you OpenShift environment.
+Deploy OpenShift on IBM Cloud VMware Solutions based on VMware Cloud Director.  This toolkit uses Terraform to automate the OpenShift installation process including the Edge Network configuration, Bastion host creation, OpenShift CoreOS bootstrap, loadbalancer, control and worker node creation. Once provisioned, the VMware Cloud Director environment gives you complete control of all aspects of you OpenShift environment.
 
 The toolkit provides the flexibility to also configure "airgapped" clusters without Internet access.
 
-See also [IBM Cloud VMWare Solutions Shared overview](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_overview)
+See also [IBM Cloud VMware Solutions Shared overview](https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_overview)
 
 This toolkit performs an OpenShift UPI type install and will provision CoreOS nodes using static IP addresses. The `ignition` module will inject code into the cluster that will automatically approve all node CSRs.  This runs only once at cluster creation.  You can delete the `ibm-post-deployment` namespace once your cluster is up and running.
 
@@ -186,15 +186,15 @@ Please follow these steps in sequence using the steps below, and come back here 
 You will order a **VMware Solutions Shared** instance in IBM Cloud(below).  When you order a new instance, a **DataCenter** is created in vCloud Director.  It takes about an hour.
 
 #### Procedure:
-* in IBM Cloud > VMWare > Overview,  select **VMWare Solutions Shared**
+* in IBM Cloud > VMware > Overview,  select **VMware Solutions Shared**
 * name your virtual data center
 * pick the resource group.  
 * agree to the terms and click `Create`
-* then in VMware Solutions > Resources you should see your VMWare Solutions Shared being created.  After an hour or less it will be **ready to use**You will need to edit terraform.tfvars as appropriate, setting up all the information necessary to create your cluster. You will need to set the vcd information as well as public ip's, etc. This file will eventually be copied to the newly created Bastion.
+* then in VMware Solutions > Resources you should see your VMware Solutions Shared being created.  After an hour or less it will be **ready to use**You will need to edit terraform.tfvars as appropriate, setting up all the information necessary to create your cluster. You will need to set the vcd information as well as public ip's, etc. This file will eventually be copied to the newly created Bastion.
 
 
 #### Initial VCD setup
-* Click on the VMWare Shared Solution instance named from the Resources list
+* Click on the VMware Shared Solution instance named from the Resources list
 * Set your admin password, and save it
 * Click the button to launch your  **vCloud Director console**
 * We recommend that you create individual Users/passwords for each person accessing the environment
@@ -361,7 +361,7 @@ storage_disk = 2097152
 ### Choosing an External IP  for your cluster and Bastion and retrieving the Red Hat Activation key
 Configure the Edge Service Gateway (ESG) to provide inbound and outbound connectivity.  For a network overview diagram, followed by general Edge setup instruction, see: https://cloud.ibm.com/docs/vmwaresolutions?topic=vmwaresolutions-shared_vcd-ops-guide#shared_vcd-ops-guide-create-network
 
-Each vCloud Datacenter comes with 5 IBM Cloud public IP addresses which we can use for SNAT and DNAT translations in and out of the datacenter instance.  VMWare vCloud calls these `sub-allocated` addresses.
+Each vCloud Datacenter comes with 5 IBM Cloud public IP addresses which we can use for SNAT and DNAT translations in and out of the datacenter instance.  VMware vCloud calls these `sub-allocated` addresses.
 The sub-allocated address are available in IBM Cloud on the vCloud instance Resources page.
 Gather the following information that you will need when configuring the ESG:
 * Make a `list of the IPs and Sub-allocated IP Addresses` for the ESG.   
