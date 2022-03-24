@@ -55,14 +55,16 @@ variable "total_node_count" {
 }
 
 variable "storage_fqdns" {
-  type = list(string)   
+  type = list(string)
 }
 
 variable "storage_count" {
   type = number
   default = 0
 }
-
+variable "compute_count" {
+  type = number
+}
 
 variable "fips" {
   type        = bool
@@ -108,7 +110,7 @@ variable "initialization_info" {
     public_bastion_ip      = string
     bastion_password       = string
     internal_bastion_ip    = string
-    terraform_ocp_repo     = string  
+    terraform_ocp_repo     = string
     rhel_key               = string
     machine_cidr           = string
     network_name           = string
