@@ -554,7 +554,7 @@ EOT
 ```
 
 ##### Debug
-**NOTE: If the cluster is ready, just run the `export KUBECONFIG` command found in your `<cluster_id>info.txt` from your bastion machine and continue to Step 3.4.**
+**NOTE: If the cluster is ready, just run the `export KUBECONFIG` command found in your `<cluster_id>info.txt` from your bastion machine and continue to [Step 3.4](#create-a-mirror-for-the-openshift-images).**
 
 Once you power on the machines it should take about 20 mins for your cluster to become active. To debug see **Debugging the OCP installation** below.
 
@@ -631,7 +631,7 @@ oc patch OperatorHub cluster --type json \
   -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
 ```
 
-Otherwise, follow the instructions in the doc [here](docs/airgap-cluster-setup.md#create-a-mirror-for-redhat-openshift-catalogs) to mirror them.
+Otherwise, follow the instructions in the the topic [Create a mirror for Redhat Openshift Catalogs](docs/airgap-cluster-setup.md#create-a-mirror-for-redhat-openshift-catalogs).
 
 #### Debugging the OCP installation
 
