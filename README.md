@@ -172,6 +172,7 @@ Please follow these steps in sequence using the steps below, and come back here 
   * [Step 3.1: Login to Bastion](#login-to-bastion)
   * [Step 3.2: Client setup](#client-setup)
   * [Step 3.3: Validating OpenShift cluster install completion](#validating-openshift-cluster-install-completion)
+  * [Step 3.4: Create a mirror for the Openshift Images](#create-a-mirror-for-the-openshift-images)
 * [Step 4: Debugging the OCP installation](#debugging-the-ocp-installation)
 * [Step 5: Post install cluster configuration](docs/airgap-cluster-setup.md#post-install-cluster-configuration)
   * [Step 5.1: Configure mirrored redhat operators catalog](docs/airgap-cluster-setup.md#configure-mirrored-redhat-operators-catalog)
@@ -551,6 +552,10 @@ EOT
 
 
 ```
+
+##### Debug
+**NOTE: If the cluster is ready, just run the `export KUBECONFIG` command found in your `<cluster_id>info.txt` from your bastion machine and continue to [Step 3.4](#create-a-mirror-for-the-openshift-images).**
+
 Once you power on the machines it should take about 20 mins for your cluster to become active. To debug see **Debugging the OCP installation** below.
 
 - power on all the VMs in the VAPP.
@@ -617,6 +622,17 @@ service-ca                                 4.5.22    True        False         F
 storage                                    4.5.22    True        False         False      53m
 
 ```
+
+#### Create a mirror for the Openshift Images
+Once you create your cluster, you may see that there are several pods in the openshift-marketplace namespace that are in the "ImagePullBackOff" state. If you do not need these catalogs, you can disable them by running the following command:
+
+```console
+oc patch OperatorHub cluster --type json \
+  -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
+```
+
+Otherwise, follow the instructions in the the topic [Create a mirror for Redhat Openshift Catalogs](docs/airgap-cluster-setup.md#create-a-mirror-for-redhat-openshift-catalogs).
+
 #### Debugging the OCP installation
 
 As noted above you power on all the VMs at once and magically OpenShift gets installed.  This section will explain enough of the magic so that you can figure out what happened when things go wrong. See Reference section below for deeper debug instructions
