@@ -259,8 +259,9 @@ resource "vcd_vapp_vm" "bastion" {
     vcd_nsxv_snat.snat_priv,
     vcd_nsxv_snat.snat_pub,
   ]
-  catalog_name  = var.vcd_catalog
-  template_name = var.initialization_info["bastion_template"]
+   catalog_name  = var.vcd_catalog
+   template_name = var.initialization_info["bastion_template"]
+#  vapp_template_id = var.vcd_catalog.var.initialization_info["bastion_template"]
   memory        = 8192
   cpus          = 2
   cpu_cores     = 1
