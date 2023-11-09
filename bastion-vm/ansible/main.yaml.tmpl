@@ -16,18 +16,18 @@
     # register the VM
     - name: Prepare RHEL host entitlement enablement
       shell: "rpm -ivh --replacepkgs http://52.117.132.7/pub/katello-ca-consumer-latest.noarch.rpm"
-      args:
-        warn: no
+     # args:
+     #   warn: no
     
     - name: Generate an uuidgen  
       shell: "uuidgen"
       register: uuid 
 
     - name: Set inputs by RHEL host entitlement enablement
-      shell: "echo '{\"dmi.system.uuid\":\"{{uuid.stdout}}\"}' > /etc/rhsm/facts/uuid_override.facts"
+      ansible.builtin.shell: echo '{dmi.system.uuid:{{uuid.stdout}}}' > /etc/rhsm/facts/uuid_override.facts
     
     - name: enable RHEL host entitlement
-      shell: "subscription-manager register --org=\"customer\" --activationkey=\"${rhel_key}\" --force"
+      ansible.builtin.shell: subscription-manager register --org=customer --activationkey=${rhel_key} --force
       
     # Upgrade all packages
     - name: Upgrade all packages
@@ -75,13 +75,15 @@
           - ansible
           - podman
           - docker
+          - gcc
+          - python3-pip
         state: latest
 
  # install install vcd-cli
     - name: install vcd-cli
-      shell: "pip3 install vcd-cli"
-      args:
-        warn: no         
+      ansible.builtin.shell: pip3 install vcd-cli
+ #     args:
+ #       warn: no         
 
 
     # nginx as http server
@@ -119,7 +121,7 @@
  
  # terraform cli
     - name: add terraform repo 
-      shell: "yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo"
+      ansible.builtin.shell: yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
 
     - name: install terraform
       yum:
