@@ -60,9 +60,9 @@
         enabled: yes
   # install install epel
     - name: install epel
-      shell: "yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
-      args:
-        warn: no         
+      ansible.builtin.shell: "yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
+     # args:
+     #   warn: no         
 
  # install additional tools
     - name: install tools
