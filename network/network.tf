@@ -176,13 +176,13 @@ resource "vcd_nsxv_dnat" "dnat" {
          
  %{if var.airgapped["enabled"]}
     - name: Copy Mirror Cert for trust
-      shell: "cp ${var.additionalTrustBundle} /etc/pki/ca-trust/source/anchors/."
-      args:
-        warn: no  
+      ansible.builtin.shell: "cp ${var.additionalTrustBundle} /etc/pki/ca-trust/source/anchors/."
+#      args:
+#        warn: no  
     - name: Update trust cert store for mirror ca
-      shell: "update-ca-trust"
-      args:
-        warn: no          
+      ansible.builtin.shell: "update-ca-trust"
+#      args:
+#        warn: no          
  %{endif}       
 EOF
 }

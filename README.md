@@ -57,6 +57,8 @@ This toolkit performs an OpenShift UPI type install and will provision CoreOS no
 
 **Change History:**
 
+  -   11/29/2023:
+      -  changes to fix issues with changes introduced by ansible 2.15    
   -   10/11/2021:
       -  added code to support minimal cluster. If you set compute_count=0 then install will set masters schedulable
   - 6/25/2021:
